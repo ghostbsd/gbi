@@ -6,7 +6,7 @@
 #
 # install.py v 0.4 Thursday, March 28 2013 19:54 Eric Turgeon
 #
-# install.py give the job to pc-sysinstall to install GhostBSD.
+# install.py gives the job to pc-sysinstall to install GhostBSD.
 
 import gtk
 import gobject
@@ -31,7 +31,7 @@ def close_application(self, widget):
 
 
 def read_output(command, window, probar):
-    probar.set_text("Installation start in progres")
+    probar.set_text("Installation start in progress")
     sleep(2)
     p = Popen(command, shell=True, stdin=PIPE, stdout=PIPE,
     stderr=STDOUT, close_fds=True)

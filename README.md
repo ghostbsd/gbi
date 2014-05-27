@@ -1,4 +1,4 @@
 gbi
 ===
 
-GBI is the graphic inter face for pc-sysinstall and its is the install of GhostBSD
+GBI is the graphic interface for pc-sysinstall and it is the installer for GhostBSD.

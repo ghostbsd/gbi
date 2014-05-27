@@ -31,8 +31,8 @@ disk_list = '%sdisk-list.sh' % query
 FIN = """ Installation is complete. You need to restart the
  computer in order to use the new installation.
  You can continue to use this live CD, although
- any changes you make or document you save will
- not be preserved."""
+ any changes you make or documents you save will
+ not be preserved on reboot."""
 
 # Erasing the file after a restart of the installer.
 if os.path.exists(CFG):
