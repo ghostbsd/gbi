@@ -66,7 +66,7 @@ class users:
             Popen(to_cfg, shell=True)
             gtk.main_quit()
         else:
-            msg = "The password of %s Mismatch; Try again!" % self.user.get_text()
+            msg = "The entered passwords for %s don't match. Try again!" % self.user.get_text()
             self.label3.set_text(msg)
 
     def on_shell(self, widget):

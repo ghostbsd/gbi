@@ -31,7 +31,7 @@ def close_application(self, widget):
 
 
 def read_output(command, window, probar):
-    probar.set_text("Installation start in progress")
+    probar.set_text("Starting installation")
     sleep(2)
     p = Popen(command, shell=True, stdin=PIPE, stdout=PIPE,
     stderr=STDOUT, close_fds=True)

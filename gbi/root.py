@@ -62,7 +62,7 @@ class users:
             Popen(to_user, shell=True)
             gtk.main_quit()
         else:
-            self.label3.set_text("The root password Mismatch; Try again!")
+            self.label3.set_text("The entered passwords don't match. Try again!")
 
     def on_check(self, widget):
         if widget.get_active():
@@ -106,7 +106,7 @@ class users:
         box1.pack_start(box2, False, False, 10)
         box2.show()
         # title.
-        ttext = "Administrator(root) Password"
+        ttext = "Administrator (root) Password"
         Title = gtk.Label("<b><span size='xx-large'>%s</span></b>" % ttext)
         Title.set_use_markup(True)
         box2.pack_start(Title, False, False, 10)
@@ -131,7 +131,7 @@ class users:
         label = gtk.Label('<b><span size="xx-large">Boot Option</span></b>')
         label.set_use_markup(True)
         box2.pack_start(label, True, True, 20)
-        check = gtk.CheckButton("Install BSD Boot loader")
+        check = gtk.CheckButton("Install BSD Boot Loader")
         check.connect("toggled", self.on_check)
         self.boot = 'none'
         boot = open(boot_file, 'w')
