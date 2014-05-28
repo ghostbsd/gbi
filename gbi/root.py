@@ -62,7 +62,7 @@ class users:
             Popen(to_user, shell=True)
             gtk.main_quit()
         else:
-            self.label3.set_text("The entered passwords don't match. Try again!")
+            self.label3.set_text("Password and password confirmation don't match. Try again!")
 
     def on_check(self, widget):
         if widget.get_active():
