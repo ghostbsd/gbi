@@ -308,7 +308,7 @@ class Ginstall:
                 cfg.writelines('rootPass=%s\n' % RPASS)
                 break
             else:
-                print "password and password confirmation don't match"
+                print "Password and password confirmation don't match"
                 sleep(1)
 
     # User setting.
@@ -324,7 +324,7 @@ class Ginstall:
                 cfg.writelines('userPass=%s\n' % UPASS)
                 break
             else:
-                print "password and password confirmation don't match"
+                print "Password and password confirmation don't match"
                 sleep(1)
 
         SHELL = raw_input("Shell(sh csh, tcsh, bash, rbash)- if you don't know just press Enter: ")
