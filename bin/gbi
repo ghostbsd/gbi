@@ -1,3 +1,0 @@
-#!/bin/sh
-
-sudo python /usr/local/etc/gbi/language.py
