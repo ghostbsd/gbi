@@ -41,7 +41,7 @@ def read_output(window, probar):
     if os.path.exists(tmp + 'destroy'):
         #new_val = probar.get_fraction() + 0.3
         probar.set_fraction(0.3)
-        probar.set_text("Creating partition table")
+        probar.set_text("Creating new disk with partitions")
         destroyParttion()
         sleep(5)
     # create partition

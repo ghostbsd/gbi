@@ -238,7 +238,7 @@ class Ginstall:
                         print '3: UFS+J'
                         print '4: ZFS'
                         print '5: SWAP'
-                        FS = raw_input("Chose an File System(1, 2, 3, 4 or 5): ")
+                        FS = raw_input("Choose an File System(1, 2, 3, 4 or 5): ")
                         if FS == '1':
                             FSYS = 'UFS'
                         elif FS == '2':
@@ -308,7 +308,7 @@ class Ginstall:
                 cfg.writelines('rootPass=%s\n' % RPASS)
                 break
             else:
-                print "Password and password confirmation don't match"
+                print "Password and password confirmation don't match. Try again!"
                 sleep(1)
 
     # User setting.
@@ -324,7 +324,7 @@ class Ginstall:
                 cfg.writelines('userPass=%s\n' % UPASS)
                 break
             else:
-                print "Password and password confirmation don't match"
+                print "Password and password confirmation don't match. Try again!"
                 sleep(1)
 
         SHELL = raw_input("Shell(sh csh, tcsh, bash, rbash)- if you don't know just press Enter: ")

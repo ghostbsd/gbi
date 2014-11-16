@@ -11,8 +11,6 @@ if not os.path.exists(tmp):
     os.makedirs(tmp)
 installer = "/usr/local/etc/gbi/"
 partitiondb = "%spartitiondb/" % tmp
-if not os.path.exists(partitiondb):
-    os.makedirs(partitiondb)
 query = "sh /usr/local/etc/gbi/backend-query/"
 query_disk = '%sdisk-list.sh' % query
 detect_sheme = '%sdetect-sheme.sh' % query
@@ -104,10 +102,13 @@ def slicePartition(part):
 
 class diskSchemeChanger():
 
-    def __init__(self, schm, path):
+    def __init__(self, schm, path, disk, size):
         dlist = disk_query()
         dselected = dlist[path[0]]
-        dselected[-1] = schm
+        if schm is None:
+            dselected[-1] = 'GPT'
+        else:
+            dselected[-1] = schm
         dlist[path[0]] = dselected
         disk = dselected[0]
         df = open(diskdb, 'wb')
@@ -123,6 +124,14 @@ class diskSchemeChanger():
         cf = open(tmp + 'destroy', 'wb')
         pickle.dump(mdsl, cf)
         cf.close()
+        if not os.path.exists(partitiondb + disk):
+            plist = []
+            mplist = []
+            psf = open(partitiondb + disk, 'wb')
+            plist.extend((['freespace', size, '', '']))
+            mplist.append(plist)
+            pickle.dump(mplist, psf)
+            psf.close()
 
 
 class partition_repos():
@@ -207,6 +216,8 @@ class partition_repos():
         psf.close()
 
     def __init__(self):
+        if not os.path.exists(partitiondb):
+            os.makedirs(partitiondb)
         df = open(diskdb, 'wb')
         dlist = []
         mdlist = []
@@ -218,6 +229,9 @@ class partition_repos():
             elif self.find_Scheme(disk[0]) == "MBR":
                 dlist.extend(([disk[0], self.disk_size(disk[0]), '', 'MBR']))
                 self.mbr_partition_slice_list(disk[0])
+                mdlist.append(dlist)
+            else:
+                dlist.extend(([disk[0], self.disk_size(disk[0]), '', None]))
                 mdlist.append(dlist)
             dlist = []
         pickle.dump(mdlist, df)
@@ -236,6 +250,20 @@ class Delete_partition():
         ll = pickle.load(llist)
         last_num = len(ll) - 1
         lnum = path[2]
+        # See if partlable exist to delete partiton
+        if os.path.exists(Part_label):
+            p_file = open(Part_label, 'r')
+            pf = p_file.readlines()
+            pnum = len(pf)
+            # Look if or more item.
+            if pnum == 1:
+                os.remove(Part_label)
+            else:
+                pfile = open(Part_label, 'w')
+                pf.pop(lnum)
+                for line in pf:
+                    pfile.writelines('%s' % line)
+                pfile.close()
         if last_num == lnum:
             free = int_size(ll[last_num][1])
             if lnum != 0 and ll[lnum - 1][0] == 'freespace':
@@ -276,22 +304,32 @@ class Delete_partition():
             self.delete_slice(drive, part, path)
 
     def delete_slice(self, drive, part, path):
-        slist = open(partitiondb + drive, 'r')
+        slist = open(partitiondb + drive, 'rb')
         sl = pickle.load(slist)
         last_num = len(sl) - 1
         snum = path[1]
+        if os.path.exists(dslice):
+            sfile = open(dslice, 'r')
+            slf = sfile.readlines()[0].rstrip()
+            slnum = int(re.sub("[^0-9]", "", slf))
+            ptnum = snum - slnum
+        if os.path.exists(Part_label):
+            p_file = open(Part_label, 'r')
+            pf = p_file.readlines()
+            pnum = len(pf)
+            # Look if one or more item.
+            if 's' in part:
+                os.remove(Part_label)
+            elif pnum == 1:
+                os.remove(Part_label)
+            else:
+                pfile = open(Part_label, 'w')
+                pf.pop(ptnum)
+                for line in pf:
+                    pfile.writelines('%s' % line)
+                pfile.close()
         if last_num == snum:
             free = int_size(sl[last_num][1])
-            dl = []
-            mdl = []
-            if os.path.exists(tmp + 'delete'):
-                df = open(tmp + 'delete', 'rb')
-                mdl = pickle.load(df)
-            dl.extend(([part, free]))
-            mdl.append(dl)
-            cf = open(tmp + 'delete', 'wb')
-            pickle.dump(mdl, cf)
-            cf.close()
             if snum != 0 and sl[snum - 1][0] == 'freespace':
                 free = free + int_size(sl[snum - 1][1])
                 sl[snum] = ['freespace', free, '', '']
@@ -300,32 +338,12 @@ class Delete_partition():
                 sl[snum] = ['freespace', free, '', '']
         elif snum == 0:
             free = int_size(sl[snum][1])
-            dl = []
-            mdl = []
-            if os.path.exists(tmp + 'delete'):
-                df = open(tmp + 'delete', 'rb')
-                mdl = pickle.load(df)
-            dl.extend(([part, free]))
-            mdl.append(dl)
-            cf = open(tmp + 'delete', 'wb')
-            pickle.dump(mdl, cf)
-            cf.close()
             if sl[snum + 1][0] == 'freespace':
                 free = free + int_size(sl[snum + 1][1])
                 sl.remove(sl[snum + 1])
             sl[snum] = ['freespace', free, '', '']
         else:
             free = int_size(sl[snum][1])
-            dl = []
-            mdl = []
-            if os.path.exists(tmp + 'delete'):
-                df = open(tmp + 'delete', 'rb')
-                mdl = pickle.load(df)
-            dl.extend(([part, free]))
-            mdl.append(dl)
-            cf = open(tmp + 'delete', 'wb')
-            pickle.dump(mdl, cf)
-            cf.close()
             if sl[snum + 1][0] == 'freespace':
                 free = free + int_size(sl[snum + 1][1])
                 sl.remove(sl[snum + 1])
@@ -335,6 +353,24 @@ class Delete_partition():
                 sl.remove(sl[snum - 1])
             else:
                 sl[snum] = ['freespace', free, '', '']
+        # Making delete file
+        dl = []
+        mdl = []
+        data = True
+        # if delete exist chek if slice is in delete.
+        if os.path.exists(tmp + 'delete'):
+            df = open(tmp + 'delete', 'rb')
+            mdl = pickle.load(df)
+            for line in mdl:
+                if part in line:
+                    data = False
+                    break
+        if data is True:
+            dl.extend(([part, free]))
+            mdl.append(dl)
+            cf = open(tmp + 'delete', 'wb')
+            pickle.dump(mdl, cf)
+            cf.close()
         if os.path.exists(partitiondb + part):
             os.remove(partitiondb + part)
         saveps = open(partitiondb + drive, 'w')
@@ -395,7 +431,8 @@ class autoDiskPartition():
         if schm == 'GPT':
             self.create_gpt_partiton(disk, size)
         elif schm == 'MBR':
-            self.delete_mbr_partition(disk)
+            if os.path.exists(partitiondb + disk):
+                self.delete_mbr_partition(disk)
             self.create_mbr_partiton(disk, size)
 
     def create_gpt_partiton(self, disk, size):
@@ -414,19 +451,25 @@ class autoDiskPartition():
         stderr=STDOUT, close_fds=True)
         mem = ram.stdout.read()
         swap = int(mem.partition(':')[2].strip()) / (1024 * 1024)
+        bnum = 1
         rootNum = number - swap
+        rnum = rootNum - bnum
         plist = []
         mplist = []
         plf = open(partitiondb + disk, 'wb')
-        plist.extend(([disk + 'p1', number, '/', 'freebsd-ufs']))
+        plist.extend(([disk + 'p1', bnum, 'none', 'freebsd-boot']))
         mplist.append(plist)
         plist = []
-        plist.extend(([disk + 'p2', swap, 'none', 'freebsd-swap']))
+        plist.extend(([disk + 'p2', rnum, '/', 'freebsd-ufs']))
+        mplist.append(plist)
+        plist = []
+        plist.extend(([disk + 'p3', swap, 'none', 'freebsd-swap']))
         mplist.append(plist)
         pickle.dump(mplist, plf)
         plf.close()
         pfile = open(Part_label, 'w')
-        pfile.writelines('UFS+SUJ %s /\n' % rootNum)
+        pfile.writelines('BOOT %s none\n' % bnum)
+        pfile.writelines('UFS+SUJ %s /\n' % rnum)
         pfile.writelines('SWAP 0 none\n')
         pfile.close()
 
@@ -527,6 +570,7 @@ class autoFreeSpace():
         pickle.dump(mplist, plf)
         plf.close()
         pfile = open(Part_label, 'w')
+        pfile.writelines('BOOT %s /\n' % bs)
         pfile.writelines('UFS+SUJ %s /\n' % rootNum)
         pfile.writelines('SWAP 0 none\n')
         pfile.close()
@@ -544,13 +588,18 @@ class createLabel():
 
     def __init__(self, path, lnumb, cnumb, lb, fs, data):
         disk = disk_query()[path[0]][0]
-        #schm = disk_query()[path[0]][3]
+        if not os.path.exists(disk_file):
+            file_disk = open(disk_file, 'w')
+            file_disk.writelines('%s\n' % disk)
+            file_disk.close()
         sl = path[1] + 1
         lv = path[2]
-        #slice_file = open(dslice, 'w')
-        #slice_file.writelines('s%s\n' % sl)
-        #slice_file.writelines('%s\n' % number)
-        #slice_file.close()
+        sfile = open(part_schem, 'w')
+        sfile.writelines('partscheme=MBR')
+        sfile.close()
+        slice_file = open(dslice, 'w')
+        slice_file.writelines('s%s\n' % sl)
+        slice_file.close()
         alph = ord('a')
         alph += lv
         letter = chr(alph)
@@ -583,13 +632,15 @@ class createSlice():
         file_disk = open(disk_file, 'w')
         file_disk.writelines('%s\n' % disk)
         file_disk.close()
-        sl = path[1] + 1
+        if len(path) == 1:
+            sl = 1
+        else:
+            sl = path[1] + 1
         sfile = open(part_schem, 'w')
         sfile.writelines('partscheme=MBR')
         sfile.close()
         slice_file = open(dslice, 'w')
         slice_file.writelines('s%s\n' % sl)
-        #slice_file.writelines('%s\n' % number)
         slice_file.close()
         plist = partition_query(disk)
         pslice = '%ss%s' % (disk, path[1] + 1)
@@ -629,8 +680,12 @@ class createPartition():
             file_disk = open(disk_file, 'w')
             file_disk.writelines('%s\n' % disk)
             file_disk.close()
-        pl = path[1] + 1
-        lv = path[1]
+        if len(path) == 1:
+            pl = 1
+            lv = 0
+        else:
+            pl = path[1] + 1
+            lv = path[1]
         if not os.path.exists(part_schem):
             sfile = open(part_schem, 'w')
             sfile.writelines('partscheme=GPT')
@@ -661,13 +716,13 @@ class createPartition():
         pfile.writelines('%s %s %s\n' % (fs, cnumb, lb))
         pfile.close()
         if data is True:
-            pl = []
-            mpl = []
+            plst = []
+            mplst = []
             if not os.path.exists(tmp + 'create'):
-                pl.extend(([pslice, cnumb]))
-                mpl.append(pl)
+                plst.extend(([pslice, cnumb]))
+                mplst.append(plst)
                 cf = open(tmp + 'create', 'wb')
-                pickle.dump(mpl, cf)
+                pickle.dump(mplst, cf)
                 cf.close()
 
 

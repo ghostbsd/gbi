@@ -71,7 +71,10 @@ class Entire():
             value3 = model.get_value(tree_iter, 2)
         self.disk = value
         self.size = value2
-        self.schm = value3
+        if value3 is None:
+            self.schm = 'GPT'
+        else:
+            self.schm = value3
         sfile = open(part_schem, 'w')
         sfile.writelines('partscheme=%s' % self.schm)
         sfile.close()
@@ -83,7 +86,8 @@ class Entire():
         slice_file.writelines('all\n')
         #slice_file.writelines('%s\n' % NUMBER)
         slice_file.close()
-        ram = Popen(memory, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
+        ram = Popen(memory, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT,
+        close_fds=True)
         mem = ram.stdout.read()
         SWAP = int(mem.partition(':')[2].strip()) / (1024 * 1024)
         NUM1 = NUMBER - SWAP

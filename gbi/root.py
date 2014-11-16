@@ -62,7 +62,7 @@ class users:
             Popen(to_user, shell=True)
             gtk.main_quit()
         else:
-            self.label3.set_text("Password and password confirmation don't match. Try again!")
+            self.label3.set_text("Password and password confirmation for root don't match. Try again!")
 
     def on_check(self, widget):
         if widget.get_active():
@@ -106,12 +106,12 @@ class users:
         box1.pack_start(box2, False, False, 10)
         box2.show()
         # title.
-        ttext = "Administrator (root) Password"
+        ttext = "Administrator(root) Password"
         Title = gtk.Label("<b><span size='xx-large'>%s</span></b>" % ttext)
         Title.set_use_markup(True)
         box2.pack_start(Title, False, False, 10)
         # password for root.
-        label = gtk.Label('<b>Administrator(root) Password</b>')
+        label = gtk.Label('<b>Administrator (root) Password</b>')
         label.set_use_markup(True)
         label.set_alignment(.4, .2)
         table = gtk.Table(1, 3, True)

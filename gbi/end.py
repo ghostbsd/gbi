@@ -10,7 +10,7 @@ lyrics = """Installation is complete. You need to restart the
 computer in order to use the new installation.
 You can continue to use this live media, although
 any changes you make or documents you save will
-not be preserved."""
+not be preserved on reboot."""
 
 
 class PyApp(gtk.Window):
