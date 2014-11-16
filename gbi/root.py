@@ -43,8 +43,8 @@ import pickle
 
 # Directory use from the installer.
 tmp = "/home/ghostbsd/.gbi/"
-installer = "/usr/local/etc/gbi/"
-query = "sh /usr/local/etc/gbi/backend-query/"
+installer = "/usr/local/lib/gbi/"
+query = "sh /usr/local/lib/gbi/backend-query/"
 if not os.path.exists(tmp):
     os.makedirs(tmp)
 to_user = 'python %suser.py' % installer
@@ -97,7 +97,7 @@ class users:
         window.set_title("GhostBSD Installer")
         window.set_border_width(10)
         window.set_position(gtk.WIN_POS_CENTER)
-        window.set_icon_from_file("/usr/local/etc/gbi/logo.png")
+        window.set_icon_from_file("/usr/local/lib/gbi/logo.png")
         box1 = gtk.VBox(False, 0)
         window.add(box1)
         box1.show()

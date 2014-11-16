@@ -18,7 +18,7 @@ from partition_handler import rDeleteParttion, destroyParttion, makingParttion
 from subprocess import Popen
 
 tmp = "/home/ghostbsd/.gbi/"
-installer = "/usr/local/etc/gbi/"
+installer = "/usr/local/lib/gbi/"
 sysinstall = "pc-sysinstall"
 to_root = 'python %sroot.py' % installer
 
@@ -59,7 +59,7 @@ def read_output(window, probar):
 
 
 class Installs():
-    default_site = "/usr/local/etc/gbi/slides/welcome.html"
+    default_site = "/usr/local/lib/gbi/slides/welcome.html"
 
     def close_application(self, widget):
         gtk.main_quit()
@@ -72,7 +72,7 @@ class Installs():
         window.set_resizable(False)
         window.set_border_width(0)
         window.set_position(gtk.WIN_POS_CENTER)
-        window.set_icon_from_file("/usr/local/etc/gbi/logo.png")
+        window.set_icon_from_file("/usr/local/lib/gbi/logo.png")
         box1 = gtk.VBox(False, 0)
         window.add(box1)
         box1.show()

@@ -45,13 +45,13 @@ from defutil import close_application, language_bbox
 
 # Folder use for the installer.
 tmp = "/home/ghostbsd/.gbi/"
-installer = "/usr/local/etc/gbi/"
-query = "sh /usr/local/etc/gbi/backend-query/"
+installer = "/usr/local/lib/gbi/"
+query = "sh /usr/local/lib/gbi/backend-query/"
 if not os.path.exists(tmp):
     os.makedirs(tmp)
 
-sysinstall = "sh /usr/local/etc/gbi/pc-sysinstall"
-logo = "/usr/local/etc/gbi/logo.png"
+sysinstall = "sh /usr/local/lib/gbi/pc-sysinstall"
+logo = "/usr/local/lib/gbi/logo.png"
 language = "%slanguage/avail-langs" % installer
 langfile = '%slanguage' % tmp
 

@@ -45,12 +45,12 @@ from partition_handler import disk_query
 
 # Folder use pr the installer.
 tmp = "/home/ghostbsd/.gbi/"
-installer = "/usr/local/etc/gbi/"
-query = "sh /usr/local/etc/gbi/backend-query/"
+installer = "/usr/local/lib/gbi/"
+query = "sh /usr/local/lib/gbi/backend-query/"
 if not os.path.exists(tmp):
     os.makedirs(tmp)
 
-logo = "/usr/local/etc/gbi/logo.png"
+logo = "/usr/local/lib/gbi/logo.png"
 memory = 'sysctl hw.physmem'
 auto = '%sauto' % tmp
 disk_info = '%sdisk-info.sh' % query
@@ -104,7 +104,7 @@ class Entire():
         window.set_title("GhostBSD Installer")
         window.set_border_width(0)
         window.set_position(gtk.WIN_POS_CENTER)
-        window.set_icon_from_file("/usr/local/etc/gbi/logo.png")
+        window.set_icon_from_file("/usr/local/lib/gbi/logo.png")
         box1 = gtk.VBox(False, 0)
         window.add(box1)
         box1.show()

@@ -9,9 +9,9 @@ import pickle
 tmp = "/home/ghostbsd/.gbi/"
 if not os.path.exists(tmp):
     os.makedirs(tmp)
-installer = "/usr/local/etc/gbi/"
+installer = "/usr/local/lib/gbi/"
 partitiondb = "%spartitiondb/" % tmp
-query = "sh /usr/local/etc/gbi/backend-query/"
+query = "sh /usr/local/lib/gbi/backend-query/"
 query_disk = '%sdisk-list.sh' % query
 detect_sheme = '%sdetect-sheme.sh' % query
 diskdb = "%sdisk" % partitiondb

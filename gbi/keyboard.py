@@ -45,14 +45,14 @@ from defutil import Keyboard_bbox, close_application
 
 # Folder use for the installer.
 tmp = "/home/ghostbsd/.gbi/"
-installer = "/usr/local/etc/gbi/"
-query = "sh /usr/local/etc/gbi/backend-query/"
+installer = "/usr/local/lib/gbi/"
+query = "sh /usr/local/lib/gbi/backend-query/"
 if not os.path.exists(tmp):
     os.makedirs(tmp)
 
-logo = "/usr/local/etc/gbi/logo.png"
-xkeyboard_variant = "/usr/local/etc/gbi/keyboard/variant"
-xkeyboard_layout = "/usr/local/etc/gbi/keyboard/layout"
+logo = "/usr/local/lib/gbi/logo.png"
+xkeyboard_variant = "/usr/local/lib/gbi/keyboard/variant"
+xkeyboard_layout = "/usr/local/lib/gbi/keyboard/layout"
 layout = '%slayout' % tmp
 variant = '%svariant' % tmp
 

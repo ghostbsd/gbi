@@ -39,7 +39,7 @@ import shutil
 
 # installer python script path
 tmp = "/home/ghostbsd/.gbi/"
-installer = "/usr/local/etc/gbi/"
+installer = "/usr/local/lib/gbi/"
 time = '%stimezone' % tmp
 signal = '%ssignal' % tmp
 disk_schem = '%sscheme' % tmp

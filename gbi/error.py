@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/local/bin/python
 # Copyright (c) 2011 GhostBSD
 #
 # See COPYING for licence terms.
@@ -27,7 +27,7 @@ class PyApp:
         window.set_border_width(8)
         window.connect("destroy", gtk.main_quit)
         window.set_title("Installation Error")
-        #window.set_icon_from_file("/usr/local/etc/gbi/logo.png")
+        # window.set_icon_from_file("/usr/local/lib/gbi/logo.png")
         box1 = gtk.VBox(False, 0)
         window.add(box1)
         box1.show()

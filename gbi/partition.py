@@ -47,8 +47,8 @@ from partition_handler import diskSchemeChanger, createSlice, createPartition
 
 # Folder use pr the installer.
 tmp = "/home/ghostbsd/.gbi/"
-installer = "/usr/local/etc/gbi/"
-query = "sh /usr/local/etc/gbi/backend-query/"
+installer = "/usr/local/lib/gbi/"
+query = "sh /usr/local/lib/gbi/backend-query/"
 if not os.path.exists(tmp):
     os.makedirs(tmp)
 
@@ -65,7 +65,7 @@ disk_label = '%sdisk-label.sh' % query
 disk_schem = '%sscheme' % tmp
 disk_file = '%sdisk' % tmp
 psize = '%spart_size' % tmp
-logo = "/usr/local/etc/gbi/logo.png"
+logo = "/usr/local/lib/gbi/logo.png"
 Part_label = '%spartlabel' % tmp
 part_schem = '%sscheme' % tmp
 partitiondb = "%spartitiondb/" % tmp
@@ -230,7 +230,7 @@ class Partitions():
         self.window.set_border_width(0)
         self.window.set_position(gtk.WIN_POS_CENTER)
         self.window.set_size_request(400, 150)
-        self.window.set_icon_from_file("/usr/local/etc/gbi/logo.png")
+        self.window.set_icon_from_file("/usr/local/lib/gbi/logo.png")
         box1 = gtk.VBox(False, 0)
         self.window.add(box1)
         box1.show()
@@ -284,7 +284,7 @@ class Partitions():
         self.window.set_border_width(0)
         self.window.set_position(gtk.WIN_POS_CENTER)
         self.window.set_size_request(400, 150)
-        self.window.set_icon_from_file("/usr/local/etc/gbi/logo.png")
+        self.window.set_icon_from_file("/usr/local/lib/gbi/logo.png")
         box1 = gtk.VBox(False, 0)
         self.window.add(box1)
         box1.show()
@@ -431,7 +431,7 @@ class Partitions():
         window.set_title("GhostBSD Installer")
         window.set_border_width(0)
         window.set_position(gtk.WIN_POS_CENTER)
-        window.set_icon_from_file("/usr/local/etc/gbi/logo.png")
+        window.set_icon_from_file("/usr/local/lib/gbi/logo.png")
         box1 = gtk.VBox(False, 0)
         window.add(box1)
         box1.show()

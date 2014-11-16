@@ -16,13 +16,13 @@ from partition_handler import partition_repos
 
 # Folder use pr the installer.
 tmp = "/home/ghostbsd/.gbi/"
-installer = "/usr/local/etc/gbi/"
-query = "sh /usr/local/etc/gbi/backend-query/"
+installer = "/usr/local/lib/gbi/"
+query = "sh /usr/local/etc/lib/backend-query/"
 if not os.path.exists(tmp):
     os.makedirs(tmp)
 
-sysinstall = "sh /usr/local/etc/gbi/pc-sysinstall"
-logo = "/usr/local/etc/gbi/logo.png"
+sysinstall = "sh /usr/local/lib/gbi/pc-sysinstall"
+logo = "/usr/local/lib/gbi/logo.png"
 disk_file = '%sdisk' % tmp
 boot_file = '%sboot' % tmp
 signal = '%ssignal' % tmp

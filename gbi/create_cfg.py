@@ -13,7 +13,7 @@ from subprocess import Popen
 
 # Directory use from the installer.
 tmp = "/home/ghostbsd/.gbi/"
-installer = "/usr/local/etc/gbi/"
+installer = "/usr/local/lib/gbi/"
 start_Install = 'python %sinstall.py' % installer
 # Installer data file.
 disk = '%sdisk' % tmp
@@ -66,7 +66,7 @@ class cfg_data():
         t_output = time.readlines()[0].strip()
         f.writelines('\n# Timezone\n')
         f.writelines('timeZone=%s\n' % t_output)
-        #f.writelines('enableNTP=yes\n')
+        # f.writelines('enableNTP=yes\n')
         os.remove(timezone)
     # Disk Setup
     r = open(disk, 'r')

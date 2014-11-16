@@ -43,13 +43,13 @@ import os
 from defutil import time_bbox, close_application
 # Folder use for the installer.
 tmp = "/home/ghostbsd/.gbi/"
-installer = "/usr/local/etc/gbi/"
+installer = "/usr/local/lib/gbi/"
 if not os.path.exists(tmp):
     os.makedirs(tmp)
 
-logo = "/usr/local/etc/gbi/logo.png"
+logo = "/usr/local/lib/gbi/logo.png"
 back = 'python %sgbi_keyboard.py' % installer
-logo = "/usr/local/etc/gbi/logo.png"
+logo = "/usr/local/lib/gbi/logo.png"
 continent = '%s/timezone/continent' % installer
 city = '%s/timezone/city/' % installer
 time = '%stimezone' % tmp
