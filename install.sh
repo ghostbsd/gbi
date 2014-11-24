@@ -23,7 +23,7 @@ cp -f gbi.desktop ${LOCALBASE}/share/applications/gbi.desktop
 
 # Install the executable
 if [ ! -d "${LOCALBASE}/bin" ] ; then
-  mkdir ${LOCALBASE}/bin
+  mkdir -p ${LOCALBASE}/bin
 fi
 
 cp bin/gbi.sh ${LOCALBASE}/bin/gbi
