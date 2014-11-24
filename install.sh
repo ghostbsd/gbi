@@ -15,7 +15,7 @@ mkdir -p ${LOCALBASE}/lib/gbi
 # Copy gbi file  
 cp -r gbi/* ${LOCALBASE}/lib/gbi
 
-if [ ! -d "${LOCALBASE}/share/applications" ]
+if [ ! -d "${LOCALBASE}/share/applications" ] ; then
   mkdir -p ${LOCALBASE}/share/applications
 fi
 
