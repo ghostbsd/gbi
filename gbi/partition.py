@@ -516,7 +516,7 @@ class Partitions():
         self.store.clear()
         for disk in disk_query():
             shem = disk[-1]
-            piter = self.storxe.append(None, [disk[0],
+            piter = self.store.append(None, [disk[0],
                                             disk[1], disk[2], disk[3], True])
             if shem == "GPT":
                 for pi in partition_query(disk[0]):
