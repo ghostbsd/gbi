@@ -19,7 +19,7 @@ from time import sleep
 from partition_handler import rDeleteParttion, destroyParttion, makingParttion
 
 tmp = "/home/ghostbsd/.gbi/"
-gbi_path = "/usr/local/etc/gbi/"
+gbi_path = "/usr/local/lib/gbi/"
 sysinstall = "pc-sysinstall"
 
 encoding = locale.getpreferredencoding()
@@ -81,7 +81,7 @@ def read_output(command, window, probar):
 
 
 class Installs():
-    default_site = "/usr/local/etc/gbi/slides/welcome.html"
+    default_site = "/usr/local/lib/gbi/slides/welcome.html"
 
     def close_application(self, widget):
         gtk.main_quit()
@@ -94,7 +94,7 @@ class Installs():
         window.set_resizable(False)
         window.set_border_width(0)
         window.set_position(gtk.WIN_POS_CENTER)
-        window.set_icon_from_file("/usr/local/etc/gbi/logo.png")
+        window.set_icon_from_file("/usr/local/lib/gbi/logo.png")
         box1 = gtk.VBox(False, 0)
         window.add(box1)
         box1.show()
