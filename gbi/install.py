@@ -61,8 +61,6 @@ def read_output(command, window, probar):
               stderr=STDOUT, close_fds=True)
     while 1:
         line = p.stdout.readline()
-        if not line:
-            break
         new_val = probar.get_fraction() + 0.000002
         probar.set_fraction(new_val)
         bartext = line
@@ -71,6 +69,8 @@ def read_output(command, window, probar):
         filer.writelines(bartext)
         filer.close
         print(bartext)
+        if bartext == "Installation finished!":
+            break
     probar.set_fraction(1.0)
     if bartext.rstrip() == "Installation finished!":
         call('python %send.py' % gbi_path, shell=True, close_fds=True)
@@ -120,6 +120,7 @@ class Installs():
         # command = 'cd /usr/ports/editors/openoffice-4 && make install clean'
         thr = threading.Thread(target=read_output,
                                args=(command, window, self.pbar))
+        thr.setDaemon(True)
         thr.start()
 
 
