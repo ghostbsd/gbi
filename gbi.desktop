@@ -4,7 +4,7 @@
 Version=1.0
 Terminal=false
 Type=Application
-Icon[C]=/usr/local/etc/gbi/install.png
+Icon[C]=/usr/local/lib/gbi/install.png
 Name[C]=GhostBSD Installer
 Categories=GNOME;GTK;System;
 NoDisplay=true
@@ -12,4 +12,4 @@ Exec=sudo gbi
 Comment[C]=GhostBSD Installer
 Name=GhostBSD Installer
 Comment=GhostBSD Installer
-Icon=/usr/local/etc/gbi/install.png
+Icon=/usr/local/lib/gbi/install.png
