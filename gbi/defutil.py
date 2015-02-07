@@ -114,7 +114,7 @@ def back_window(widget):
         Popen(to_use_disk, shell=True)
         gtk.main_quit()
     elif nxt == 'custom':
-        Popen(to_label, shell=True)
+        Popen(to_partition, shell=True)
         gtk.main_quit()
 
 
