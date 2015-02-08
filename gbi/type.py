@@ -55,11 +55,12 @@ class Types():
         box2.set_border_width(10)
         box1.pack_start(box2, True, True, 0)
         box2.show()
-        #auto partition or Customize Disk Partition.
+        # auto partition or Customize Disk Partition.
         bbox = gtk.VBox()
         label = gtk.Label()
         box2.pack_start(label, False, False, 0)
-        label = gtk.Label('<b><span size="xx-large">Installation Type</span></b>')
+        label = gtk.Label(
+            '<b><span size="xx-large">Installation Type</span></b>')
         label.set_use_markup(True)
         box2.pack_start(label, False, False, 10)
         # create a Hbox to center the radio button.
@@ -73,12 +74,12 @@ class Types():
         pass_file.writelines(self.ne)
         pass_file.close
         radio.show()
-        #box2.pack_start(radio, True, True, 10)
+        # box2.pack_start(radio, True, True, 10)
         radio = gtk.RadioButton(radio, "Partition Editor")
         bbox.pack_start(radio, False, True, 10)
         radio.connect("toggled", self.partition, "custom")
         radio.show()
-        #box2.pack_start(radio, True, True, 10)
+        # box2.pack_start(radio, True, True, 10)
         hbox.pack_start(bbox, True, True, 100)
         hbox.pack_start(bbox, True, True, 50)
         label = gtk.Label()
