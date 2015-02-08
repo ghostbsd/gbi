@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 #####################################################################
-# Copyright (c) 2010-2013, GhostBSD. All rights reserved.
+# Copyright (c) 2010-2014, GhostBSD. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -28,7 +28,7 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #####################################################################
-# $Id: defutil.py v 0.1 Fryday, March 29 2013 15:19 Eric Turgeon $
+# $Id: defutil.py v 0.4 Sunday, February 08 2015 Eric Turgeon $
 
 # defutil.py define all repetitive def for the the installer.
 
@@ -52,7 +52,6 @@ to_type = 'python %stype.py' % installer
 to_upgrade = 'python %stype.py' % installer
 to_use_disk = 'python %suse_disk.py' % installer
 to_partition = 'python %spartition.py' % installer
-to_label = 'python %slabel.py' % installer
 to_root = 'python %sroot.py' % installer
 to_user = 'python %suser.py' % installer
 Part_label = '%spartlabel' % tmp
@@ -116,11 +115,6 @@ def back_window(widget):
     elif nxt == 'custom':
         Popen(to_partition, shell=True)
         gtk.main_quit()
-
-
-def label_window(widget):
-    Popen(to_label, shell=True)
-    gtk.main_quit()
 
 
 def root_window(widget, data):

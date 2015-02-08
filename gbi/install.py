@@ -4,7 +4,7 @@
 #
 # See COPYING for licence terms.
 #
-# install.py v 0.4 Thursday, March 28 2013 19:54 Eric Turgeon
+# install.py v 0.4 Sunday, February 08 2015 Eric Turgeon
 #
 # install.py give the job to pc-sysinstall to install GhostBSD.
 
@@ -61,16 +61,17 @@ def read_output(command, window, probar):
               stderr=STDOUT, close_fds=True)
     while 1:
         line = p.stdout.readline()
+        if not line:
+            break
         new_val = probar.get_fraction() + 0.000002
         probar.set_fraction(new_val)
         bartext = line
         probar.set_text("%s" % bartext.rstrip())
-        filer = open("/home/ghostbsd/.gbi/tmp", "a")
-        filer.writelines(bartext)
-        filer.close
-        print(bartext)
-        if bartext == "Installation finished!":
-            break
+        # Those for next 4 Commented line is for debugin only.
+        #filer = open("/home/ghostbsd/.gbi/tmp", "a")
+        #filer.writelines(bartext)
+        #filer.close
+        #print(bartext)
     probar.set_fraction(1.0)
     if bartext.rstrip() == "Installation finished!":
         call('python %send.py' % gbi_path, shell=True, close_fds=True)
