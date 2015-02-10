@@ -375,6 +375,8 @@ class Partitions():
             self.treeview.expand_all()
             self.treeview.set_cursor(self.path)
         elif self.slice == 'freespace':
+            print self.path
+            print self.size
             autoFreeSpace(self.path, self.size)
             self.Tree_Store()
             self.treeview.expand_all()

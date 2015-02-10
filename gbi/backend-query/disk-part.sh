@@ -28,7 +28,11 @@ do
 
   if [ ! -z "${i}" ] ; then
     BLOCK="`echo ${i} | cut -d ' ' -f 1`"
-    MB="`expr ${BLOCK} / 2048`MB"
+    if [ "${BLOCK}" -ge 2048 ] ; then
+      MB="`expr ${BLOCK} / 2048`MB"
+    else
+      MB=1MB
+    fi
   fi
   if [ ! "${MB}" = "0MB" ] ; then
     LABEL="`echo ${i} | cut -d ' ' -f 3`"

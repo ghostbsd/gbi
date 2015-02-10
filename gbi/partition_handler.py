@@ -562,8 +562,8 @@ class autoFreeSpace():
         plist = []
         plist.extend((
         [disk + 'p%s' % int(sl + 1), rootNum, '/', 'freebsd-ufs']))
-        mplist[path] = plist
         mplist.append(plist)
+        plist = []
         plist.extend((
         [disk + 'p%s' % int(sl + 2), swap, 'none', 'freebsd-swap']))
         mplist.append(plist)
