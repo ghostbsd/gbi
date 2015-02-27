@@ -4,7 +4,7 @@
 #
 # See COPYING for licence terms.
 #
-# type.py v 0.3 Thursday, Mar 28 2013 19:31:53 Eric Turgeon
+# type.py v 0.5 Thursday, Mar 28 2013 19:31:53 Eric Turgeon
 #
 # type.py create and delete partition slice for GhostBSD system.
 
@@ -81,7 +81,7 @@ class Types():
         radio.show()
         # box2.pack_start(radio, True, True, 10)
         hbox.pack_start(bbox, True, True, 100)
-        hbox.pack_start(bbox, True, True, 50)
+        # hbox.pack_start(bbox, True, True, 50)
         label = gtk.Label()
         box2.pack_start(label, False, False, 0)
         box2 = gtk.HBox(False, 10)

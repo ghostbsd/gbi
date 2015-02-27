@@ -338,16 +338,21 @@ class Delete_partition():
                 sl[snum] = ['freespace', free, '', '']
         elif snum == 0:
             free = int_size(sl[snum][1])
-            if sl[snum + 1][0] == 'freespace':
-                free = free + int_size(sl[snum + 1][1])
-                sl.remove(sl[snum + 1])
-            sl[snum] = ['freespace', free, '', '']
+            if free == 1:
+                sl.remove(sl[snum])
+            else:
+                print "no"
+                if sl[snum + 1][0] == 'freespace':
+                    free = free + int_size(sl[snum + 1][1])
+                    sl.remove(sl[snum + 1])
+                    sl[snum] = ['freespace', free, '', '']
         else:
             free = int_size(sl[snum][1])
             if sl[snum + 1][0] == 'freespace':
                 free = free + int_size(sl[snum + 1][1])
+                sl[snum] = ['freespace', free, '', '']
                 sl.remove(sl[snum + 1])
-            if snum != 0 and sl[snum - 1][0] == 'freespace':
+            elif snum != 0 and sl[snum - 1][0] == 'freespace':
                 free = free + int_size(sl[snum - 1][1])
                 sl[snum] = ['freespace', free, '', '']
                 sl.remove(sl[snum - 1])
