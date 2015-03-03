@@ -330,32 +330,51 @@ class Delete_partition():
                 pfile.close()
         if last_num == snum:
             free = int_size(sl[last_num][1])
-            if snum != 0 and sl[snum - 1][0] == 'freespace':
-                free = free + int_size(sl[snum - 1][1])
-                sl[snum] = ['freespace', free, '', '']
-                sl.remove(sl[snum - 1])
+            if free == 1:
+                sl.remove(sl[snum])
             else:
-                sl[snum] = ['freespace', free, '', '']
+                if snum != 0 and sl[snum - 1][0] == 'freespace':
+                    free = free + int_size(sl[snum - 1][1])
+                    sl[snum] = ['freespace', free, '', '']
+                    sl.remove(sl[snum - 1])
+                else:
+                    sl[snum] = ['freespace', free, '', '']
         elif snum == 0:
             free = int_size(sl[snum][1])
             if free == 1:
                 sl.remove(sl[snum])
             else:
-                print "no"
                 if sl[snum + 1][0] == 'freespace':
                     free = free + int_size(sl[snum + 1][1])
                     sl.remove(sl[snum + 1])
                     sl[snum] = ['freespace', free, '', '']
         else:
             free = int_size(sl[snum][1])
-            if sl[snum + 1][0] == 'freespace':
-                free = free + int_size(sl[snum + 1][1])
-                sl[snum] = ['freespace', free, '', '']
-                sl.remove(sl[snum + 1])
+            if sl[snum + 1][0] == 'freespace' and sl[snum - 1][0] == 'freespace':
+                if free == 1:
+                    free = int_size(sl[snum + 1][1]) + int_size(sl[snum - 1][1])
+                    sl[snum] = ['freespace', free, '', '']
+                    sl.remove(sl[snum + 1])
+                    sl.remove(sl[snum - 1])
+                else:
+                    free = free + int_size(sl[snum + 1][1]) + int_size(sl[snum - 1][1])
+                    sl[snum] = ['freespace', free, '', '']
+                    sl.remove(sl[snum + 1])
+                    sl.remove(sl[snum - 1])
+            elif sl[snum + 1][0] == 'freespace':
+                if free == 1:
+                    sl.remove(sl[snum])
+                else:
+                    free = free + int_size(sl[snum + 1][1])
+                    sl[snum] = ['freespace', free, '', '']
+                    sl.remove(sl[snum + 1])
             elif snum != 0 and sl[snum - 1][0] == 'freespace':
-                free = free + int_size(sl[snum - 1][1])
-                sl[snum] = ['freespace', free, '', '']
-                sl.remove(sl[snum - 1])
+                if free == 1:
+                    sl.remove(sl[snum])
+                else:
+                    free = free + int_size(sl[snum - 1][1])
+                    sl[snum] = ['freespace', free, '', '']
+                    sl.remove(sl[snum - 1])
             else:
                 sl[snum] = ['freespace', free, '', '']
         # Making delete file
