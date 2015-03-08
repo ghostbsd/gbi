@@ -38,9 +38,11 @@ do
     LABEL="`echo ${i} | cut -d ' ' -f 3`"
     SLICE="`echo ${i} | cut -d ' ' -f 2`"
     if [ "$SLICE" = '-' ] ; then
-      echo "freespace ${MB} none"
+	if [ ! "${MB}" = "1MB" ] ; then
+	    echo "freespace ${MB} none"
+	fi
     else
-      if [ ! -z "$SLICE" ] ; then
+	if [ ! -z "$SLICE" ] ; then
         echo "${DISK}${sp}${SLICE} ${MB} ${LABEL} "
       fi
     fi
