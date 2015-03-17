@@ -163,7 +163,7 @@ class users:
         self.repassword1.set_visibility(False)
         self.label5 = gtk.Label("Shell")
         shell = gtk.combo_box_new_text()
-        self.sh = '/usr/local/bin/fish'
+        self.sh = '/usr/local/bin/csh'
         shell.append_text('sh')
         shell.append_text('csh')
         shell.append_text('tcsh')
