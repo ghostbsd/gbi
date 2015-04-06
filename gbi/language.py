@@ -42,6 +42,7 @@ import gtk
 import os
 import os.path
 from defutil import close_application, language_bbox
+from subprocess import Popen, PIPE, STDOUT
 
 # Folder use for the installer.
 tmp = "/home/ghostbsd/.gbi/"
@@ -49,12 +50,13 @@ installer = "/usr/local/lib/gbi/"
 query = "sh /usr/local/lib/gbi/backend-query/"
 if not os.path.exists(tmp):
     os.makedirs(tmp)
-
 sysinstall = "sh /usr/local/lib/gbi/pc-sysinstall"
 logo = "/usr/local/lib/gbi/logo.png"
 language = "%slanguage/avail-langs" % installer
 langfile = '%slanguage' % tmp
-
+langcmd = 'pc-sysinstall query-langs'
+langlist = Popen(langcmd, shell=True, stdin=PIPE, stdout=PIPE,
+        stderr=STDOUT, close_fds=True).stdout.readlines()
 # Text to be replace be multiple language file.
 welltitle = "Welcome To GhostBSD!"
 welltext = """Select the language you want to use with GhostBSD."""
@@ -123,7 +125,7 @@ class Language():
         lang_file.close()
         # Adding a treestore and store language in it.
         store = gtk.TreeStore(str)
-        for line in lang_output:
+        for line in langlist:
             store.append(None, [line.rstrip()])
         treeView = gtk.TreeView(store)
         treeView.set_model(store)

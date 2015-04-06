@@ -42,7 +42,7 @@ class cfg_data():
     f.writelines('packageType=livecd\n')
     # System Language
     lang = open(language, 'r')
-    l_output = lang.readlines()[0].strip().partition(':')[2].strip()
+    l_output = lang.readlines()[0].strip().split()[0].strip()
     f.writelines('\n# System Language\n')
     f.writelines('localizeLang=%s\n' % l_output)
     os.remove(language)
