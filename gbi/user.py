@@ -55,8 +55,8 @@ class users:
         f = open('%suser' % tmp, 'wb')
         uname = self.user.get_text()
         name = self.name.get_text()
-        if self.password1.get_text() == self.repassword1.get_text():
-            up = self.password1.get_text()
+        if self.password.get_text() == self.repassword.get_text():
+            up = self.password.get_text()
             shell = self.sh
             hf = '/home/%s' % self.user.get_text()
             hst = self.host.get_text()
@@ -65,9 +65,7 @@ class users:
             f.close()
             Popen(to_cfg, shell=True)
             gtk.main_quit()
-        else:
-            msg = "Password and password confirmation for %s don't match. Try again!" % self.user.get_text()
-            self.label3.set_text(msg)
+
 
     def on_shell(self, widget):
         SHELL = widget.get_active_text()
@@ -105,6 +103,13 @@ class users:
         button.connect("clicked", self.next_window)
         return bbox
 
+
+    def userAndHost(self, widget):
+        username = self.name.get_text().split()
+        self.host.set_text("%s.ghostbsd-pc.home" % username[0].lower() )
+        self.user.set_text(username[0].lower())
+    
+    
     def __init__(self):
         window = gtk.Window(gtk.WINDOW_TOPLEVEL)
         window.connect("destroy", close_application)
@@ -130,24 +135,6 @@ class users:
         #box2.set_border_width(10)
         box1.pack_start(box2, False, False, 0)
         box2.show()
-        label = gtk.Label('<b>Administrator (root) Password</b>')
-        label.set_use_markup(True)
-        label.set_alignment(.4, .2)
-        table = gtk.Table(1, 2, True)
-
-        label1 = gtk.Label("Password")
-        self.password = gtk.Entry()
-        self.password.set_visibility(False)
-        label2 = gtk.Label("Verify Password")
-        self.repassword = gtk.Entry()
-        self.repassword.set_visibility(False)
-        table.attach(label, 0, 2, 0, 2)
-        table.attach(label1, 0, 1, 2, 3)
-        table.attach(self.password, 1, 2, 2, 3)
-        table.attach(label2, 2, 3, 2, 3)
-        table.attach(self.repassword, 3, 4, 2, 3)
-        #box2.pack_start(table, False, False, 10)
-        #User account.
         label = gtk.Label('<b>User Account</b>')
         label.set_use_markup(True)
         label.set_alignment(.2, .2)
@@ -155,12 +142,14 @@ class users:
         self.user = gtk.Entry()
         self.label2 = gtk.Label("Real name")
         self.name = gtk.Entry()
+        self.name.connect("changed", self.userAndHost)
         self.label3 = gtk.Label("Password")
-        self.password1 = gtk.Entry()
-        self.password1.set_visibility(False)
+        self.password = gtk.Entry()
+        self.password.set_visibility(False)
         self.label4 = gtk.Label("Verify Password")
-        self.repassword1 = gtk.Entry()
-        self.repassword1.set_visibility(False)
+        self.repassword = gtk.Entry()
+        self.repassword.set_visibility(False)
+        self.repassword.connect("changed", self.passwdVerification)
         self.label5 = gtk.Label("Shell")
         shell = gtk.combo_box_new_text()
         self.sh = '/usr/local/bin/csh'
@@ -179,7 +168,7 @@ class users:
         label.set_alignment(0, .5)
         table = gtk.Table(1, 3, True)
         table.set_row_spacings(10)
-        pcname = gtk.Label("Computer name")
+        pcname = gtk.Label("Hostname")
         self.host = gtk.Entry()
         #table.attach(label, 0, 2, 0, 1)
         table.attach(self.label2, 0, 1, 1, 2)
@@ -189,10 +178,12 @@ class users:
         table.attach(Username, 0, 1, 3, 4)
         table.attach(self.user, 1, 2, 3, 4)
         table.attach(self.label3, 0, 1, 4, 5)
-        table.attach(self.password1, 1, 2, 4, 5)
+        table.attach(self.password, 1, 2, 4, 5)
         table.attach(self.label4, 0, 1, 5, 6)
-        table.attach(self.repassword1, 1, 2, 5, 6)
-
+        table.attach(self.repassword, 1, 2, 5, 6)
+        # set image for password matching
+        self.img = gtk.Image()
+        table.attach(self.img, 2, 3, 5, 6)
         table.attach(self.label5, 0, 1, 6, 7)
         table.attach(shell, 1, 2, 6, 7)
         box2.pack_start(table, False, False, 0)
@@ -200,8 +191,8 @@ class users:
         self.box3.set_border_width(10)
         box1.pack_start(self.box3, True, True, 0)
         self.box3.show()
-        self.label3 = gtk.Label()
-        self.box3.pack_start(self.label3, False, False, 0)
+        #self.label3 = gtk.Label()
+        #self.box3.pack_start(self.label3, False, False, 0)
         box2 = gtk.HBox(False, 10)
         box2.set_border_width(5)
         box1.pack_start(box2, False, True, 0)
@@ -211,5 +202,11 @@ class users:
             True, True, 5)
         window.show_all()
 
+
+    def passwdVerification(self, widget):                                       
+        if self.password.get_text() == self.repassword.get_text():              
+            self.img.set_from_stock(gtk.STOCK_YES, 10)                          
+        else:                                                                   
+            self.img.set_from_stock(gtk.STOCK_NO, 10)
 users()
 gtk.main()
