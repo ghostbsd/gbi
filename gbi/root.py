@@ -51,7 +51,7 @@ to_user = 'python %suser.py' % installer
 boot_file = '%sboot' % tmp
 
 
-class users:
+class rootUsers:
     def next_window(self, widget):
         f = open('%sroot' % tmp, 'wb')
         if self.password.get_text() == self.repassword.get_text():
@@ -122,31 +122,40 @@ class users:
         label2 = gtk.Label("Verify Password")
         self.repassword = gtk.Entry()
         self.repassword.set_visibility(False)
+        self.repassword.connect("changed", self.passwdVerification)
+        self.label3 = gtk.Label()
+        self.img = gtk.Image() 
         table.attach(label1, 0, 1, 1, 2)
         table.attach(self.password, 1, 2, 1, 2)
         table.attach(label2, 0, 1, 2, 3)
         table.attach(self.repassword, 1, 2, 2, 3)
+        table.attach(self.img, 2, 3, 2, 3)
         box2.pack_start(table, False, False, 10)
         # Boot option.
+        box3 = gtk.VBox(False, 10)                                         
+        box3.set_border_width(10)                                          
+        box1.pack_start(box3, True, True, 0)                               
+        box3.show()                                                       
+        label = gtk.Label()                                               
         label = gtk.Label('<b><span size="xx-large">Boot Option</span></b>')
         label.set_use_markup(True)
-        box2.pack_start(label, True, True, 20)
+        box3.pack_start(label, False, False, 20)
         check = gtk.CheckButton("Install FreeBSD Boot Manager(MBR only)")
         check.connect("toggled", self.on_check)
         self.boot = 'none'
         boot = open(boot_file, 'w')
         boot.writelines(self.boot)
         boot.close()
-        table = gtk.Table(1, 3, True)
+        table = gtk.Table(1, 6, True)
         table.set_row_spacings(10)
-        table.attach(check, 1, 2, 0, 1)
-        box2.pack_start(table, False, False, 10)
+        table.attach(check, 2, 5, 0, 1)
+        box3.pack_start(table, False, False, 10)
         self.box3 = gtk.VBox(False, 10)
         self.box3.set_border_width(10)
         box1.pack_start(self.box3, True, True, 0)
-        self.box3.show()
-        self.label3 = gtk.Label()
-        self.box3.pack_start(self.label3, False, False, 0)
+        #self.box3.show()
+        #self.label = gtk.Label()
+        #self.box3.pack_start(self.label3, False, False, 0)
         box2 = gtk.HBox(False, 10)
         box2.set_border_width(5)
         box1.pack_start(box2, False, True, 0)
@@ -156,5 +165,14 @@ class users:
             True, True, 5)
         window.show_all()
 
-users()
+
+    def passwdVerification(self, widget):
+        if self.password.get_text() == self.repassword.get_text():
+            self.label3.set_text("Password match")
+            self.img.set_from_stock(gtk.STOCK_YES, 10)
+        else:
+            self.label3.set_text("Password doesn't match.")
+            self.img.set_from_stock(gtk.STOCK_NO, 10)
+
+rootUsers()
 gtk.main()
