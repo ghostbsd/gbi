@@ -37,6 +37,7 @@
 
 import gtk
 import os
+import re
 from subprocess import Popen
 from defutil import close_application, back_window
 import pickle
@@ -119,6 +120,7 @@ class rootUsers:
         label1 = gtk.Label("Password")
         self.password = gtk.Entry()
         self.password.set_visibility(False)
+        self.password.connect("changed", self.passwdstrength)
         label2 = gtk.Label("Verify Password")
         self.repassword = gtk.Entry()
         self.repassword.set_visibility(False)
@@ -127,6 +129,7 @@ class rootUsers:
         self.img = gtk.Image() 
         table.attach(label1, 0, 1, 1, 2)
         table.attach(self.password, 1, 2, 1, 2)
+        table.attach(self.label3, 2, 3, 1, 2)
         table.attach(label2, 0, 1, 2, 3)
         table.attach(self.repassword, 1, 2, 2, 3)
         table.attach(self.img, 2, 3, 2, 3)
@@ -164,14 +167,41 @@ class rootUsers:
             10, gtk.BUTTONBOX_END),
             True, True, 5)
         window.show_all()
+    
+
+    def passwdstrength(self, widget):
+        passwd = self.password.get_text()
+        print passwd
+        if len(passwd) <= 5:
+            self.label3.set_text("Super Weak")
+            print "Super Weak"
+        elif len(passwd) <= 10
+            if re.match("[a-z]", passwd):
+                print "Very Weak"
+                if re.match("[A-Z]", passwd):
+
+                    if re.match("[0-9]", passwd):
+                        if re.match("[~!@#$%^&*_+-]", passwd):
+            elif len(passwd) <= 10:
+                self.label3.set_text("Weak")
+                print "Weak"
+            elif re.match("[a-z]", passwd) and re.match("[A-Z]", passwd) and re.match("[0-9]", passwd) and len(passwd) <= 6:
+                self.label3.set_text("Fairly Weak")
+                print "Fairly Weak"
+            elif re.match("[a-z]", passwd) and re.match("[A-Z]", passwd) and len(passwd) <= 6:
+                self.label3.set_text("Very Weak")
+                print "Very Weak"
+        elif re.match("[a-z]", passwd) and len(passwd) <= 6:          
+            self.label3.set_text("Super Weak")
+            print "Super Weak 6" 
+        elif re.match("[a-z]", passwd) and re.match("[A-Z]", passwd) and re.match("[0-9]", passwd) and len(passwd) <= 10:
+            self.label3.set_text("Weak")
 
 
     def passwdVerification(self, widget):
         if self.password.get_text() == self.repassword.get_text():
-            self.label3.set_text("Password match")
             self.img.set_from_stock(gtk.STOCK_YES, 10)
         else:
-            self.label3.set_text("Password doesn't match.")
             self.img.set_from_stock(gtk.STOCK_NO, 10)
 
 rootUsers()
