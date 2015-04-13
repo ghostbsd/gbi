@@ -52,6 +52,41 @@ to_user = 'python %suser.py' % installer
 boot_file = '%sboot' % tmp
 
 
+# Find if pasword contain only lower case and number
+def lowerCase(strg, search=re.compile(r'[^a-z]').search):
+    return not bool(search(strg))
+
+
+# Find if pasword contain only upper case
+def upperCase(strg, search=re.compile(r'[^A-Z]').search):
+    return not bool(search(strg))
+
+
+# Find if pasword contain only lower case and number
+def lowerandNunber(strg, search=re.compile(r'[^a-z0-9]').search):
+    return not bool(search(strg))
+
+
+# Find if pasword contain only upper case and number
+def upperandNunber(strg, search=re.compile(r'[^A-Z0-9]').search):
+    return not bool(search(strg))
+
+
+# Find if pasword contain only lower and upper case and
+def lowerUpperCase(strg, search=re.compile(r'[^a-zA-Z]').search):
+    return not bool(search(strg))
+
+
+# Find if pasword contain only lower and upper case and
+def lowerUpperNumber(strg, search=re.compile(r'[^a-zA-Z0-9]').search):
+    return not bool(search(strg))
+
+
+# Find if pasword contain only lower and upper case and
+def allCharacter(strg, search=re.compile(r'[^a-zA-Z0-9~\!@#\$%\^&\*_\+":;\'\-]').search):
+    return not bool(search(strg))
+
+
 class rootUsers:
     def next_window(self, widget):
         f = open('%sroot' % tmp, 'wb')
@@ -62,8 +97,6 @@ class rootUsers:
             f.close()
             Popen(to_user, shell=True)
             gtk.main_quit()
-        else:
-            self.label3.set_text("Password and password confirmation for root don't match. Try again!")
 
     def on_check(self, widget):
         if widget.get_active():
@@ -126,7 +159,7 @@ class rootUsers:
         self.repassword.set_visibility(False)
         self.repassword.connect("changed", self.passwdVerification)
         self.label3 = gtk.Label()
-        self.img = gtk.Image() 
+        self.img = gtk.Image()
         table.attach(label1, 0, 1, 1, 2)
         table.attach(self.password, 1, 2, 1, 2)
         table.attach(self.label3, 2, 3, 1, 2)
@@ -135,11 +168,11 @@ class rootUsers:
         table.attach(self.img, 2, 3, 2, 3)
         box2.pack_start(table, False, False, 10)
         # Boot option.
-        box3 = gtk.VBox(False, 10)                                         
-        box3.set_border_width(10)                                          
-        box1.pack_start(box3, True, True, 0)                               
-        box3.show()                                                       
-        label = gtk.Label()                                               
+        box3 = gtk.VBox(False, 10)
+        box3.set_border_width(10)
+        box1.pack_start(box3, True, True, 0)
+        box3.show()
+        label = gtk.Label()
         label = gtk.Label('<b><span size="xx-large">Boot Option</span></b>')
         label.set_use_markup(True)
         box3.pack_start(label, False, False, 20)
@@ -156,47 +189,89 @@ class rootUsers:
         self.box3 = gtk.VBox(False, 10)
         self.box3.set_border_width(10)
         box1.pack_start(self.box3, True, True, 0)
-        #self.box3.show()
-        #self.label = gtk.Label()
-        #self.box3.pack_start(self.label3, False, False, 0)
         box2 = gtk.HBox(False, 10)
         box2.set_border_width(5)
         box1.pack_start(box2, False, True, 0)
         box2.show()
         box2.pack_start(self.create_bbox(True,
-            10, gtk.BUTTONBOX_END),
-            True, True, 5)
+                        10, gtk.BUTTONBOX_END),
+                        True, True, 5)
         window.show_all()
-    
 
     def passwdstrength(self, widget):
         passwd = self.password.get_text()
-        print passwd
-        if len(passwd) <= 5:
+        if len(passwd) <= 4:
             self.label3.set_text("Super Weak")
-            print "Super Weak"
-        elif len(passwd) <= 10
-            if re.match("[a-z]", passwd):
-                print "Very Weak"
-                if re.match("[A-Z]", passwd):
-
-                    if re.match("[0-9]", passwd):
-                        if re.match("[~!@#$%^&*_+-]", passwd):
-            elif len(passwd) <= 10:
-                self.label3.set_text("Weak")
-                print "Weak"
-            elif re.match("[a-z]", passwd) and re.match("[A-Z]", passwd) and re.match("[0-9]", passwd) and len(passwd) <= 6:
-                self.label3.set_text("Fairly Weak")
-                print "Fairly Weak"
-            elif re.match("[a-z]", passwd) and re.match("[A-Z]", passwd) and len(passwd) <= 6:
+        elif len(passwd) <= 8:
+            if lowerCase(passwd) or upperCase(passwd) or passwd.isdigit():
+                self.label3.set_text("Super Weak")
+            elif lowerandNunber(passwd):
                 self.label3.set_text("Very Weak")
-                print "Very Weak"
-        elif re.match("[a-z]", passwd) and len(passwd) <= 6:          
-            self.label3.set_text("Super Weak")
-            print "Super Weak 6" 
-        elif re.match("[a-z]", passwd) and re.match("[A-Z]", passwd) and re.match("[0-9]", passwd) and len(passwd) <= 10:
-            self.label3.set_text("Weak")
-
+            elif upperandNunber(passwd):
+                self.label3.set_text("Very Weak")
+            elif lowerUpperCase(passwd):
+                self.label3.set_text("Very Weak")
+            elif lowerUpperNumber(passwd):
+                self.label3.set_text("Fairly Weak")
+            elif allCharacter(passwd):
+                self.label3.set_text("Weak")
+        elif len(passwd) <= 12:
+            if lowerCase(passwd) or upperCase(passwd) or passwd.isdigit():
+                self.label3.set_text("Very Weak")
+            elif lowerandNunber(passwd):
+                self.label3.set_text("Fairly Weak")
+            elif upperandNunber(passwd):
+                self.label3.set_text("Fairly Weak")
+            elif lowerUpperCase(passwd):
+                self.label3.set_text("Fairly Weak")
+            elif lowerUpperNumber(passwd):
+                self.label3.set_text("Weak")
+            elif allCharacter(passwd):
+                self.label3.set_text("Strong")
+        elif len(passwd) <= 16:
+            if lowerCase(passwd) or upperCase(passwd) or passwd.isdigit():
+                self.label3.set_text("Fairly Weak")
+            elif lowerandNunber(passwd):
+                self.label3.set_text("Weak")
+            elif upperandNunber(passwd):
+                self.label3.set_text("Weak")
+            elif lowerUpperCase(passwd):
+                self.label3.set_text("Weak")
+            elif lowerUpperNumber(passwd):
+                self.label3.set_text("Strong")
+            elif allCharacter(passwd):
+                self.label3.set_text("Fairly Strong")
+        elif len(passwd) <= 20:
+            if lowerCase(passwd) or upperCase(passwd) or passwd.isdigit():
+                self.label3.set_text("Weak")
+            elif lowerandNunber(passwd):
+                self.label3.set_text("Strong")
+            elif upperandNunber(passwd):
+                self.label3.set_text("Strong")
+            elif lowerUpperCase(passwd):
+                self.label3.set_text("Strong")
+            elif lowerUpperNumber(passwd):
+                self.label3.set_text("Fairly Strong")
+            elif allCharacter(passwd):
+                self.label3.set_text("Very Strong")
+        elif len(passwd) <= 24:
+            if lowerCase(passwd) or upperCase(passwd) or passwd.isdigit():
+                self.label3.set_text("Strong")
+            elif lowerandNunber(passwd):
+                self.label3.set_text("Fairly Strong")
+            elif upperandNunber(passwd):
+                self.label3.set_text("Fairly Strong")
+            elif lowerUpperCase(passwd):
+                self.label3.set_text("Fairly Strong")
+            elif lowerUpperNumber(passwd):
+                self.label3.set_text("Very Strong")
+            elif allCharacter(passwd):
+                self.label3.set_text("Super Strong")
+        elif len(passwd) > 24:
+            if lowerCase(passwd) or upperCase(passwd) or passwd.isdigit():
+                self.label3.set_text("Fairly Strong")
+            else:
+                self.label3.set_text("Super Strong")
 
     def passwdVerification(self, widget):
         if self.password.get_text() == self.repassword.get_text():
