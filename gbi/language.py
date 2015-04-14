@@ -115,14 +115,6 @@ class Language():
         sw = gtk.ScrolledWindow()
         sw.set_shadow_type(gtk.SHADOW_ETCHED_IN)
         sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        # Set English as default.
-        l_file = open(language, 'r')
-        lang_output = l_file.readlines()
-        line0 = lang_output[0].strip()
-        self.language = line0
-        lang_file = open(langfile, 'w')
-        lang_file.writelines(self.language)
-        lang_file.close()
         # Adding a treestore and store language in it.
         store = gtk.TreeStore(str)
         for line in langlist:
