@@ -92,7 +92,7 @@ class cfg_data():
     shem = read.readlines()[0]
     f.writelines(shem + '\n')
     f.writelines('commitDiskPart\n')
-    os.remove(disk_schem)
+    # os.remove(disk_schem)
     # Partition Setup
     f.writelines('\n# Partition Setup\n')
     part = open(partlabel, 'r')
