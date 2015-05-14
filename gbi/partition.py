@@ -402,18 +402,20 @@ class Partitions():
         self.treeview.expand_all()
 
     def create_partition(self, widget):
+        print self.path
         if len(self.path) == 3:
             if self.slice == 'freespace':
                 self.labelEditor(self.path, self.slice, self.size, 0, 1)
         elif len(self.path) == 2 and self.slice == 'freespace':
-            if how_partition(self.path) == 1:
-                self.schemeEditor(True)
-            elif scheme_query(self.path) == "MBR" and self.path[1] < 4:
+            if scheme_query(self.path) == "MBR" and self.path[1] < 4:
                 self.sliceEditor()
             elif scheme_query(self.path) == "GPT":
                 self.labelEditor(self.path, self.slice, self.size, 1, 1)
         else:
-            self.schemeEditor(True)
+            if how_partition(self.path) == 1:
+                 self.schemeEditor(True)
+            else:
+                pass
 
     def partition_selection(self, tree_selection):
         (model, pathlist) = tree_selection.get_selected_rows()
@@ -440,11 +442,13 @@ class Partitions():
                 self.modifi_bt.set_sensitive(True)
                 self.auto_bt.set_sensitive(False)
             else:
-                self.create_bt.set_sensitive(True)
                 self.delete_bt.set_sensitive(False)
                 self.modifi_bt.set_sensitive(False)
                 self.auto_bt.set_sensitive(True)
-
+                if how_partition(self.path) == 1:
+                    self.create_bt.set_sensitive(True)
+                else:
+                    self.create_bt.set_sensitive(False)
     def __init__(self):
         window = gtk.Window(gtk.WINDOW_TOPLEVEL)
         window.connect("destroy", close_application)
