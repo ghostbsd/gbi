@@ -338,21 +338,21 @@ class Partitions():
         bbox.set_border_width(5)
         bbox.set_layout(layout)
         bbox.set_spacing(spacing)
-        button = gtk.Button("Create")
-        button.connect("clicked", self.create_partition)
-        bbox.add(button)
-        button = gtk.Button("Delete")
-        button.connect("clicked", self.delete_partition)
-        bbox.add(button)
-        button = gtk.Button("Modify")
-        button.connect("clicked", self.modify_partition)
-        bbox.add(button)
-        button = gtk.Button("Revert")
-        button.connect("clicked", self.revertChange)
-        bbox.add(button)
-        button = gtk.Button("Auto")
-        button.connect("clicked", self.autoPartition)
-        bbox.add(button)
+        self.create_bt = gtk.Button("Create")
+        self.create_bt.connect("clicked", self.create_partition)
+        bbox.add(self.create_bt)
+        self.delete_bt = gtk.Button("Delete")
+        self.delete_bt.connect("clicked", self.delete_partition)
+        bbox.add(self.delete_bt)
+        self.modifi_bt = gtk.Button("Modify")
+        self.modifi_bt.connect("clicked", self.modify_partition)
+        bbox.add(self.modifi_bt)
+        self.revert_bt = gtk.Button("Revert")
+        self.revert_bt.connect("clicked", self.revertChange)
+        bbox.add(self.revert_bt)
+        self.auto_bt = gtk.Button("Auto")
+        self.auto_bt.connect("clicked", self.autoPartition)
+        bbox.add(self.auto_bt)
         return bbox
 
     def modify_partition(self, widget):
@@ -424,6 +424,26 @@ class Partitions():
             #value2 = model.get_value(tree_iter, 2)
             self.scheme = model.get_value(tree_iter, 3)
             self.path = path
+            if 'freespace' in self.slice:
+                self.create_bt.set_sensitive(True)
+                self.delete_bt.set_sensitive(False)
+                self.modifi_bt.set_sensitive(False)
+                self.auto_bt.set_sensitive(True)
+            elif 's' in self.slice:
+                self.create_bt.set_sensitive(False)
+                self.delete_bt.set_sensitive(True)
+                self.modifi_bt.set_sensitive(True)
+                self.auto_bt.set_sensitive(False)
+            elif 'p' in self.slice:
+                self.create_bt.set_sensitive(False)
+                self.delete_bt.set_sensitive(True)
+                self.modifi_bt.set_sensitive(True)
+                self.auto_bt.set_sensitive(False)
+            else:
+                self.create_bt.set_sensitive(True)
+                self.delete_bt.set_sensitive(False)
+                self.modifi_bt.set_sensitive(False)
+                self.auto_bt.set_sensitive(True)
 
     def __init__(self):
         window = gtk.Window(gtk.WINDOW_TOPLEVEL)
