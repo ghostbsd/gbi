@@ -35,6 +35,7 @@ def disk_query():
 def how_partition(path):
     disk = disk_query()[path[0]][0]
     part = partition_query(disk)
+    print len(part)
     return len(part)
 
 

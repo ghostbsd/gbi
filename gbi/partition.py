@@ -447,6 +447,8 @@ class Partitions():
                 self.auto_bt.set_sensitive(True)
                 if how_partition(self.path) == 1:
                     self.create_bt.set_sensitive(True)
+                if how_partition(self.path) == 0:
+                    self.create_bt.set_sensitive(True)
                 else:
                     self.create_bt.set_sensitive(False)
     def __init__(self):
