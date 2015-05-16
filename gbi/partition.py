@@ -413,7 +413,9 @@ class Partitions():
                 self.labelEditor(self.path, self.slice, self.size, 1, 1)
         else:
             if how_partition(self.path) == 1:
-                 self.schemeEditor(True)
+                self.schemeEditor(True)
+            elif how_partition(self.path) == 0:
+                self.schemeEditor(True)
             else:
                 pass
 

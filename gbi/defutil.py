@@ -80,7 +80,6 @@ def language_window(widget):
 
 def time_window(widget):
     Popen(to_time, shell=True)
-    call("setxkbmap us", shell=True)
     gtk.main_quit()
 
 
