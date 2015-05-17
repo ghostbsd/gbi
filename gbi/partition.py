@@ -206,16 +206,16 @@ class Partitions():
         diskSchemeChanger(self.scheme, self.path, self.slice, self.size)
         self.update()
         self.window.hide()
-        if scheme_query(self.path) == "MBR" and len(self.path) == 1:
-            self.update()
-            self.sliceEditor()
-            self.update()
-        elif scheme_query(self.path) == "MBR" and self.path[1] < 4:
-            self.update()
-            self.sliceEditor()
-            self.update()
-        elif scheme_query(self.path) == "GPT":
-            self.labelEditor(self.path, self.slice, self.size, 1, 1)
+        # if scheme_query(self.path) == "MBR" and len(self.path) == 1:
+        #     self.update()
+        #     self.sliceEditor()
+        #     self.update()
+        # elif scheme_query(self.path) == "MBR" and self.path[1] < 4:
+        #     self.update()
+        #     self.sliceEditor()
+        #     self.update()
+        # elif scheme_query(self.path) == "GPT":
+        #     self.labelEditor(self.path, self.slice, self.size, 1, 1)
 
     def autoSchemePartition(self, widget):
         diskSchemeChanger(self.scheme, self.path, self.slice, self.size)
