@@ -67,14 +67,15 @@ def read_output(command, window, probar):
         probar.set_fraction(new_val)
         bartext = line
         probar.set_text("%s" % bartext.rstrip())
-        # Those for next 4 Commented line is for debugin only.
-        #filer = open("/home/ghostbsd/.gbi/tmp", "a")
-        #filer.writelines(bartext)
-        #filer.close
-        #print(bartext)
+        ## Those for next 4 line is for debugin only.
+        # filer = open("/home/ghostbsd/.gbi/tmp", "a")
+        # filer.writelines(bartext)
+        # filer.close
+        print(bartext)
     probar.set_fraction(1.0)
     if bartext.rstrip() == "Installation finished!":
         call('python %send.py' % gbi_path, shell=True, close_fds=True)
+        call("/home/ghostbsd/.gbi/", shell=True, close_fds=True)
         gobject.idle_add(window.destroy)
     else:
         call('python %serror.py' % gbi_path, shell=True, close_fds=True)
