@@ -15,7 +15,7 @@ not be preserved on reboot."""
 
 class PyApp(gtk.Window):
     def on_reboot(self, widget):
-        Popen('sudo reboot', shell=True)
+        Popen('shutdown -d now', shell=True)
         gtk.main_quit()
 
     def on_close(self, widget):

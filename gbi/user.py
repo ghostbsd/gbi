@@ -186,7 +186,7 @@ class users:
         self.repassword.connect("changed", self.passwdVerification)
         self.label5 = gtk.Label("Shell")
         shell = gtk.combo_box_new_text()
-        self.sh = '/usr/local/bin/csh'
+        self.sh = '/usr/local/bin/fish'
         shell.append_text('sh')
         shell.append_text('csh')
         shell.append_text('tcsh')
@@ -195,7 +195,7 @@ class users:
         shell.append_text('rbash')
         shell.append_text('ksh')
         shell.append_text('zsh')
-        shell.set_active(1)
+        shell.set_active(3)
         shell.connect("changed", self.on_shell)
         label = gtk.Label('<b>Set Hostname</b>')
         label.set_use_markup(True)
