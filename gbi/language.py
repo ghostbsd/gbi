@@ -56,9 +56,9 @@ language = "%slanguage/avail-langs" % installer
 langfile = '%slanguage' % tmp
 langcmd = 'pc-sysinstall query-langs'
 langlist = Popen(langcmd, shell=True, stdin=PIPE, stdout=PIPE,
-        stderr=STDOUT, close_fds=True).stdout.readlines()
+                 stderr=STDOUT, close_fds=True).stdout.readlines()
 # Text to be replace be multiple language file.
-welltitle = "Welcome To GhostBSD!"
+title = "Welcome To GhostBSD!"
 welltext = """Select the language you want to use with GhostBSD."""
 
 
@@ -134,14 +134,14 @@ class Language():
         vhbox.set_border_width(10)
         hbox.pack_start(vhbox, True, True, 5)
         vhbox.show()
-        self.wellcometitle = gtk.Label('<span size="xx-large">' + welltitle + '</span>')
-        self.wellcometitle.set_use_markup(True)
+        self.wellcome = gtk.Label('<span size="xx-large">' + title + '</span>')
+        self.wellcome.set_use_markup(True)
         self.wellcometext = gtk.Label(welltext)
         self.wellcometext.set_use_markup(True)
         table = gtk.Table()
         wall = gtk.Label()
-        #table.attach(wall, 0, 1, 0, 1)
-        table.attach(self.wellcometitle, 0, 1, 1, 2)
+        # table.attach(wall, 0, 1, 0, 1)
+        table.attach(self.wellcome, 0, 1, 1, 2)
         wall = gtk.Label()
         table.attach(wall, 0, 1, 2, 3)
         table.attach(self.wellcometext, 0, 1, 3, 4)
@@ -156,9 +156,8 @@ class Language():
         vbox1.pack_start(vbox2, False, False, 0)
         vbox2.show()
         # Button from defutil.
-        vbox2.pack_start(language_bbox(True,
-            10, gtk.BUTTONBOX_END),
-            True, True, 5)
+        vbox2.pack_start(language_bbox(True, 10, gtk.BUTTONBOX_END),
+                         True, True, 5)
         window.show_all()
 
 Language()

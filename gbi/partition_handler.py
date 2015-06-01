@@ -1,7 +1,6 @@
 #!/usr/local/bin/python
 
 import os
-#import sys
 import re
 from subprocess import Popen, PIPE, STDOUT, call
 import pickle
@@ -442,7 +441,7 @@ class autoDiskPartition():
         llist = []
         mllist = []
         plf = open(partitiondb + disk + 's1', 'wb')
-        llist.extend(([disk + 's1a', number, '/', 'freebsd-ufs']))
+        llist.extend(([disk + 's1a', rootNum, '/', 'freebsd-ufs']))
         mllist.append(llist)
         llist = []
         llist.extend(([disk + 's1b', swap, 'none', 'freebsd-swap']))
@@ -633,6 +632,52 @@ class createLabel():
         llist = []
         mllist = label_query(disk + 's%s' % sl)
         plf = open(partitiondb + disk + 's%s' % sl, 'wb')
+        if lnumb == 0:
+            cnumb -= 1
+        if fs == 'UFS' or fs == 'UFS+S' or fs == 'UFS+J' or fs == 'UFS+SUJ':
+            llist.extend((
+            [disk + 's%s' % sl + letter, cnumb, lb, 'freebsd-ufs']))
+        elif fs == 'SWAP':
+            llist.extend((
+            [disk + 's%s' % sl + letter, cnumb, lb, 'freebsd-swap']))
+        #elif == 'ZFS':
+        mllist[lv] = llist
+        llist = []
+        if lnumb > 0:
+            llist.extend((['freespace', lnumb, '', '']))
+            mllist.append(llist)
+        pickle.dump(mllist, plf)
+        plf.close()
+        pfile = open(Part_label, 'a')
+        pfile.writelines('%s %s %s\n' % (fs, cnumb, lb))
+        pfile.close()
+
+
+class modifyLabel():
+
+
+    def __init__(self, path, lnumb, cnumb, lb, fs, data):
+        disk = disk_query()[path[0]][0]
+        if not os.path.exists(disk_file):
+            file_disk = open(disk_file, 'w')
+            file_disk.writelines('%s\n' % disk)
+            file_disk.close()
+        sl = path[1] + 1
+        lv = path[2]
+        sfile = open(part_schem, 'w')
+        sfile.writelines('partscheme=MBR')
+        sfile.close()
+        slice_file = open(dslice, 'w')
+        slice_file.writelines('s%s\n' % sl)
+        slice_file.close()
+        alph = ord('a')
+        alph += lv
+        letter = chr(alph)
+        llist = []
+        mllist = label_query(disk + 's%s' % sl)
+        plf = open(partitiondb + disk + 's%s' % sl, 'wb')
+        if lnumb == 0:
+            cnumb -= 1
         if fs == 'UFS' or fs == 'UFS+S' or fs == 'UFS+J' or fs == 'UFS+SUJ':
             llist.extend((
             [disk + 's%s' % sl + letter, cnumb, lb, 'freebsd-ufs']))
@@ -671,6 +716,8 @@ class createSlice():
         slice_file.close()
         plist = partition_query(disk)
         pslice = '%ss%s' % (disk, path[1] + 1)
+        if rs == 0:
+            size -= 1
         plist[path[1]] = [pslice, size, '', 'freebsd']
         if rs > 0:
             plist.append(['freespace', rs, '', ''])
@@ -725,6 +772,64 @@ class createPartition():
         plist = []
         pslice = '%sp%s' % (disk, pl)
         mplist = partition_query(disk)
+        if lnumb == 0:
+            cnumb -= 1
+        pf = open(partitiondb + disk, 'wb')
+        if fs == 'UFS' or fs == 'UFS+S' or fs == 'UFS+J' or fs == 'UFS+SUJ':
+            plist.extend(([disk + 'p%s' % pl, cnumb, lb, 'freebsd-ufs']))
+        elif fs == 'SWAP':
+            plist.extend(([disk + 'p%s' % pl, cnumb, lb, 'freebsd-swap']))
+        elif fs == 'BOOT':
+            plist.extend(([disk + 'p%s' % pl, cnumb, lb, 'freebsd-boot']))
+        mplist[lv] = plist
+        plist = []
+        if lnumb > 0:
+            plist.extend((['freespace', lnumb, '', '']))
+            mplist.append(plist)
+        pickle.dump(mplist, pf)
+        pf.close()
+        pfile = open(Part_label, 'a')
+        pfile.writelines('%s %s %s\n' % (fs, cnumb, lb))
+        pfile.close()
+        if data is True:
+            plst = []
+            mplst = []
+            if not os.path.exists(tmp + 'create'):
+                plst.extend(([pslice, cnumb]))
+                mplst.append(plst)
+                cf = open(tmp + 'create', 'wb')
+                pickle.dump(mplst, cf)
+                cf.close()
+
+
+class modifyPartition():
+
+    def __init__(self, path, lnumb, inumb, cnumb, lb, fs, data):
+        disk = disk_query()[path[0]][0]
+        if not os.path.exists(disk_file):
+            file_disk = open(disk_file, 'w')
+            file_disk.writelines('%s\n' % disk)
+            file_disk.close()
+        if len(path) == 1:
+            pl = 1
+            lv = 0
+        else:
+            pl = path[1] + 1
+            lv = path[1]
+        if not os.path.exists(part_schem):
+            sfile = open(part_schem, 'w')
+            sfile.writelines('partscheme=GPT')
+            sfile.close()
+        if not os.path.exists(dslice):
+            slice_file = open(dslice, 'w')
+            slice_file.writelines('p%s\n' % pl)
+            #slice_file.writelines('%s\n' % number)
+            slice_file.close()
+        plist = []
+        pslice = '%sp%s' % (disk, pl)
+        mplist = partition_query(disk)
+        if lnumb == 0:
+            cnumb -= 1
         pf = open(partitiondb + disk, 'wb')
         if fs == 'UFS' or fs == 'UFS+S' or fs == 'UFS+J' or fs == 'UFS+SUJ':
             plist.extend(([disk + 'p%s' % pl, cnumb, lb, 'freebsd-ufs']))

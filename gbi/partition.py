@@ -121,9 +121,8 @@ class Partitions():
         box2.set_border_width(10)
         box1.pack_start(box2, True, True, 0)
         box2.show()
-
         # create label
-        #label0 = gtk.Label("Create Partition Label")
+        # label0 = gtk.Label("Create Partition Label")
         table = gtk.Table(1, 2, True)
         label1 = gtk.Label("Type:")
         label2 = gtk.Label("Size(MB):")
@@ -146,7 +145,7 @@ class Partitions():
         else:
             self.entry.set_editable(True)
         self.mountpoint = gtk.combo_box_entry_new_text()
-        #self.mountpoint.append_text('select labels')
+        # self.mountpoint.append_text('select labels')
         self.label = "none"
         self.mountpoint.append_text('none')
         # The space for root '/ ' is to recognise / from the file.
@@ -436,12 +435,12 @@ class Partitions():
             elif 's' in self.slice:
                 self.create_bt.set_sensitive(False)
                 self.delete_bt.set_sensitive(True)
-                self.modifi_bt.set_sensitive(True)
+                #self.modifi_bt.set_sensitive(True)
                 self.auto_bt.set_sensitive(False)
             elif 'p' in self.slice:
                 self.create_bt.set_sensitive(False)
                 self.delete_bt.set_sensitive(True)
-                self.modifi_bt.set_sensitive(True)
+                #self.modifi_bt.set_sensitive(True)
                 self.auto_bt.set_sensitive(False)
             else:
                 self.delete_bt.set_sensitive(False)

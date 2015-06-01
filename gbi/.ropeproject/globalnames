@@ -1,0 +1,16 @@
+Ä}q(Uerror]q(UlyricsqUPyAppqeUend]q(hheUdefutil]q(Uto_keyboardqU	installerqUKeyboard_bboxq	U	time_bboxq
+UtmpqUuser_windowqU
+to_upgradeqU
+Part_labelqU	type_bboxqUkeyboard_windowqUto_rootqUtype_windowqUpartition_bboxqUroot_windowqUto_partitionqUdisk_windowqUclose_applicationqUuse_disk_bboxqUto_userqUto_typeqUto_timeqUcustom_windowqUlanguage_bboxqUtime_windowqUto_use_diskqUsignalq Uto_languageq!U
+disk_schemq"Utimeq#U
+to_prepartq$Ulanguage_windowq%Uback_windowq&eUlanguage]q'(hUlangcmdq(Ulanglistq)Ulanguageq*Ulogoq+Utitleq,Uwelltextq-ULanguageq.Ulangfileq/Uqueryq0hU
+sysinstallq1eUkeyboard]q2(hUlayoutq3h.UPlaceholderEntryq4h+Uvariantq5Uxkeyboard_layoutq6h0Uxkeyboard_variantq7heUtype]q8(hU	disk_infoq9U
+part_queryq:h+U	disk_fileq;h UTypesq<h0U	boot_fileq=hU	disk_listq>h1eUuse_disk]q?(hUmemoryq@h9UdsliceqAhh+UautoqBU
+part_schemqCUEntireqDh;h0hh>eUdatetimeqE]qF(U	timedeltaqGUMAXYEARqHUdateqIUdatetime_CAPIqJUtzinfoqKh#UMINYEARqLUdatetimeqMeU	partition]qN(hh+h;Uadd_partqOhh0h>hUpartitiondbqPUdetect_shemeqQh@h9U	disk_partqRUpsizeqSUpartqThCU
+disk_labelqUh"U
+PartitionsqVeUosqW]qX(Upopen4qYUexecleqZUpopen3q[USEEK_CURq\Uspawnlpq]Uexeclpq^Uenvironq_Uspawnvpq`UspawnlqaUexecvpqbUmakedirsqcUlinesepqdUP_WAITqeUspawnvqfUspawnveqgUexecvpeqhUunsetenvqiUSEEK_SETqjUgetenvqkUpopen2qlUwalkqmUspawnleqnUexeclqoUnameqpUSEEK_ENDqqUspawnlpeqrU	P_NOWAITOqsUP_NOWAITqtU
+removedirsquUrenamesqvUspawnvpeqwUexeclpeqxeUuser]qy(hUusersqzUlowerandNunberq{UlowerUpperCaseq|UupperandNunberq}UlowerUpperNumberq~h0hU	lowerCaseqU	upperCaseqÄUallCharacterqÅUto_cfgqÇeUinstall]qÉ(hUgbi_pathqÑhUInstallsqÖUread_outputqÜUthreadBreakqáUutf8convqàUencodingqâh1eUprepart]qä(hhàháhâhÖhÜhhh1eUginstall]qã(hUFINqåhh0UCFGqçh@hRhUhOUPATHqéUGinstallqèUPC_SYSqêUbootMenuqëh>eUtimezone]qí(hUcityqìh.Ubackqîh#h+hU	continentqïeUshutilqñ]qó(UcopyfileqòUignore_patternsqôUcopytreeqöUget_archive_formatsqõUcopyfileobjqúUregister_archive_formatqùUcopymodeqûUmake_archiveqüUmoveq†Uunregister_archive_formatq°Urmtreeq¢UErrorq£Ucopyq§U	ExecErrorq•Ucopy2q¶USpecialFileErrorqßUcopystatq®UWindowsErrorq©eUroot]q™(hU	rootUsersq´h}h{h|hÄhh~h0h=hhhÅeU
+create_cfg]q¨(hh3h*Ucfg_dataq≠hAUstart_InstallqÆh5Uuser_passwdqØh"Utimezoneq∞h=hUmodelq±Udiskq≤Upcinstallcfgq≥U	partlabelq¥UleftqµeUpartition_handler]q∂(Uquery_partitionq∑hh;UmodifyLabelq∏UdiskSchemeChangerqπUDelete_partitionq∫Ulabel_queryqªUcreateSliceqºhh0hU
+query_diskqΩUnlqæUrDeleteParttionqøUcreatePartitionq¿hPhQh@Uquery_labelq¡Upartition_reposq¬UmodifyPartitionq√hAUscheme_queryqƒh9Udiskdbq≈UdestroyParttionq∆U
+disk_queryq«Uhow_partitionq»Upartition_queryq…UcreateLabelq UsliceNumqÀUautoFreeSpaceqÃhCUfind_schemeqÕUmakingParttionqŒUautoDiskPartitionqœUint_sizeq–UslicePartitionq—U
+rpartsliceq“eu.
