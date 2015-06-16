@@ -60,7 +60,7 @@ def scheme_query(path):
 def find_scheme(disk):
         cmd = "%s %s" % (detect_sheme, disk)
         shm_out = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE,
-        stderr=STDOUT, close_fds=True)
+                        stderr=STDOUT, close_fds=True)
         scheme = shm_out.stdout.readlines()[0].rstrip()
         return scheme
 
@@ -313,8 +313,12 @@ class Delete_partition():
         if os.path.exists(dslice):
             sfile = open(dslice, 'r')
             slf = sfile.readlines()[0].rstrip()
-            slnum = int(re.sub("[^0-9]", "", slf))
-            ptnum = snum - slnum
+            print slf
+            if slf == 'all':
+                ptnum = snum - 1
+            else: 
+                slnum = int(re.sub("[^0-9]", "", slf))
+                ptnum = snum - slnum
         if os.path.exists(Part_label):
             p_file = open(Part_label, 'r')
             pf = p_file.readlines()

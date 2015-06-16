@@ -159,7 +159,7 @@ class Partitions():
         self.mountpoint.append_text('/var')
         self.mountpoint.set_active(0)
         self.mountpoint.connect("changed", self.on_label)
-        #table.attach(label0, 0, 2, 0, 1)
+        # table.attach(label0, 0, 2, 0, 1)
         table.attach(label1, 0, 1, 1, 2)
         table.attach(self.fstype, 1, 2, 1, 2)
         table.attach(label2, 0, 1, 2, 3)
@@ -183,12 +183,12 @@ class Partitions():
         if data2 == 1:
             if data1 == 0:
                 button.connect("clicked", self.on_add_label, self.entry, numb, path, True)
-            elif  data1 == 1:
+            elif data1 == 1:
                 button.connect("clicked", self.on_add_partition, self.entry, numb, path, True)
         else:
             if data1 == 0:
                 button.connect("clicked", self.on_add_label, self.entry, numb, path, False)
-            elif  data1 == 1:
+            elif data1 == 1:
                 button.connect("clicked", self.on_add_partition, self.entry, numb, path, False)
         bbox.add(button)
         box2.pack_start(bbox, True, True, 5)
@@ -292,15 +292,15 @@ class Partitions():
         box1.pack_start(box2, True, True, 0)
         box2.show()
         # create Partition slice
-        #label = gtk.Label('<b>Create a New Partition Slice</b>')
-        #label.set_use_markup(True)
-        #label.set_alignment(0, .5)
+        # label = gtk.Label('<b>Create a New Partition Slice</b>')
+        # label.set_use_markup(True)
+        # label.set_alignment(0, .5)
         table = gtk.Table(1, 2, True)
         label1 = gtk.Label("Size(MB):")
         adj = gtk.Adjustment(numb, 0, numb, 1, 100, 0)
         self.entry = gtk.SpinButton(adj, 10, 0)
         self.entry.set_numeric(True)
-        #table.attach(label, 0, 2, 0, 1)
+        # table.attach(label, 0, 2, 0, 1)
         table.attach(label1, 0, 1, 1, 2)
         table.attach(self.entry, 1, 2, 1, 2)
         box2.pack_start(table, False, False, 0)
