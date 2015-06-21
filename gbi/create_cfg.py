@@ -133,7 +133,7 @@ class cfg_data():
     f.writelines('defaultGroup=wheel\n')
     f.writelines('userGroups=operator\n')
     f.writelines('commitUser\n')
-    f.writelines('runCommand=/usr/local/bin/iso_to_hd\n')
+    # f.writelines('runCommand=cd_to_hd\n')
     f.close()
     os.remove(user_passwd)
     Popen(start_Install, shell=True)

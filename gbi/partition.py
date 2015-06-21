@@ -427,8 +427,12 @@ class Partitions():
             #value2 = model.get_value(tree_iter, 2)
             self.scheme = model.get_value(tree_iter, 3)
             self.path = path
+
             if 'freespace' in self.slice:
-                self.create_bt.set_sensitive(True)
+                if path[1] >= 4 and "s" in self.slice:
+                    self.create_bt.set_sensitive(False)
+                else:
+                    self.create_bt.set_sensitive(True)
                 self.delete_bt.set_sensitive(False)
                 self.modifi_bt.set_sensitive(False)
                 self.auto_bt.set_sensitive(True)
