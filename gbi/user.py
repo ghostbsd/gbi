@@ -133,7 +133,7 @@ class users:
         button = gtk.Button(stock=gtk.STOCK_CANCEL)
         bbox.add(button)
         button.connect("clicked", close_application)
-        button = gtk.Button(stock=gtk.STOCK_GO_FORWARD)
+        button = gtk.Button("Install")
         bbox.add(button)
         button.connect("clicked", self.next_window)
         return bbox
