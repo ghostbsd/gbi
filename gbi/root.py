@@ -183,8 +183,6 @@ class rootUsers:
         grub = gtk.RadioButton(bsd, "Grub Boot Manager")
         grub.connect("toggled", self.boot_manager, "grub")
         grub.show()
-        # check = gtk.CheckButton("FreeBSD Boot Manager(MBR only)")
-        # check.connect("toggled", self.on_check)
         self.boot = "none"
         boot = open(boot_file, 'w')
         boot.writelines(self.boot)
