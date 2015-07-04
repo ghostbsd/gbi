@@ -98,11 +98,8 @@ class rootUsers:
             Popen(to_user, shell=True)
             gtk.main_quit()
 
-    def on_check(self, widget):
-        if widget.get_active():
-            self.boot = "bsd"
-        else:
-            self.boot = 'none'
+    def boot_manager(self, radiobutton, val):
+        self.boot = val
         boot = open(boot_file, 'w')
         boot.writelines(self.boot)
         boot.close()
@@ -172,19 +169,31 @@ class rootUsers:
         box3.set_border_width(10)
         box1.pack_start(box3, True, True, 0)
         box3.show()
-        label = gtk.Label()
         label = gtk.Label('<b><span size="xx-large">Boot Option</span></b>')
         label.set_use_markup(True)
         box3.pack_start(label, False, False, 20)
-        check = gtk.CheckButton("Install FreeBSD Boot Manager(MBR only)")
-        check.connect("toggled", self.on_check)
-        self.boot = 'none'
+        hbox = gtk.HBox()
+        box2.pack_start(hbox, True, True, 10)
+        none = gtk.RadioButton(None, "No Boot Manager")
+        none.connect("toggled", self.boot_manager, "none")
+        none.show()
+        bsd = gtk.RadioButton(none, "BSD Boot Manager(MBR only)")
+        bsd.connect("toggled", self.boot_manager, "bsd")
+        bsd.show()
+        grub = gtk.RadioButton(bsd, "Grub Boot Manager")
+        grub.connect("toggled", self.boot_manager, "grub")
+        grub.show()
+        # check = gtk.CheckButton("FreeBSD Boot Manager(MBR only)")
+        # check.connect("toggled", self.on_check)
+        self.boot = "none"
         boot = open(boot_file, 'w')
         boot.writelines(self.boot)
         boot.close()
         table = gtk.Table(1, 6, True)
         table.set_row_spacings(10)
-        table.attach(check, 2, 5, 0, 1)
+        table.attach(none, 2, 5, 0, 1)
+        table.attach(bsd, 2, 5, 1, 2)
+        table.attach(grub, 2, 5, 2, 3)
         box3.pack_start(table, False, False, 10)
         self.box3 = gtk.VBox(False, 10)
         self.box3.set_border_width(10)
