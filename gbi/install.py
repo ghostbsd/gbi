@@ -20,7 +20,7 @@ from partition_handler import rDeleteParttion, destroyParttion, makingParttion
 
 tmp = "/home/ghostbsd/.gbi/"
 gbi_path = "/usr/local/lib/gbi/"
-sysinstall = "/usr/local/bin/pc-sysinstall"
+sysinstall = "/usr/local/sbin/pc-sysinstall"
 
 encoding = locale.getpreferredencoding()
 utf8conv = lambda x: str(x, encoding).encode('utf8')
