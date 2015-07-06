@@ -891,6 +891,14 @@ class destroyParttion():
                  drive), shell=True)
 
 
+def pc_or_efi():
+    cmd = "kenv grub.platform"
+    kenv_output = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE,
+                    stderr=STDOUT, close_fds=True)
+    kenv = kenv_output.stdout.readlines()[0].rstrip()
+    return kenv
+
+
 class makingParttion():
 
     def __init__(self):
@@ -903,12 +911,13 @@ class makingParttion():
                 drive = rpartslice(part)
                 sl = sliceNum(part)
                 if slicePartition(part) == 'p':
-                    cmd = 'gpart add -s 512 -t freebsd-boot -i %s %s' % (sl, drive)
-                    print(cmd)
+                    # if pc_or_efi() == 'efi':
+                    #     cmd = 'gpart add -s 100M -t efi -i %s %s' % (sl, drive)
+                    # else:
+                    cmd = 'gpart add -s 1M -t freebsd-boot -i %s %s' % (sl, drive)
                     call(cmd, shell=True)
                 elif slicePartition(part) == 's':
                     size = int(line[1])
                     block = int(size * 2048)
-                    print(('gpart add -s %s -t freebsd %s' % (block, drive)))
                     cmd = 'gpart add -s %s -t freebsd %s' % (block, drive)
                     call(cmd, shell=True)

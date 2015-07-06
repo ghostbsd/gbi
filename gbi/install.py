@@ -63,15 +63,15 @@ def read_output(command, window, probar):
         line = p.stdout.readline()
         if not line:
             break
-        new_val = probar.get_fraction() + 0.000002
+        new_val = probar.get_fraction() + 0.000003
         probar.set_fraction(new_val)
         bartext = line
-        probar.set_text("%s" % bartext.rstrip())
+        #probar.set_text("%s" % bartext.rstrip())
         ## Those for next 4 line is for debugin only.
         # filer = open("/home/ghostbsd/.gbi/tmp", "a")
         # filer.writelines(bartext)
         # filer.close
-        print(bartext)
+        #print(bartext)
     probar.set_fraction(1.0)
     if bartext.rstrip() == "Installation finished!":
         call('python %send.py' % gbi_path, shell=True, close_fds=True)
