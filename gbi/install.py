@@ -33,28 +33,28 @@ def close_application(self, widget):
 
 
 def read_output(command, window, probar):
-    probar.set_text("Beginning installation")
+    # probar.set_text("Beginning installation")
     sleep(2)
-    probar.set_text("Creating partition table")
+    # probar.set_text("Creating partition table")
     sleep(2)
     if os.path.exists(tmp + 'delete'):
         # new_val = probar.get_fraction() + 0.001
         probar.set_fraction(0.001)
-        probar.set_text("Deleting partition")
+        # probar.set_text("Deleting partition")
         rDeleteParttion()
         sleep(5)
     # destroy disk partition and create scheme
     if os.path.exists(tmp + 'destroy'):
         # new_val = probar.get_fraction() + 0.001
         probar.set_fraction(0.002)
-        probar.set_text("Creating new disk with partitions")
+        # probar.set_text("Creating new disk with partitions")
         destroyParttion()
         sleep(5)
     # create partition
     if os.path.exists(tmp + 'create'):
         # new_val = probar.get_fraction() + 0.001
         probar.set_fraction(0.003)
-        probar.set_text("Creating new partitions")
+        # probar.set_text("Creating new partitions")
         makingParttion()
         sleep(5)
     p = Popen(command, shell=True, stdin=PIPE, stdout=PIPE,
