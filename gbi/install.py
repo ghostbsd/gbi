@@ -33,27 +33,28 @@ def close_application(self, widget):
 
 
 def read_output(command, window, probar):
+    call('service hald stop',shell=True)
     # probar.set_text("Beginning installation")
     sleep(2)
     # probar.set_text("Creating partition table")
     sleep(2)
     if os.path.exists(tmp + 'delete'):
         # new_val = probar.get_fraction() + 0.001
-        probar.set_fraction(0.001)
+        probar.set_fraction(0.002)
         # probar.set_text("Deleting partition")
         rDeleteParttion()
         sleep(5)
     # destroy disk partition and create scheme
     if os.path.exists(tmp + 'destroy'):
         # new_val = probar.get_fraction() + 0.001
-        probar.set_fraction(0.002)
+        probar.set_fraction(0.004)
         # probar.set_text("Creating new disk with partitions")
         destroyParttion()
         sleep(5)
     # create partition
     if os.path.exists(tmp + 'create'):
         # new_val = probar.get_fraction() + 0.001
-        probar.set_fraction(0.003)
+        probar.set_fraction(0.006)
         # probar.set_text("Creating new partitions")
         makingParttion()
         sleep(5)
@@ -73,6 +74,7 @@ def read_output(command, window, probar):
         # filer.close
         #print(bartext)
     probar.set_fraction(1.0)
+    call('service hald start',shell=True)
     if bartext.rstrip() == "Installation finished!":
         call('python %send.py' % gbi_path, shell=True, close_fds=True)
         call("/home/ghostbsd/.gbi/", shell=True, close_fds=True)
