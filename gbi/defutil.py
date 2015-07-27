@@ -151,7 +151,7 @@ def root_window(widget, data):
             #     print(fs)
             #     if fs == '/':
             #         Popen(to_root, shell=True)
-            #         gtk.main_quit()
+            gtk.main_quit()
             #     else:
             #         message = gtk.MessageDialog(type=gtk.MESSAGE_WARNING, buttons=gtk.BUTTONS_OK)
             #         message.set_markup("Root(/) file system is missing")
