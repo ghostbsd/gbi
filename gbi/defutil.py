@@ -150,7 +150,7 @@ def root_window(widget, data):
             #     fs = part[0].split()[-1]
             #     print(fs)
             #     if fs == '/':
-            #         Popen(to_root, shell=True)
+            Popen(to_root, shell=True)
             gtk.main_quit()
             #     else:
             #         message = gtk.MessageDialog(type=gtk.MESSAGE_WARNING, buttons=gtk.BUTTONS_OK)
