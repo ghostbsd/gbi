@@ -542,7 +542,7 @@ class autoFreeSpace():
         plf.close()
         pfile = open(Part_label, 'w')
         pfile.writelines('UFS+SUJ %s /\n' % rootNum)
-        pfile.writelines('SWAP 0 none\n')
+        pfile.writelines('SWAP %s none\n' % swap - 1)
         pfile.close()
         pl = []
         mpl = []
@@ -602,7 +602,7 @@ class autoFreeSpace():
         pfile = open(Part_label, 'w')
         pfile.writelines('BOOT %s /\n' % bs)
         pfile.writelines('UFS+SUJ %s /\n' % rootNum)
-        pfile.writelines('SWAP 0 none\n')
+        pfile.writelines('SWAP %s none\n' % swap - 1)
         pfile.close()
         pl = []
         mpl = []
