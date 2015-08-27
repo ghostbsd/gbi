@@ -40,19 +40,28 @@
 import gtk
 import os.path
 import os
-from subprocess import call
+from subprocess import Popen, PIPE, call
 from defutil import Keyboard_bbox, close_application
 
 # Folder use for the installer.
 tmp = "/home/ghostbsd/.gbi/"
 installer = "/usr/local/lib/gbi/"
+pc_sysinstall = "/usr/local/bin/pc-sysinstall"
 query = "sh /usr/local/lib/gbi/backend-query/"
 if not os.path.exists(tmp):
     os.makedirs(tmp)
 
 logo = "/usr/local/lib/gbi/logo.png"
+
+xk_variant = "%s xkeyboard-variants" % pc_sysinstall
+xk_layout = "%s xkeyboard-layouts" % pc_sysinstall
+
+# xkeyboard_variant = Popen(xk_variant , shell=True, stdout=PIPE, close_fds=True)
+# xkeyboard_layout = Popen(xk_layout , shell=True, stdout=PIPE, close_fds=True)
+
 xkeyboard_variant = "/usr/local/lib/gbi/keyboard/variant"
 xkeyboard_layout = "/usr/local/lib/gbi/keyboard/layout"
+
 layout = '%slayout' % tmp
 variant = '%svariant' % tmp
 

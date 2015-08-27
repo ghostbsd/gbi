@@ -1,0 +1,7 @@
+#!/usr/local/bin/python
+from subprocess import call
+from sys import path
+path.append("/usr/local/lib/gbi")
+
+call("python /usr/local/lib/gbi/language.py", shell=True)
+
