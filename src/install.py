@@ -33,7 +33,8 @@ def close_application(self, widget):
 
 
 def read_output(command, window, probar):
-    call('service hald stop',shell=True)
+    call('service hald stop', shell=True)
+    call('umount /media/GhostBSD', shell=True)
     # probar.set_text("Beginning installation")
     sleep(2)
     # probar.set_text("Creating partition table")
