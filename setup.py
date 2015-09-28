@@ -67,6 +67,7 @@ data_files = [
     ('{prefix}/lib/gbi'.format(prefix=sys.prefix), ['src/type.py',]),
     ('{prefix}/lib/gbi'.format(prefix=sys.prefix), ['src/untitled.py',]),
     ('{prefix}/lib/gbi'.format(prefix=sys.prefix), ['src/use_disk.py',]),
+    ('{prefix}/lib/gbi'.format(prefix=sys.prefix), ['src/use_zfs.py',]),
     ('{prefix}/lib/gbi'.format(prefix=sys.prefix), ['src/user.py',]),
     ('{prefix}/lib/gbi/backend-query'.format(prefix=sys.prefix), ['src/backend-query/detect-laptop.sh',]),
     ('{prefix}/lib/gbi/backend-query'.format(prefix=sys.prefix), ['src/backend-query/detect-nics.sh',]),

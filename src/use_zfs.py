@@ -52,12 +52,11 @@ auto = '%sauto' % tmp
 disk_info = '%sdisk-info.sh' % query
 disk_file = '%sdisk' % tmp
 dslice = '%sslice' % tmp
-Part_label = '%spartlabel' % tmp
+Part_label = '%szfs_partition' % tmp
 part_schem = '%sscheme' % tmp
-disk_list = '%sdisk-list.sh' % query
 
 
-class Entire():
+class ZFS():
     def Selection_Variant(self, tree_selection):
         (model, pathlist) = tree_selection.get_selected_rows()
         for path in pathlist:
@@ -92,6 +91,24 @@ class Entire():
         pfile.writelines('SWAP 0 none\n')
         pfile.close()
 
+    def sheme_selection(self, combobox):
+        model = combobox.get_model()
+        index = combobox.get_active()
+        data = model[index][0]
+        self.scheme = data.partition(':')[0]
+        
+    def mirror_selection(self, combobox):
+        model = combobox.get_model()
+        index = combobox.get_active()
+        data = model[index][0]
+        self.mirror = data
+
+    def on_check(self, widget):
+        if widget.get_active():
+            self.zfs_four_k = ""
+        else:
+            self.zfs_four_k = "None"
+
     def __init__(self):
         window = gtk.Window(gtk.WINDOW_TOPLEVEL)
         window.connect("destroy", close_application)
@@ -109,10 +126,10 @@ class Entire():
         box1.pack_start(box2, True, True, 0)
         box2.show()
         # Title
-        Title = gtk.Label("<b><span size='xx-large'>Install GhostBSD entirely on disk</span></b> ")
+        Title = gtk.Label("<b><span size='xx-large'>ZFS Configuration</span></b> ")
         Title.set_use_markup(True)
         box2.pack_start(Title, False, False, 0)
-        # chose Disk
+        # Chose disk
         sw = gtk.ScrolledWindow()
         sw.set_shadow_type(gtk.SHADOW_ETCHED_IN)
         sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
@@ -137,7 +154,7 @@ class Entire():
         column2.set_widget(column_header2)
         cell3 = gtk.CellRendererText()
         column3 = gtk.TreeViewColumn(None, cell3, text=0)
-        column_header3 = gtk.Label('Scheme')
+        column_header3 = gtk.Label('Name')
         column_header3.set_use_markup(True)
         column_header3.show()
         column3.set_widget(column_header3)
@@ -152,10 +169,78 @@ class Entire():
         tree_selection.connect("changed", self.Selection_Variant)
         sw.add(treeView)
         sw.show()
-        box2.pack_start(sw, True, True, 10)
-        sfile = open(part_schem, 'w')
-        sfile.writelines('partscheme=GPT')
-        sfile.close()
+        #box2.pack_start(sw, False, False, 10)
+        # Mirro, raidz and strip 
+        self.mirror = 'None'
+        mirror_label = gtk.Label('<b>Pool Type</b>')
+        mirror_label.set_use_markup(True)
+        mirror_box = gtk.combo_box_new_text()
+        mirror_box.append_text("None")
+        mirror_box.append_text("mirror")
+        mirror_box.append_text("raidz1")
+        mirror_box.append_text("raidz2")
+        mirror_box.append_text("raidz3")
+        mirror_box.append_text("striop")
+        mirror_box.connect('changed', self.mirror_selection)
+        mirror_box.set_active(0)
+        # Pool Name
+        pool_label = gtk.Label('<b>Pool Name</b>')
+        pool_label.set_use_markup(True)
+        self.pool = gtk.Entry()
+        # Creating MBR or GPT drive
+        label = gtk.Label('<b>Partition Scheme</b>')
+        label.set_use_markup(True)
+        # Adding a combo box to selecting MBR or GPT sheme.
+        self.scheme = 'GPT'
+        shemebox = gtk.combo_box_new_text()
+        shemebox.append_text("GPT: GUID Partition Table")
+        shemebox.append_text("MBR: DOS Partition")
+        shemebox.connect('changed', self.sheme_selection)
+        shemebox.set_active(0)
+        # Force 4k Sectors
+        check = gtk.CheckButton("Force ZFS 4k block size")
+        check.connect("toggled", self.on_check)
+        # Swap Size
+        swp_size_label = gtk.Label('<b>Swap Size</b>')
+        swp_size_label.set_use_markup(True)
+        self.swap_entry = gtk.Entry()
+        # Swap encription
+        swap_encrypt_check = gtk.CheckButton("Encrypt Swap")
+        #swap_encrypt_check.connect("toggled", self.on_check_swap_encrypt)
+        # Swap mirror
+        swap_mirror_check = gtk.CheckButton("Mirror Swap")
+        #swap_mirror_check.connect("toggled", self.on_check_swap_mirror)
+        # GELI Disk encription
+        encrypt_check = gtk.CheckButton("Encrypt Disk")
+        # encrypt_check.connect("toggled", self.on_check_encrypt)
+        # password
+        self.passwd_label = gtk.Label("Password")
+        self.password = gtk.Entry()
+        self.password.set_visibility(False)
+        # self.password.connect("changed", self.passwdstrength)
+        self.vpasswd_label = gtk.Label("Verify Password")
+        self.repassword = gtk.Entry()
+        self.repassword.set_visibility(False)
+        # self.repassword.connect("changed", self.passwdVerification)
+        table = gtk.Table(1, 16, True)
+        table.attach(mirror_label, 0, 4, 1, 2)
+        table.attach(mirror_box, 4, 8, 1, 2)
+        table.attach(label, 8, 12, 1, 2)
+        table.attach(shemebox, 12, 16, 1, 2)
+        table.attach(sw, 1, 15, 3, 6)
+        table.attach(pool_label, 0, 4, 7, 8)
+        table.attach(self.pool, 4, 8, 7, 8)
+        table.attach(check, 10, 15, 7, 8)
+        table.attach(swp_size_label, 8, 12, 9, 10)
+        table.attach(self.swap_entry, 12, 16, 9, 10)
+        table.attach(swap_encrypt_check, 10, 15, 10, 11)
+        table.attach(swap_mirror_check, 10, 15, 11, 12)
+        table.attach(encrypt_check, 2, 7, 9, 10)
+        table.attach(self.passwd_label, 0, 3, 10, 11)
+        table.attach(self.password, 3, 7, 10, 11)
+        table.attach(self.vpasswd_label, 0, 3, 11, 12)
+        table.attach(self.repassword, 3, 7, 11, 12)
+        box2.pack_start(table, False, False, 0)
         box2 = gtk.HBox(False, 10)
         box2.set_border_width(5)
         box1.pack_start(box2, False, False, 0)
@@ -166,5 +251,5 @@ class Entire():
                         True, True, 5)
         window.show_all()
 
-Entire()
+ZFS()
 gtk.main()

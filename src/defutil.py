@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 #####################################################################
-# Copyright (c) 2010-2014, GhostBSD. All rights reserved.
+# Copyright (c) 2010-2015, GhostBSD. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -28,9 +28,6 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #####################################################################
-# $Id: defutil.py v 0.4 Sunday, February 08 2015 Eric Turgeon $
-
-# defutil.py define all repetitive def for the the installer.
 
 import gtk
 import os.path
@@ -52,6 +49,7 @@ to_type = 'python %stype.py' % installer
 to_upgrade = 'python %stype.py' % installer
 to_use_disk = 'python %suse_disk.py' % installer
 to_partition = 'python %spartition.py' % installer
+to_zfs = 'python %suse_zfs.py' % installer
 to_root = 'python %sroot.py' % installer
 to_user = 'python %suser.py' % installer
 Part_label = '%spartlabel' % tmp
@@ -92,13 +90,15 @@ def type_window(widget):
 def disk_window(widget, nxt):
     read_file = open(signal, 'r')
     nxt = read_file.read()
-    if nxt == 'user':
+    if nxt == 'disk':
         Popen(to_use_disk, shell=True)
         gtk.main_quit()
     elif nxt == 'custom':
         Popen(to_partition, shell=True)
         gtk.main_quit()
-
+    elif nxt == 'zfs':
+        Popen(to_zfs, shell=True)
+        gtk.main_quit()
 
 def custom_window(widget):
         Popen(to_partition, shell=True)
@@ -108,11 +108,14 @@ def custom_window(widget):
 def back_window(widget):
     read_file = open(signal, 'r')
     nxt = read_file.readlines()[0].rstrip()
-    if nxt == 'user':
+    if nxt == 'disk':
         Popen(to_use_disk, shell=True)
         gtk.main_quit()
     elif nxt == 'custom':
         Popen(to_partition, shell=True)
+        gtk.main_quit()
+    elif nxt == "zfs":
+        Popen(to_zfs, shell=True)
         gtk.main_quit()
 
 

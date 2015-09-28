@@ -1,6 +1,6 @@
-#!/usr/bin/env python
+#!/usr/local/bin//python
 #
-# Copyright (c) 2013 GhostBSD
+# Copyright (c) 2015 GhostBSD
 #
 # See COPYING for licence terms.
 #
@@ -68,8 +68,8 @@ class Types():
         box2.pack_start(hbox, True, True, 10)
         radio = gtk.RadioButton(None, "Use Entire Disk")
         bbox.pack_start(radio, False, True, 10)
-        radio.connect("toggled", self.partition, "user")
-        self.ne = 'user'
+        radio.connect("toggled", self.partition, "disk")
+        self.ne = 'disk'
         pass_file = open(signal, 'w')
         pass_file.writelines(self.ne)
         pass_file.close
@@ -80,6 +80,10 @@ class Types():
         radio.connect("toggled", self.partition, "custom")
         radio.show()
         # box2.pack_start(radio, True, True, 10)
+        radio = gtk.RadioButton(radio, "Use Entire Disk With ZFS")
+        bbox.pack_start(radio, False, True, 10)
+        radio.connect("toggled", self.partition, "zfs")
+        radio.show()
         hbox.pack_start(bbox, True, True, 100)
         # hbox.pack_start(bbox, True, True, 50)
         label = gtk.Label()
