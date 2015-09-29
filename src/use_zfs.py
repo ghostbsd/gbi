@@ -37,7 +37,7 @@ import os
 import os.path
 from subprocess import Popen, PIPE, STDOUT
 from defutil import use_disk_bbox, close_application
-from partition_handler import disk_query
+from partition_handler import zfs_disk_query, zfs_disk_size_query
 
 # Folder use pr the installer.
 tmp = "/home/ghostbsd/.gbi/"
@@ -54,6 +54,7 @@ disk_file = '%sdisk' % tmp
 dslice = '%sslice' % tmp
 Part_label = '%szfs_partition' % tmp
 part_schem = '%sscheme' % tmp
+zfs_dsk_list = []
 
 
 class ZFS():
@@ -103,11 +104,41 @@ class ZFS():
         data = model[index][0]
         self.mirror = data
 
+    def on_check_poll(self, widget):
+        if widget.get_active():
+            self.pool.set_sensitive(True)
+            self.zpool = True
+        else:
+            self.pool.set_sensitive(False)
+            self.zpool = False
+
     def on_check(self, widget):
         if widget.get_active():
-            self.zfs_four_k = ""
+            self.zfs_four_k = "True"
         else:
-            self.zfs_four_k = "None"
+            self.zfs_four_k = "False"
+
+    def on_check_encrypt(self, widget):
+        if widget.get_active():
+            self.password.set_sensitive(True)
+            self.repassword.set_sensitive(True)
+            self.disk_encript = True
+        else:
+            self.password.set_sensitive(False)
+            self.repassword.set_sensitive(False)
+            self.disk_encript = False
+
+    def on_check_swap_encrypt(self, widget):
+        if widget.get_active():
+            self.swap_encrypt = "True"
+        else:
+            self.swap_encrypt = "False"
+            
+    def on_check_swap_mirror(self, widget):
+        if widget.get_active():
+            self.swap_mirror = "True"
+        else:
+            self.swap_mirror = "False"
 
     def __init__(self):
         window = gtk.Window(gtk.WINDOW_TOPLEVEL)
@@ -133,12 +164,20 @@ class ZFS():
         sw = gtk.ScrolledWindow()
         sw.set_shadow_type(gtk.SHADOW_ETCHED_IN)
         sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        store = gtk.TreeStore(str, str, str, 'gboolean')
-        for disk in disk_query():
-            store.append(None, [disk[0], disk[1], disk[3], True])
+        store = gtk.TreeStore(str, str, str,'gboolean')
+        for disk in zfs_disk_query():
+            print disk
+            dsk = disk.partition(':')[0].rstrip()
+            print dsk
+            dsk_name = disk.partition(':')[2].rstrip()
+            dsk_size = zfs_disk_size_query(dsk).rstrip()
+            store.append(None, [dsk, dsk_size, dsk_name, False])
         treeView = gtk.TreeView(store)
         treeView.set_model(store)
         treeView.set_rules_hint(True)
+        self.check_cell = gtk.CellRendererToggle()
+        self.check_cell.set_property('activatable', True)
+        self.check_cell.connect('toggled', self.col1_toggled_cb, store)
         cell = gtk.CellRendererText()
         column = gtk.TreeViewColumn(None, cell, text=0)
         column_header = gtk.Label('Disk')
@@ -158,9 +197,12 @@ class ZFS():
         column_header3.set_use_markup(True)
         column_header3.show()
         column3.set_widget(column_header3)
+        column1 = gtk.TreeViewColumn("Check", self.check_cell)
+        column1.add_attribute(self.check_cell, "active", 3)
         column.set_attributes(cell, text=0)
         column2.set_attributes(cell2, text=1)
         column3.set_attributes(cell3, text=2)
+        treeView.append_column(column1)
         treeView.append_column(column)
         treeView.append_column(column2)
         treeView.append_column(column3)
@@ -184,61 +226,70 @@ class ZFS():
         mirror_box.connect('changed', self.mirror_selection)
         mirror_box.set_active(0)
         # Pool Name
-        pool_label = gtk.Label('<b>Pool Name</b>')
-        pool_label.set_use_markup(True)
+        self.zpool = False
+        pool_check = gtk.CheckButton('Pool Name')
+        pool_check.connect("toggled", self.on_check_poll)
         self.pool = gtk.Entry()
+        self.pool.set_text('zroot')
+        self.pool.set_sensitive(False)
         # Creating MBR or GPT drive
         label = gtk.Label('<b>Partition Scheme</b>')
         label.set_use_markup(True)
         # Adding a combo box to selecting MBR or GPT sheme.
         self.scheme = 'GPT'
         shemebox = gtk.combo_box_new_text()
-        shemebox.append_text("GPT: GUID Partition Table")
-        shemebox.append_text("MBR: DOS Partition")
+        shemebox.append_text("GPT")
+        shemebox.append_text("MBR")
         shemebox.connect('changed', self.sheme_selection)
         shemebox.set_active(0)
         # Force 4k Sectors
+        self.zfs_four_k = "False"
         check = gtk.CheckButton("Force ZFS 4k block size")
         check.connect("toggled", self.on_check)
         # Swap Size
-        swp_size_label = gtk.Label('<b>Swap Size</b>')
+        swp_size_label = gtk.Label('<b>Swap Size(MB)</b>')
         swp_size_label.set_use_markup(True)
         self.swap_entry = gtk.Entry()
         # Swap encription
+        self.swap_encrypt = False
         swap_encrypt_check = gtk.CheckButton("Encrypt Swap")
-        #swap_encrypt_check.connect("toggled", self.on_check_swap_encrypt)
+        swap_encrypt_check.connect("toggled", self.on_check_swap_encrypt)
         # Swap mirror
+        self.swap_mirror = False
         swap_mirror_check = gtk.CheckButton("Mirror Swap")
-        #swap_mirror_check.connect("toggled", self.on_check_swap_mirror)
+        swap_mirror_check.connect("toggled", self.on_check_swap_mirror)
         # GELI Disk encription
+        self.disk_encript = False
         encrypt_check = gtk.CheckButton("Encrypt Disk")
-        # encrypt_check.connect("toggled", self.on_check_encrypt)
+        encrypt_check.connect("toggled", self.on_check_encrypt)
         # password
         self.passwd_label = gtk.Label("Password")
         self.password = gtk.Entry()
+        self.password.set_sensitive(False)
         self.password.set_visibility(False)
         # self.password.connect("changed", self.passwdstrength)
-        self.vpasswd_label = gtk.Label("Verify Password")
+        self.vpasswd_label = gtk.Label("Verify it")
         self.repassword = gtk.Entry()
+        self.repassword.set_sensitive(False)
         self.repassword.set_visibility(False)
         # self.repassword.connect("changed", self.passwdVerification)
         table = gtk.Table(1, 16, True)
         table.attach(mirror_label, 0, 4, 1, 2)
-        table.attach(mirror_box, 4, 8, 1, 2)
-        table.attach(label, 8, 12, 1, 2)
-        table.attach(shemebox, 12, 16, 1, 2)
+        table.attach(mirror_box, 4, 7, 1, 2)
+        table.attach(label, 9, 12, 1, 2)
+        table.attach(shemebox, 12, 15, 1, 2)
         table.attach(sw, 1, 15, 3, 6)
-        table.attach(pool_label, 0, 4, 7, 8)
-        table.attach(self.pool, 4, 8, 7, 8)
-        table.attach(check, 10, 15, 7, 8)
-        table.attach(swp_size_label, 8, 12, 9, 10)
-        table.attach(self.swap_entry, 12, 16, 9, 10)
-        table.attach(swap_encrypt_check, 10, 15, 10, 11)
-        table.attach(swap_mirror_check, 10, 15, 11, 12)
-        table.attach(encrypt_check, 2, 7, 9, 10)
-        table.attach(self.passwd_label, 0, 3, 10, 11)
+        table.attach(pool_check, 1, 4, 7, 8)
+        table.attach(self.pool, 4, 7, 7, 8)
+        table.attach(check, 9, 15, 7, 8)
+        table.attach(swp_size_label, 9, 12, 9, 10)
+        table.attach(self.swap_entry, 12, 15, 9, 10)
+        table.attach(swap_encrypt_check, 9, 15, 10, 11)
+        table.attach(swap_mirror_check, 9, 15, 11, 12)
+        table.attach(encrypt_check, 1, 7, 9, 10)
+        table.attach(self.passwd_label, 1, 3, 10, 11)
         table.attach(self.password, 3, 7, 10, 11)
-        table.attach(self.vpasswd_label, 0, 3, 11, 12)
+        table.attach(self.vpasswd_label, 1, 3, 11, 12)
         table.attach(self.repassword, 3, 7, 11, 12)
         box2.pack_start(table, False, False, 0)
         box2 = gtk.HBox(False, 10)
@@ -250,6 +301,14 @@ class ZFS():
                         10, gtk.BUTTONBOX_END),
                         True, True, 5)
         window.show_all()
+
+    def col1_toggled_cb(self, cell, path, model):
+        model[path][3] = not model[path][3]
+        if model[path][3] is False:
+            zfs_dsk_list.remove(model[path][0])
+        else:
+            zfs_dsk_list.extend([model[path][0]])
+        return
 
 ZFS()
 gtk.main()

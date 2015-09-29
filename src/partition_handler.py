@@ -9,6 +9,7 @@ tmp = "/home/ghostbsd/.gbi/"
 if not os.path.exists(tmp):
     os.makedirs(tmp)
 installer = "/usr/local/lib/gbi/"
+sysinstall = "/usr/local/sbin/pc-sysinstall"
 partitiondb = "%spartitiondb/" % tmp
 query = "sh /usr/local/lib/gbi/backend-query/"
 query_disk = '%sdisk-list.sh' % query
@@ -29,6 +30,20 @@ def disk_query():
     df = open(diskdb, 'rb')
     dl = pickle.load(df)
     return dl
+
+
+def zfs_disk_query():
+    disk_output = Popen(sysinstall + " disk-list", shell=True, stdin=PIPE, stdout=PIPE,
+    stderr=STDOUT, close_fds=True)
+    return disk_output.stdout.readlines()
+
+
+def zfs_disk_size_query(disk):
+    disk_info_output = Popen(sysinstall + " disk-info " + disk, shell=True, stdin=PIPE, stdout=PIPE,
+    stderr=STDOUT, close_fds=True)
+    return disk_info_output.stdout.readlines()[3].partition('=')[2]
+
+zfs_disk_size_query("ada0")
 
 
 def how_partition(path):
