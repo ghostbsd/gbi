@@ -43,8 +43,6 @@ def zfs_disk_size_query(disk):
     stderr=STDOUT, close_fds=True)
     return disk_info_output.stdout.readlines()[3].partition('=')[2]
 
-zfs_disk_size_query("ada0")
-
 
 def how_partition(path):
     disk = disk_query()[path[0]][0]

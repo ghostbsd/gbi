@@ -53,7 +53,7 @@ auto = '%sauto' % tmp
 disk_info = '%sdisk-info.sh' % query
 disk_file = '%sdisk' % tmp
 dslice = '%sslice' % tmp
-Part_label = '%szfs_partition' % tmp
+Part_label = '%szfs_config' % tmp
 part_schem = '%sscheme' % tmp
 zfs_dsk_list = []
 to_root = 'python %sroot.py' % installer
@@ -115,9 +115,34 @@ class ZFS():
         SIZE = int(zfs_dsk_list[0].partition('-')[2].rstrip())
         SWAP = int(self.swap_entry.get_text())
         ZFS_NUM = SIZE - SWAP
+        if self.disk_encript is True:
+            dgeli = '.eli '
+        else:
+            dgeli = ' '
+        if self.swap_encrypt is True:
+            sgeli = '.eli '
+        else:
+            sgeli = ' '
         pfile = open(Part_label, 'w')
-        pfile.writelines('ZFS %s /\n' % ZFS_NUM)
-        pfile.writelines('SWAP %s none\n' % SWAP)
+        pfile.writelines('disk0=%s\n' % zfs_dsk_list[0].partition('-')[0].rstrip())
+        pfile.writelines('partition=ALL')
+        if self.mirror == 'None':
+            pfile.writelines('disk0-part=ZFS%s%s /,/usr,/var\n' % (dgeli, ZFS_NUM))
+            if SWAP != 0:
+                pfile.writelines('disk0-part=SWAP%s%s none\n' % (sgeli, SWAP))
+        else:
+            ZFS_disk = zfs_dsk_list
+            disk_len = len(ZFS_disk) - 1
+            num = 1
+            while disk_len != 0:
+                mirror_dsk = ' ' + ZFS_disk[num].partition('-')[0].rstrip()
+                num += 1
+                disk_len -= 1
+            pfile.writelines('disk0-part=ZFS%s%s /, /usr, /var (%s:%s)\n' % (dgeli, ZFS_NUM, self.mirror, mirror_dsk ))
+            if SWAP != 0:
+                pfile.writelines('disk0-part=SWAP%s%s none\n' % (sgeli, SWAP))
+        if self.disk_encript is True:encpass=mypass
+        pfile.writelines('encpass=%s' % self.password.get_text())
         pfile.close()
         # Popen(to_root, shell=True)
         # gtk.main_quit()
