@@ -156,8 +156,8 @@ class ZFS():
             pfile.writelines('#encpass=None\n')
         pfile.writelines('commitDiskLabel\n')
         pfile.close()
-        # Popen(to_root, shell=True)
-        # gtk.main_quit()
+        Popen(to_root, shell=True)
+        gtk.main_quit()
 
 
     def sheme_selection(self, combobox):
