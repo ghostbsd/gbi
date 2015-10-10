@@ -79,7 +79,7 @@ class cfg_data():
                 read = open(boot_file, 'r')
                 boot = read.readlines()[0].strip()
                 f.writelines('bootManager=%s\n' % boot)
-        os.remove(boot_file)
+                os.remove(boot_file)
             else:
                 f.writelines(linepartscheme)
         #os.remove(zfs_config)
