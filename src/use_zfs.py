@@ -124,12 +124,20 @@ class ZFS():
         else:
             sgeli = ' '
         pfile = open(Part_label, 'w')
+        if self.zpool is True:
+            pfile.writelines("zpoolName=%s\n" % self.pool.get_text())
+        else:
+            pfile.writelines("#zpoolName=None\n")
+        if self.zfs_four_k is True:
+            pfile.writelines('zfsForce4k=YES\n\n')
+        else:
+            pfile.writelines('#zfsForce4k=No\n\n')
         pfile.writelines('disk0=%s\n' % zfs_dsk_list[0].partition('-')[0].rstrip())
-        pfile.writelines('partition=ALL')
+        pfile.writelines('partition=ALL\n')
+        pfile.writelines('partscheme=%s\n' % self.scheme)
+        pfile.writelines('commitDiskPart\n\n')
         if self.mirror == 'None':
-            pfile.writelines('disk0-part=ZFS%s%s /,/usr,/var\n' % (dgeli, ZFS_NUM))
-            if SWAP != 0:
-                pfile.writelines('disk0-part=SWAP%s%s none\n' % (sgeli, SWAP))
+            pool_type = '\n'
         else:
             ZFS_disk = zfs_dsk_list
             disk_len = len(ZFS_disk) - 1
@@ -138,11 +146,15 @@ class ZFS():
                 mirror_dsk = ' ' + ZFS_disk[num].partition('-')[0].rstrip()
                 num += 1
                 disk_len -= 1
-            pfile.writelines('disk0-part=ZFS%s%s /, /usr, /var (%s:%s)\n' % (dgeli, ZFS_NUM, self.mirror, mirror_dsk ))
-            if SWAP != 0:
-                pfile.writelines('disk0-part=SWAP%s%s none\n' % (sgeli, SWAP))
-        if self.disk_encript is True:encpass=mypass
-        pfile.writelines('encpass=%s' % self.password.get_text())
+            pool_type = ' (%s:%s)\n' % (self.mirror, mirror_dsk)
+        pfile.writelines('disk0-part=ZFS%s%s /, /usr, /var%s' % (dgeli, ZFS_NUM, pool_type))
+        if SWAP != 0:
+            pfile.writelines('disk0-part=SWAP%s%s none\n' % (sgeli, SWAP))
+        if self.disk_encript is True:
+            pfile.writelines('encpass=%s\n' % self.password.get_text())
+        else:
+            pfile.writelines('#encpass=None\n')
+        pfile.writelines('commitDiskLabel\n')
         pfile.close()
         # Popen(to_root, shell=True)
         # gtk.main_quit()
@@ -170,9 +182,9 @@ class ZFS():
 
     def on_check(self, widget):
         if widget.get_active():
-            self.zfs_four_k = "True"
+            self.zfs_four_k = True
         else:
-            self.zfs_four_k = "False"
+            self.zfs_four_k = False
 
     def on_check_encrypt(self, widget):
         if widget.get_active():
@@ -188,15 +200,15 @@ class ZFS():
 
     def on_check_swap_encrypt(self, widget):
         if widget.get_active():
-            self.swap_encrypt = "True"
+            self.swap_encrypt = True
         else:
-            self.swap_encrypt = "False"
+            self.swap_encrypt = False
             
     def on_check_swap_mirror(self, widget):
         if widget.get_active():
-            self.swap_mirror = "True"
+            self.swap_mirror = True
         else:
-            self.swap_mirror = "False"
+            self.swap_mirror = False
 
     def __init__(self):
         window = gtk.Window(gtk.WINDOW_TOPLEVEL)
@@ -350,12 +362,12 @@ class ZFS():
         table.attach(check, 9, 15, 7, 8)
         table.attach(swp_size_label, 9, 12, 9, 10)
         table.attach(self.swap_entry, 12, 15, 9, 10)
-        table.attach(self.swap_encrypt_check, 9, 15, 10, 11)
-        table.attach(swap_mirror_check, 9, 15, 11, 12)
+        table.attach(self.swap_encrypt_check, 9, 15, 11, 12)
+        #table.attach(swap_mirror_check, 9, 15, 11, 12)
         table.attach(encrypt_check, 1, 7, 9, 10)
         table.attach(self.passwd_label, 1, 3, 10, 11)
         table.attach(self.password, 3, 7, 10, 11)
-        table.attach(self.strenght_label, 7, 9, 10, 11)
+        table.attach(self.strenght_label, 7, 10, 10, 11)
         table.attach(self.vpasswd_label, 1, 3, 11, 12)
         table.attach(self.repassword, 3, 7, 11, 12)
         table.attach(self.img, 7, 8, 11, 12)

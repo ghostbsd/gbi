@@ -29,6 +29,7 @@ timezone = '%stimezone' % tmp
 variant = '%svariant' % tmp
 boot_file = '%sboot' % tmp
 disk_schem = '%sscheme' % tmp
+zfs_config = '%szfs_config' % tmp
 
 
 class cfg_data():
@@ -68,43 +69,58 @@ class cfg_data():
         f.writelines('timeZone=%s\n' % t_output)
         # f.writelines('enableNTP=yes\n')
         os.remove(timezone)
-    # Disk Setup
-    r = open(disk, 'r')
-    drive = r.readlines()
-    d_output = drive[0].strip()
-    f.writelines('\n# Disk Setup\n')
-    f.writelines('disk0=%s\n' % d_output)
-    os.remove(disk)
-    # Partition Slice.
-    p = open(dslice, 'r')
-    line = p.readlines()
-    part = line[0].rstrip()
-    f.writelines('partition=%s\n' % part)
-    os.remove(dslice)
-    # Boot Menu
-    read = open(boot_file, 'r')
-    line = read.readlines()
-    boot = line[0].strip()
-    f.writelines('bootManager=%s\n' % boot)
-    os.remove(boot_file)
-    # Sheme sheme
-    read = open(disk_schem, 'r')
-    shem = read.readlines()[0]
-    f.writelines(shem + '\n')
-    f.writelines('commitDiskPart\n')
-    # os.remove(disk_schem)
-    # Partition Setup
-    f.writelines('\n# Partition Setup\n')
-    part = open(partlabel, 'r')
-    # If slice and auto file exist add first partition line.
-    # But Swap need to be 0 it will take the rest of the freespace.
-    for line in part:
-        if 'BOOT' in line:
-            pass
-        else:
-            f.writelines('disk0-part=%s\n' % line.strip())
-    f.writelines('commitDiskLabel\n')
-    os.remove(partlabel)
+    if os.path.exists(zfs_config):
+        # Disk Setup
+        r = open(zfs_config, 'r')
+        zfsconf = r.readlines()
+        for line in zfsconf:
+            if 'partscheme' in line:
+                f.writelines(line)
+                read = open(boot_file, 'r')
+                boot = read.readlines()[0].strip()
+                f.writelines('bootManager=%s\n' % boot)
+        os.remove(boot_file)
+            else:
+                f.writelines(linepartscheme)
+        #os.remove(zfs_config)
+    else:
+        # Disk Setup
+        r = open(disk, 'r')
+        drive = r.readlines()
+        d_output = drive[0].strip()
+        f.writelines('\n# Disk Setup\n')
+        f.writelines('disk0=%s\n' % d_output)
+        os.remove(disk)
+        # Partition Slice.
+        p = open(dslice, 'r')
+        line = p.readlines()
+        part = line[0].rstrip()
+        f.writelines('partition=%s\n' % part)
+        os.remove(dslice)
+        # Boot Menu
+        read = open(boot_file, 'r')
+        line = read.readlines()
+        boot = line[0].strip()
+        f.writelines('bootManager=%s\n' % boot)
+        os.remove(boot_file)
+        # Sheme sheme
+        read = open(disk_schem, 'r')
+        shem = read.readlines()[0]
+        f.writelines(shem + '\n')
+        f.writelines('commitDiskPart\n')
+        # os.remove(disk_schem)
+        # Partition Setup
+        f.writelines('\n# Partition Setup\n')
+        part = open(partlabel, 'r')
+        # If slice and auto file exist add first partition line.
+        # But Swap need to be 0 it will take the rest of the freespace.
+        for line in part:
+            if 'BOOT' in line:
+                pass
+            else:
+                f.writelines('disk0-part=%s\n' % line.strip())
+        f.writelines('commitDiskLabel\n')
+        os.remove(partlabel)
     # Network Configuration
     f.writelines('\n# Network Configuration\n')
     readu = open(user_passwd, 'rb')
