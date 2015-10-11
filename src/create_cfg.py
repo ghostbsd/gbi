@@ -81,7 +81,7 @@ class cfg_data():
                 f.writelines('bootManager=%s\n' % boot)
                 os.remove(boot_file)
             else:
-                f.writelines(linepartscheme)
+                f.writelines(line)
         #os.remove(zfs_config)
     else:
         # Disk Setup
