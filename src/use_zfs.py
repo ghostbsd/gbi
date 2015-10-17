@@ -112,7 +112,7 @@ class ZFS():
         return bbox
 
     def next_to_root(self, widget):
-        SIZE = int(zfs_dsk_list[0].partition('-')[2].rstrip())
+        SIZE = int(zfs_dsk_list[0].partition('-')[2].rstrip()) - 1
         SWAP = int(self.swap_entry.get_text())
         ZFS_NUM = SIZE - SWAP
         if self.disk_encript is True:
