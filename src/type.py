@@ -66,7 +66,7 @@ class Types():
         # create a Hbox to center the radio button.
         hbox = gtk.HBox()
         box2.pack_start(hbox, True, True, 10)
-        radio = gtk.RadioButton(None, "Use Entire Disk")
+        radio = gtk.RadioButton(None, "UFS full disk Configuration")
         bbox.pack_start(radio, False, True, 10)
         radio.connect("toggled", self.partition, "disk")
         self.ne = 'disk'
@@ -75,12 +75,12 @@ class Types():
         pass_file.close
         radio.show()
         # box2.pack_start(radio, True, True, 10)
-        radio = gtk.RadioButton(radio, "Partition Editor")
+        radio = gtk.RadioButton(radio, "UFS Custom Configuration")
         bbox.pack_start(radio, False, True, 10)
         radio.connect("toggled", self.partition, "custom")
         radio.show()
         # box2.pack_start(radio, True, True, 10)
-        radio = gtk.RadioButton(radio, "Use Entire Disk With ZFS")
+        radio = gtk.RadioButton(radio, "ZFS Configuration")
         bbox.pack_start(radio, False, True, 10)
         radio.connect("toggled", self.partition, "zfs")
         radio.show()

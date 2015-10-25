@@ -112,7 +112,7 @@ class ZFS():
         return bbox
 
     def next_to_root(self, widget):
-        SIZE = int(zfs_dsk_list[0].partition('-')[2].rstrip()) - 1
+        SIZE = int(zfs_dsk_list[0].partition('-')[2].rstrip()) - 2
         SWAP = int(self.swap_entry.get_text())
         ZFS_NUM = SIZE - SWAP
         if self.disk_encript is True:
@@ -191,12 +191,12 @@ class ZFS():
             self.password.set_sensitive(True)
             self.repassword.set_sensitive(True)
             self.disk_encript = True
-            self.swap_encrypt_check.set_active(True)
+            #self.swap_encrypt_check.set_active(True)
         else:
             self.password.set_sensitive(False)
             self.repassword.set_sensitive(False)
             self.disk_encript = False
-            self.swap_encrypt_check.set_active(False)
+            #self.swap_encrypt_check.set_active(False)
 
     def on_check_swap_encrypt(self, widget):
         if widget.get_active():
@@ -362,7 +362,7 @@ class ZFS():
         table.attach(check, 9, 15, 7, 8)
         table.attach(swp_size_label, 9, 12, 9, 10)
         table.attach(self.swap_entry, 12, 15, 9, 10)
-        table.attach(self.swap_encrypt_check, 9, 15, 11, 12)
+        #table.attach(self.swap_encrypt_check, 9, 15, 11, 12)
         #table.attach(swap_mirror_check, 9, 15, 11, 12)
         table.attach(encrypt_check, 1, 7, 9, 10)
         table.attach(self.passwd_label, 1, 3, 10, 11)
