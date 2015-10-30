@@ -456,21 +456,13 @@ class Partitions():
                     self.create_bt.set_sensitive(True)
                 else:
                     self.create_bt.set_sensitive(False)
+
     def __init__(self):
-        window = gtk.Window(gtk.WINDOW_TOPLEVEL)
-        window.connect("destroy", close_application)
-        window.set_size_request(700, 500)
-        window.set_resizable(False)
-        window.set_title("GhostBSD Installer")
-        window.set_border_width(0)
-        window.set_position(gtk.WIN_POS_CENTER)
-        window.set_icon_from_file("/usr/local/lib/gbi/logo.png")
-        box1 = gtk.VBox(False, 0)
-        window.add(box1)
-        box1.show()
+        self.box1 = gtk.VBox(False, 0)
+        self.box1.show()
         box2 = gtk.VBox(False, 10)
         box2.set_border_width(10)
-        box1.pack_start(box2, True, True, 0)
+        self.box1.pack_start(box2, True, True, 0)
         box2.show()
         # Title
         Title = gtk.Label("<b><span size='xx-large'>Partition Editor</span></b> ")
@@ -530,20 +522,13 @@ class Partitions():
         box2.pack_start(sw)
         box2 = gtk.HBox(False, 10)
         box2.set_border_width(5)
-        box1.pack_start(box2, False, True, 0)
+        self.box1.pack_start(box2, False, True, 0)
         box2.show()
         self.scheme = 'GPT'
         box2.pack_start(self.delete_create_button(True,
                                                   10, gtk.BUTTONBOX_START),
                         True, True, 5)
-        box2 = gtk.HBox(False, 10)
-        box2.set_border_width(5)
-        box1.pack_start(box2, False, True, 0)
-        box2.show()
-        box2.pack_start(partition_bbox(True,
-                                       10, gtk.BUTTONBOX_END),
-                        True, True, 5)
-        window.show_all()
+        return
 
     def Tree_Store(self):
         self.store.clear()
@@ -565,6 +550,5 @@ class Partitions():
                             self.store.append(piter1, [li[0], li[1], li[2], li[3], True])
         return self.store
 
-# partition_repos()
-Partitions()
-gtk.main()
+    def get_model(self):
+        return self.box1

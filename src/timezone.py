@@ -55,7 +55,7 @@ city = '%s/timezone/city/' % installer
 time = '%stimezone' % tmp
 
 
-class Language:
+class TimeZone:
 
     def continent_columns(self, treeView):
         cell = gtk.CellRendererText()
@@ -101,20 +101,11 @@ class Language:
         time_file.close()
 
     def __init__(self):
-        window = gtk.Window(gtk.WINDOW_TOPLEVEL)
-        window.connect("destroy", close_application)
-        window.set_size_request(700, 500)
-        window.set_resizable(False)
-        window.set_title("GhostBSD Installer")
-        window.set_border_width(0)
-        window.set_position(gtk.WIN_POS_CENTER)
-        window.set_icon_from_file(logo)
-        box1 = gtk.VBox(False, 0)
-        window.add(box1)
-        box1.show()
+        self.box1 = gtk.VBox(False, 0)
+        self.box1.show()
         box2 = gtk.VBox(False, 10)
         box2.set_border_width(10)
-        box1.pack_start(box2, True, True, 0)
+        self.box1.pack_start(box2, True, True, 0)
         box2.show()
         table = gtk.Table(1, 2, True)
         label = gtk.Label('<b><span size="xx-large">Time Zone Selection</span></b>')
@@ -161,15 +152,7 @@ class Language:
         sw.add(treeView)
         sw.show()
         hbox.pack_start(sw, True, True, 5)
+        return
 
-        box2 = gtk.HBox(False, 10)
-        box2.set_border_width(5)
-        box1.pack_start(box2, False, False, 0)
-        box2.show()
-        box2.pack_start(time_bbox(True,
-                        10, gtk.BUTTONBOX_END),
-                        True, True, 5)
-        window.show_all()
-
-Language()
-gtk.main()
+    def get_model(self):
+        return self.box1

@@ -87,7 +87,7 @@ def allCharacter(strg, search=re.compile(r'[^a-zA-Z0-9~\!@#\$%\^&\*_\+":;\'\-]')
     return not bool(search(strg))
 
 
-class rootUsers:
+class RootUser:
     def next_window(self, widget):
         f = open('%sroot' % tmp, 'wb')
         if self.password.get_text() == self.repassword.get_text():
@@ -122,19 +122,11 @@ class rootUsers:
         return bbox
 
     def __init__(self):
-        window = gtk.Window(gtk.WINDOW_TOPLEVEL)
-        window.connect("destroy", close_application)
-        window.set_size_request(700, 500)
-        window.set_title("GhostBSD Installer")
-        window.set_border_width(10)
-        window.set_position(gtk.WIN_POS_CENTER)
-        window.set_icon_from_file("/usr/local/lib/gbi/logo.png")
-        box1 = gtk.VBox(False, 0)
-        window.add(box1)
-        box1.show()
+        self.box1 = gtk.VBox(False, 0)
+        self.box1.show()
         box2 = gtk.VBox(False, 0)
         box2.set_border_width(10)
-        box1.pack_start(box2, False, False, 10)
+        self.box1.pack_start(box2, False, False, 10)
         box2.show()
         # title.
         ttext = "Administrator(root) Password"
@@ -167,7 +159,7 @@ class rootUsers:
         # Boot option.
         box3 = gtk.VBox(False, 10)
         box3.set_border_width(10)
-        box1.pack_start(box3, True, True, 0)
+        self.box1.pack_start(box3, True, True, 0)
         box3.show()
         label = gtk.Label('<b><span size="xx-large">Boot Option</span></b>')
         label.set_use_markup(True)
@@ -195,15 +187,10 @@ class rootUsers:
         box3.pack_start(table, False, False, 10)
         self.box3 = gtk.VBox(False, 10)
         self.box3.set_border_width(10)
-        box1.pack_start(self.box3, True, True, 0)
-        box2 = gtk.HBox(False, 10)
-        box2.set_border_width(5)
-        box1.pack_start(box2, False, True, 0)
-        box2.show()
-        box2.pack_start(self.create_bbox(True,
-                        10, gtk.BUTTONBOX_END),
-                        True, True, 5)
-        window.show_all()
+        self.box1.pack_start(self.box3, True, True, 0)
+
+    def get_model(self):
+        return self.box1
 
     def passwdstrength(self, widget):
         passwd = self.password.get_text()
@@ -285,6 +272,3 @@ class rootUsers:
             self.img.set_from_stock(gtk.STOCK_YES, 10)
         else:
             self.img.set_from_stock(gtk.STOCK_NO, 10)
-
-rootUsers()
-gtk.main()

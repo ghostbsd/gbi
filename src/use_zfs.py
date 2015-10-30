@@ -211,20 +211,11 @@ class ZFS():
             self.swap_mirror = False
 
     def __init__(self):
-        window = gtk.Window(gtk.WINDOW_TOPLEVEL)
-        window.connect("destroy", close_application)
-        window.set_size_request(700, 500)
-        window.set_resizable(False)
-        window.set_title("GhostBSD Installer")
-        window.set_border_width(0)
-        window.set_position(gtk.WIN_POS_CENTER)
-        window.set_icon_from_file("/usr/local/lib/gbi/logo.png")
-        box1 = gtk.VBox(False, 0)
-        window.add(box1)
-        box1.show()
+        self.box1 = gtk.VBox(False, 0)
+        self.box1.show()
         box2 = gtk.VBox(False, 10)
         box2.set_border_width(10)
-        box1.pack_start(box2, True, True, 0)
+        self.box1.pack_start(box2, True, True, 0)
         box2.show()
         # Title
         Title = gtk.Label("<b><span size='xx-large'>ZFS Configuration</span></b>")
@@ -236,9 +227,7 @@ class ZFS():
         sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         store = gtk.TreeStore(str, str, str,'gboolean')
         for disk in zfs_disk_query():
-            print disk
             dsk = disk.partition(':')[0].rstrip()
-            print dsk
             dsk_name = disk.partition(':')[2].rstrip()
             dsk_size = zfs_disk_size_query(dsk).rstrip()
             store.append(None, [dsk, dsk_size, dsk_name, False])
@@ -372,15 +361,10 @@ class ZFS():
         table.attach(self.repassword, 3, 7, 11, 12)
         table.attach(self.img, 7, 8, 11, 12)
         box2.pack_start(table, False, False, 0)
-        box2 = gtk.HBox(False, 10)
-        box2.set_border_width(5)
-        box1.pack_start(box2, False, False, 0)
-        box2.show()
-        # Add button
-        box2.pack_start(self.zfs_bbox(True,
-                        10, gtk.BUTTONBOX_END),
-                        True, True, 5)
-        window.show_all()
+        return
+
+    def get_model(self):
+        return self.box1
 
     def digit_only(self, *args):
         text = self.swap_entry.get_text().strip()
@@ -474,6 +458,3 @@ class ZFS():
             self.img.set_from_stock(gtk.STOCK_YES, 10)
         else:
             self.img.set_from_stock(gtk.STOCK_NO, 10)
-
-ZFS()
-gtk.main()

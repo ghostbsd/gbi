@@ -222,6 +222,9 @@ class AddUser:
         # self.label3 = gtk.Label()
         # self.box3.pack_start(self.label3, False, False, 0)
 
+    def get_model(self):
+        return self.box1
+
     def passwdstrength(self, widget):
         passwd = self.password.get_text()
         if len(passwd) <= 4:

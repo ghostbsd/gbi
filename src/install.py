@@ -92,16 +92,7 @@ class Installs():
         gtk.main_quit()
 
     def __init__(self):
-        window = gtk.Window(gtk.WINDOW_TOPLEVEL)
-        window.connect("destroy", self.close_application)
-        window.set_size_request(700, 500)
-        window.set_title("Installation")
-        window.set_resizable(False)
-        window.set_border_width(0)
-        window.set_position(gtk.WIN_POS_CENTER)
-        window.set_icon_from_file("/usr/local/lib/gbi/logo.png")
         box1 = gtk.VBox(False, 0)
-        window.add(box1)
         box1.show()
         box2 = gtk.VBox(False, 10)
         box2.set_border_width(10)
@@ -120,14 +111,10 @@ class Installs():
         sw.show()
         box2.pack_start(sw, True, True, 0)
         window.show_all()
-        command = '%s -c %spcinstall.cfg' % (sysinstall, tmp)
+        #command = '%s -c %spcinstall.cfg' % (sysinstall, tmp)
         # This is only for testing
-        # command = 'cd /usr/ports/editors/openoffice-4 && make install clean'
+        command = 'cd /usr/ports/editors/openoffice-4 && make install clean'
         thr = threading.Thread(target=read_output,
                                args=(command, window, self.pbar))
         thr.setDaemon(True)
         thr.start()
-
-
-Installs()
-gtk.main()

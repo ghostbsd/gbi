@@ -12,7 +12,6 @@ import gtk
 import os
 import os.path
 from defutil import type_bbox, close_application
-from partition_handler import partition_repos
 
 # Folder use pr the installer.
 tmp = "/home/ghostbsd/.gbi/"
@@ -21,7 +20,6 @@ query = "sh /usr/local/etc/lib/backend-query/"
 if not os.path.exists(tmp):
     os.makedirs(tmp)
 
-sysinstall = "sh /usr/local/lib/gbi/pc-sysinstall"
 logo = "/usr/local/lib/gbi/logo.png"
 disk_file = '%sdisk' % tmp
 boot_file = '%sboot' % tmp
@@ -38,19 +36,15 @@ class Types():
         pass_file = open(signal, 'w')
         pass_file.writelines(self.ne)
         pass_file.close
+        return
+        
+    def get_type(self):
+        return self.ne
 
     def get_model(self):
         return self.box1
 
     def __init__(self):
-        window = gtk.Window(gtk.WINDOW_TOPLEVEL)
-        window.connect("destroy", close_application)
-        window.set_size_request(500, 300)
-        window.set_resizable(False)
-        window.set_title("GhostBSD Installer")
-        window.set_border_width(0)
-        window.set_position(gtk.WIN_POS_CENTER)
-        window.set_icon_from_file(logo)
         self.box1 = gtk.VBox(False, 0)
         self.box1.show()
         box2 = gtk.VBox(False, 10)
@@ -95,12 +89,4 @@ class Types():
         box2.set_border_width(5)
         self.box1.pack_start(box2, False, False, 0)
         box2.show()
-        # Add button
-        box2.pack_start(type_bbox(next, True,
-                        10, gtk.BUTTONBOX_END),
-                        True, True, 5)
-        window.show_all()
-
-partition_repos()
-Types()
-gtk.main()
+        return

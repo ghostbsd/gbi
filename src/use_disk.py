@@ -57,7 +57,7 @@ part_schem = '%sscheme' % tmp
 disk_list = '%sdisk-list.sh' % query
 
 
-class Entire():
+class UFSDisk:
     def Selection_Variant(self, tree_selection):
         (model, pathlist) = tree_selection.get_selected_rows()
         for path in pathlist:
@@ -91,22 +91,14 @@ class Entire():
         pfile.writelines('UFS+SUJ %s /\n' % NUM1)
         pfile.writelines('SWAP 0 none\n')
         pfile.close()
+        return
 
     def __init__(self):
-        window = gtk.Window(gtk.WINDOW_TOPLEVEL)
-        window.connect("destroy", close_application)
-        window.set_size_request(700, 500)
-        window.set_resizable(False)
-        window.set_title("GhostBSD Installer")
-        window.set_border_width(0)
-        window.set_position(gtk.WIN_POS_CENTER)
-        window.set_icon_from_file("/usr/local/lib/gbi/logo.png")
-        box1 = gtk.VBox(False, 0)
-        window.add(box1)
-        box1.show()
+        self.box1 = gtk.VBox(False, 0)
+        self.box1.show()
         box2 = gtk.VBox(False, 10)
         box2.set_border_width(10)
-        box1.pack_start(box2, True, True, 0)
+        self.box1.pack_start(box2, True, True, 0)
         box2.show()
         # Title
         Title = gtk.Label("<b><span size='xx-large'>Install GhostBSD entirely on disk</span></b> ")
@@ -156,15 +148,9 @@ class Entire():
         sfile = open(part_schem, 'w')
         sfile.writelines('partscheme=GPT')
         sfile.close()
-        box2 = gtk.HBox(False, 10)
-        box2.set_border_width(5)
-        box1.pack_start(box2, False, False, 0)
-        box2.show()
-        # Add button
-        box2.pack_start(use_disk_bbox(True,
-                        10, gtk.BUTTONBOX_END),
-                        True, True, 5)
-        window.show_all()
+        return
 
-Entire()
-gtk.main()
+    def get_model(self):
+        return self.box1
+
+
