@@ -8,7 +8,7 @@
 #
 # type.py create and delete partition slice for GhostBSD system.
 
-import gtk
+from gi.repository import Gtk
 import os
 import os.path
 from defutil import type_bbox, close_application
@@ -45,25 +45,25 @@ class Types():
         return self.box1
 
     def __init__(self):
-        self.box1 = gtk.VBox(False, 0)
+        self.box1 = Gtk.VBox(False, 0)
         self.box1.show()
-        box2 = gtk.VBox(False, 10)
+        box2 = Gtk.VBox(False, 10)
         box2.set_border_width(10)
         self.box1.pack_start(box2, True, True, 0)
 
         box2.show()
         # auto partition or Customize Disk Partition.
-        bbox = gtk.VBox()
-        label = gtk.Label()
+        bbox = Gtk.VBox()
+        label = Gtk.Label()
         box2.pack_start(label, False, False, 0)
-        label = gtk.Label(
+        label = Gtk.Label(
             '<b><span size="xx-large">Installation Type</span></b>')
         label.set_use_markup(True)
         box2.pack_start(label, False, False, 10)
         # create a Hbox to center the radio button.
-        hbox = gtk.HBox()
+        hbox = Gtk.HBox()
         box2.pack_start(hbox, True, True, 10)
-        radio = gtk.RadioButton(None, "UFS full disk Configuration")
+        radio = Gtk.RadioButton.new_with_label_from_widget(None, "UFS full disk Configuration")
         bbox.pack_start(radio, False, True, 10)
         radio.connect("toggled", self.partition, "disk")
         self.ne = 'disk'
@@ -72,20 +72,20 @@ class Types():
         pass_file.close
         radio.show()
         # box2.pack_start(radio, True, True, 10)
-        radio = gtk.RadioButton(radio, "UFS Custom Configuration")
+        radio = Gtk.RadioButton.new_with_label_from_widget(radio, "UFS Custom Configuration")
         bbox.pack_start(radio, False, True, 10)
         radio.connect("toggled", self.partition, "custom")
         radio.show()
         # box2.pack_start(radio, True, True, 10)
-        radio = gtk.RadioButton(radio, "ZFS Configuration")
+        radio = Gtk.RadioButton.new_with_label_from_widget(radio, "ZFS Configuration")
         bbox.pack_start(radio, False, True, 10)
         radio.connect("toggled", self.partition, "zfs")
         radio.show()
         hbox.pack_start(bbox, True, True, 100)
         # hbox.pack_start(bbox, True, True, 50)
-        label = gtk.Label()
+        label = Gtk.Label()
         box2.pack_start(label, False, False, 0)
-        box2 = gtk.HBox(False, 10)
+        box2 = Gtk.HBox(False, 10)
         box2.set_border_width(5)
         self.box1.pack_start(box2, False, False, 0)
         box2.show()

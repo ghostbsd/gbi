@@ -31,8 +31,7 @@
 # LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-
-import gtk
+from gi.repository import Gtk, GObject
 import os
 import os.path
 import re
@@ -96,17 +95,17 @@ def allCharacter(strg, search=re.compile(r'[^a-zA-Z0-9~\!@#\$%\^&\*_\+":;\'\-]')
 
 class ZFS():
     def zfs_bbox(self, horizontal, spacing, layout):
-        bbox = gtk.HButtonBox()
+        bbox = Gtk.HButtonBox()
         bbox.set_border_width(5)
         bbox.set_layout(layout)
         bbox.set_spacing(spacing)
-        button = gtk.Button(stock=gtk.STOCK_GO_BACK)
+        button = Gtk.Button(stock=Gtk.STOCK_GO_BACK)
         bbox.add(button)
         button.connect("clicked", type_window)
-        button = gtk.Button(stock=gtk.STOCK_CANCEL)
+        button = Gtk.Button(stock=Gtk.STOCK_CANCEL)
         bbox.add(button)
         button.connect("clicked", close_application)
-        self.forward_button = gtk.Button(stock=gtk.STOCK_GO_FORWARD)
+        self.forward_button = Gtk.Button(stock=Gtk.STOCK_GO_FORWARD)
         bbox.add(self.forward_button)
         self.forward_button.connect("clicked", self.next_to_root)
         return bbox
@@ -157,7 +156,7 @@ class ZFS():
         pfile.writelines('commitDiskLabel\n')
         pfile.close()
         Popen(to_root, shell=True)
-        gtk.main_quit()
+        Gtk.main_quit()
 
 
     def sheme_selection(self, combobox):
@@ -211,52 +210,52 @@ class ZFS():
             self.swap_mirror = False
 
     def __init__(self):
-        self.box1 = gtk.VBox(False, 0)
+        self.box1 = Gtk.VBox(False, 0)
         self.box1.show()
-        box2 = gtk.VBox(False, 10)
+        box2 = Gtk.VBox(False, 10)
         box2.set_border_width(10)
         self.box1.pack_start(box2, True, True, 0)
         box2.show()
         # Title
-        Title = gtk.Label("<b><span size='xx-large'>ZFS Configuration</span></b>")
+        Title = Gtk.Label("<b><span size='xx-large'>ZFS Configuration</span></b>")
         Title.set_use_markup(True)
         box2.pack_start(Title, False, False, 0)
         # Chose disk
-        sw = gtk.ScrolledWindow()
-        sw.set_shadow_type(gtk.SHADOW_ETCHED_IN)
-        sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        store = gtk.TreeStore(str, str, str,'gboolean')
+        sw = Gtk.ScrolledWindow()
+        sw.set_shadow_type(Gtk.SHADOW_ETCHED_IN)
+        sw.set_policy(Gtk.POLICY_AUTOMATIC, Gtk.POLICY_AUTOMATIC)
+        store = Gtk.TreeStore(str, str, str,'gboolean')
         for disk in zfs_disk_query():
             dsk = disk.partition(':')[0].rstrip()
             dsk_name = disk.partition(':')[2].rstrip()
             dsk_size = zfs_disk_size_query(dsk).rstrip()
             store.append(None, [dsk, dsk_size, dsk_name, False])
-        treeView = gtk.TreeView(store)
+        treeView = Gtk.TreeView(store)
         treeView.set_model(store)
         treeView.set_rules_hint(True)
-        self.check_cell = gtk.CellRendererToggle()
+        self.check_cell = Gtk.CellRendererToggle()
         self.check_cell.set_property('activatable', True)
         self.check_cell.connect('toggled', self.col1_toggled_cb, store)
-        cell = gtk.CellRendererText()
-        column = gtk.TreeViewColumn(None, cell, text=0)
-        column_header = gtk.Label('Disk')
+        cell = Gtk.CellRendererText()
+        column = Gtk.TreeViewColumn(None, cell, text=0)
+        column_header = Gtk.Label('Disk')
         column_header.set_use_markup(True)
         column_header.show()
         column.set_widget(column_header)
         column.set_sort_column_id(0)
-        cell2 = gtk.CellRendererText()
-        column2 = gtk.TreeViewColumn(None, cell2, text=0)
-        column_header2 = gtk.Label('Size(MB)')
+        cell2 = Gtk.CellRendererText()
+        column2 = Gtk.TreeViewColumn(None, cell2, text=0)
+        column_header2 = Gtk.Label('Size(MB)')
         column_header2.set_use_markup(True)
         column_header2.show()
         column2.set_widget(column_header2)
-        cell3 = gtk.CellRendererText()
-        column3 = gtk.TreeViewColumn(None, cell3, text=0)
-        column_header3 = gtk.Label('Name')
+        cell3 = Gtk.CellRendererText()
+        column3 = Gtk.TreeViewColumn(None, cell3, text=0)
+        column_header3 = Gtk.Label('Name')
         column_header3.set_use_markup(True)
         column_header3.show()
         column3.set_widget(column_header3)
-        column1 = gtk.TreeViewColumn("Check", self.check_cell)
+        column1 = Gtk.TreeViewColumn("Check", self.check_cell)
         column1.add_attribute(self.check_cell, "active", 3)
         column.set_attributes(cell, text=0)
         column2.set_attributes(cell2, text=1)
@@ -266,14 +265,14 @@ class ZFS():
         treeView.append_column(column2)
         treeView.append_column(column3)
         tree_selection = treeView.get_selection()
-        tree_selection.set_mode(gtk.SELECTION_SINGLE)
+        tree_selection.set_mode(Gtk.SELECTION_SINGLE)
         sw.add(treeView)
         sw.show()
         # Mirro, raidz and strip 
         self.mirror = 'None'
-        mirror_label = gtk.Label('<b>Pool Type</b>')
+        mirror_label = Gtk.Label('<b>Pool Type</b>')
         mirror_label.set_use_markup(True)
-        mirror_box = gtk.combo_box_new_text()
+        mirror_box = Gtk.combo_box_new_text()
         mirror_box.append_text("None")
         mirror_box.append_text("mirror")
         mirror_box.append_text("raidz1")
@@ -284,63 +283,63 @@ class ZFS():
         mirror_box.set_active(0)
         # Pool Name
         self.zpool = False
-        pool_check = gtk.CheckButton('Pool Name')
+        pool_check = Gtk.CheckButton('Pool Name')
         pool_check.connect("toggled", self.on_check_poll)
-        self.pool = gtk.Entry()
+        self.pool = Gtk.Entry()
         self.pool.set_text('zroot')
         self.pool.set_sensitive(False)
         # Creating MBR or GPT drive
-        label = gtk.Label('<b>Partition Scheme</b>')
+        label = Gtk.Label('<b>Partition Scheme</b>')
         label.set_use_markup(True)
         # Adding a combo box to selecting MBR or GPT sheme.
         self.scheme = 'GPT'
-        shemebox = gtk.combo_box_new_text()
+        shemebox = Gtk.combo_box_new_text()
         shemebox.append_text("GPT")
         shemebox.append_text("MBR")
         shemebox.connect('changed', self.sheme_selection)
         shemebox.set_active(0)
         # Force 4k Sectors
         self.zfs_four_k = "False"
-        check = gtk.CheckButton("Force ZFS 4k block size")
+        check = Gtk.CheckButton("Force ZFS 4k block size")
         check.connect("toggled", self.on_check)
         # Swap Size
         ram = Popen(memory, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT,
         close_fds=True)
         mem = ram.stdout.read()
         swap = int(mem.partition(':')[2].strip()) / (1024 * 1024)
-        swp_size_label = gtk.Label('<b>Swap Size(MB)</b>')
+        swp_size_label = Gtk.Label('<b>Swap Size(MB)</b>')
         swp_size_label.set_use_markup(True)
-        self.swap_entry = gtk.Entry()
+        self.swap_entry = Gtk.Entry()
         self.swap_entry.set_text(str(swap))
         self.swap_entry.connect('changed', self.digit_only)
         # Swap encription
         self.swap_encrypt = False
-        self.swap_encrypt_check = gtk.CheckButton("Encrypt Swap")
+        self.swap_encrypt_check = Gtk.CheckButton("Encrypt Swap")
         self.swap_encrypt_check.connect("toggled", self.on_check_swap_encrypt)
         # Swap mirror
         self.swap_mirror = False
-        swap_mirror_check = gtk.CheckButton("Mirror Swap")
+        swap_mirror_check = Gtk.CheckButton("Mirror Swap")
         swap_mirror_check.connect("toggled", self.on_check_swap_mirror)
         # GELI Disk encription
         self.disk_encript = False
-        encrypt_check = gtk.CheckButton("Encrypt Disk")
+        encrypt_check = Gtk.CheckButton("Encrypt Disk")
         encrypt_check.connect("toggled", self.on_check_encrypt)
         # password
-        self.passwd_label = gtk.Label("Password")
-        self.password = gtk.Entry()
+        self.passwd_label = Gtk.Label("Password")
+        self.password = Gtk.Entry()
         self.password.set_sensitive(False)
         self.password.set_visibility(False)
 
         self.password.connect("changed", self.passwdstrength)
-        self.strenght_label = gtk.Label()
-        self.vpasswd_label = gtk.Label("Verify it")
-        self.repassword = gtk.Entry()
+        self.strenght_label = Gtk.Label()
+        self.vpasswd_label = Gtk.Label("Verify it")
+        self.repassword = Gtk.Entry()
         self.repassword.set_sensitive(False)
         self.repassword.set_visibility(False)
         self.repassword.connect("changed", self.passwdVerification)
         # set image for password matching
-        self.img = gtk.Image()
-        table = gtk.Table(1, 16, True)
+        self.img = Gtk.Image()
+        table = Gtk.Table(1, 16, True)
         table.attach(mirror_label, 0, 4, 1, 2)
         table.attach(mirror_box, 4, 7, 1, 2)
         table.attach(label, 9, 12, 1, 2)
@@ -455,6 +454,6 @@ class ZFS():
 
     def passwdVerification(self, widget):
         if self.password.get_text() == self.repassword.get_text():
-            self.img.set_from_stock(gtk.STOCK_YES, 10)
+            self.img.set_from_stock(Gtk.STOCK_YES, 10)
         else:
-            self.img.set_from_stock(gtk.STOCK_NO, 10)
+            self.img.set_from_stock(Gtk.STOCK_NO, 10)

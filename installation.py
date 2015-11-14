@@ -16,6 +16,7 @@ from partition import Partitions
 from use_zfs import ZFS
 from root import RootUser
 from addUser import AddUser
+from install import Installs
 from partition_handler import partition_repos
 
 logo = "/usr/local/lib/gbi/logo.png"
@@ -113,6 +114,14 @@ class MainWindow:
             self.window.show_all()
             self.notebook.next_page()
         elif page == 6:
+            Ibox = gtk.VBox(False, 0)
+            Ibox.show()
+            self.isntall = Installs()
+            get_install = self.isntall.get_model()
+            Ibox.pack_start(get_install, True, True, 0)
+            label = gtk.Label("Installation")
+            self.notebook.insert_page(Ibox, label, 7)
+            self.window.show_all()
             self.notebook.next_page()
 
     def back_page(self, widget):
@@ -156,6 +165,7 @@ class MainWindow:
 
         # Create buttons
         self.table = gtk.Table(1, 6, True)
+
         self.button1 = gtk.Button(label='Back')
         self.button1.connect("clicked", self.back_page)
         self.table.attach(self.button1, 3, 4, 0, 1)
@@ -178,11 +188,12 @@ class MainWindow:
         mainVbox.set_border_width(5)
         self.window.show_all()
 
-def main():
-    gtk.main()
-    return 0
+    def Button3Off(self):
+        self.button3.set_sensitive(False)
+        return
 
-if __name__ == "__main__":
-    partition_repos()
-    MainWindow()
-    main()
+    def Button3On(self):
+        self.button3.set_sensitive(True)
+        return
+
+gtk.main()

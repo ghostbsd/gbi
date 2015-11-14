@@ -1,7 +1,20 @@
 #!/usr/local/bin/python
-from subprocess import call
 from sys import path
-path.append("/usr/local/lib/gbi")
+from gi.repository import Gtk
 
-call("python /usr/local/lib/gbi/language.py", shell=True)
+installer = "/usr/local/lib/gbi/"
+path.append("/home/ericbsd/gbi/src/")
+# path.append(installer)
+
+from gbiWindow import MainWindow
+from partition_handler import partition_repos
+
+def main():
+    Gtk.main()
+    return 0
+
+if __name__ == "__main__":
+    partition_repos()
+    MainWindow()
+    main()
 

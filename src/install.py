@@ -7,16 +7,15 @@
 # install.py v 0.4 Sunday, February 08 2015 Eric Turgeon
 #
 # install.py give the job to pc-sysinstall to install GhostBSD.
-
-import gtk
-import gobject
-import webkit
+from gi.repository import Gtk, GObject
+from gi.repository import WebKit
 import threading
 import locale
 import os
 from subprocess import Popen, PIPE, STDOUT, call
 from time import sleep
 from partition_handler import rDeleteParttion, destroyParttion, makingParttion
+from create_cfg import cfg_data
 
 tmp = "/home/ghostbsd/.gbi/"
 gbi_path = "/usr/local/lib/gbi/"
@@ -25,40 +24,40 @@ sysinstall = "/usr/local/sbin/pc-sysinstall"
 encoding = locale.getpreferredencoding()
 utf8conv = lambda x: str(x, encoding).encode('utf8')
 threadBreak = False
-gobject.threads_init()
+GObject.threads_init()
 
 
 def close_application(self, widget):
-    gtk.main_quit()
+    Gtk.main_quit()
 
 
-def read_output(command, window, probar):
+def read_output(command, probar):
     call('service hald stop', shell=True)
     call('umount /media/GhostBSD', shell=True)
-    # probar.set_text("Beginning installation")
+    probar.set_fraction(0.004)
+    probar.set_text("Creating pcinstall.cfg")
+    cfg_data()
+    probar.set_text("Beginning installation")
     sleep(2)
-    # probar.set_text("Creating partition table")
+    probar.set_text("Partition table Configuration")
     sleep(2)
     if os.path.exists(tmp + 'delete'):
-        # new_val = probar.get_fraction() + 0.001
-        probar.set_fraction(0.002)
-        # probar.set_text("Deleting partition")
+        probar.set_fraction(0.004)
+        probar.set_text("Deleting partition")
         rDeleteParttion()
-        sleep(5)
+        sleep(2)
     # destroy disk partition and create scheme
     if os.path.exists(tmp + 'destroy'):
-        # new_val = probar.get_fraction() + 0.001
-        probar.set_fraction(0.004)
-        # probar.set_text("Creating new disk with partitions")
+        probar.set_fraction(0.005)
+        probar.set_text("Creating new disk with partitions")
         destroyParttion()
-        sleep(5)
+        sleep(2)
     # create partition
     if os.path.exists(tmp + 'create'):
-        # new_val = probar.get_fraction() + 0.001
-        probar.set_fraction(0.006)
-        # probar.set_text("Creating new partitions")
+        probar.set_fraction(0.008)
+        probar.set_text("Creating new partitions")
         makingParttion()
-        sleep(5)
+        sleep(2)
     p = Popen(command, shell=True, stdin=PIPE, stdout=PIPE,
               stderr=STDOUT, close_fds=True)
     while 1:
@@ -78,43 +77,46 @@ def read_output(command, window, probar):
     call('service hald start',shell=True)
     if bartext.rstrip() == "Installation finished!":
         call('python %send.py' % gbi_path, shell=True, close_fds=True)
-        call("/home/ghostbsd/.gbi/", shell=True, close_fds=True)
-        gobject.idle_add(window.destroy)
+        call("rm -rf /home/ghostbsd/.gbi/", shell=True, close_fds=True)
+        #GObject.idle_add(window.destroy)
     else:
         call('python %serror.py' % gbi_path, shell=True, close_fds=True)
-        gobject.idle_add(window.destroy)
+        #GObject.idle_add(window.destroy)
 
 
 class Installs():
     default_site = "/usr/local/lib/gbi/slides/welcome.html"
 
     def close_application(self, widget):
-        gtk.main_quit()
+        Gtk.main_quit()
 
-    def __init__(self):
-        box1 = gtk.VBox(False, 0)
-        box1.show()
-        box2 = gtk.VBox(False, 10)
+    def __init__(self, button1, button2, button3, notebook):
+        self.box1 = Gtk.VBox(False, 0)
+        self.box1.show()
+        box2 = Gtk.VBox(False, 10)
         box2.set_border_width(10)
-        box1.pack_start(box2, True, True, 0)
+        self.box1.pack_start(box2, True, True, 0)
         box2.show()
-        self.pbar = gtk.ProgressBar()
-        self.pbar.set_orientation(gtk.PROGRESS_LEFT_TO_RIGHT)
+        self.pbar = Gtk.ProgressBar()
+        #self.pbar.set_orientation(Gtk.PROGRESS_LEFT_TO_RIGHT)
         self.pbar.set_fraction(0.0)
         self.pbar.set_size_request(-1, 20)
         # self.timer = gobject.timeout_add(150, progress_timeout, self.pbar)
         box2.pack_start(self.pbar, False, False, 0)
-        web_view = webkit.WebView()
+        web_view = WebKit.WebView()
         web_view.open(self.default_site)
-        sw = gtk.ScrolledWindow()
+        sw = Gtk.ScrolledWindow()
         sw.add(web_view)
         sw.show()
         box2.pack_start(sw, True, True, 0)
-        window.show_all()
-        #command = '%s -c %spcinstall.cfg' % (sysinstall, tmp)
+        command = '%s -c %spcinstall.cfg' % (sysinstall, tmp)
         # This is only for testing
-        command = 'cd /usr/ports/editors/openoffice-4 && make install clean'
+        # command = 'cd /usr/ports/editors/openoffice-4 && make install clean'
         thr = threading.Thread(target=read_output,
-                               args=(command, window, self.pbar))
+                               args=(command, self.pbar))
         thr.setDaemon(True)
         thr.start()
+        return
+
+    def get_model(self):
+        return self.box1

@@ -35,7 +35,7 @@
 #
 # user.py create users and set root password.
 
-import gtk
+from gi.repository import Gtk
 import os
 import re
 from subprocess import Popen
@@ -87,7 +87,7 @@ def allCharacter(strg, search=re.compile(r'[^a-zA-Z0-9~\!@#\$%\^&\*_\+":;\'\-]')
 
 
 class AddUser:
-    def next_window(self, widget):
+    def save_selection(self):
         f = open('%suser' % tmp, 'wb')
         uname = self.user.get_text()
         name = self.name.get_text()
@@ -99,8 +99,6 @@ class AddUser:
             ul = [uname, name, up, shell, hf, hst]
             pickle.dump(ul, f)
             f.close()
-            Popen(to_cfg, shell=True)
-            gtk.main_quit()
 
     def on_shell(self, widget):
         SHELL = widget.get_active_text()
@@ -121,63 +119,47 @@ class AddUser:
         elif SHELL == 'ksh':
             self.sh = '/usr/local/bin/ksh93'
 
-    def create_bbox(self, horizontal, spacing, layout):
-        bbox = gtk.HButtonBox()
-        bbox.set_border_width(5)
-        # Set the appearance of the Button Box
-        bbox.set_layout(layout)
-        bbox.set_spacing(spacing)
-        button = gtk.Button(stock=gtk.STOCK_GO_BACK)
-        button.connect("clicked", root_window)
-        bbox.add(button)
-        button = gtk.Button(stock=gtk.STOCK_CANCEL)
-        bbox.add(button)
-        button.connect("clicked", close_application)
-        button = gtk.Button("Install")
-        bbox.add(button)
-        button.connect("clicked", self.next_window)
-        return bbox
 
     def userAndHost(self, widget):
         username = self.name.get_text().split()
         self.host.set_text("%s.ghostbsd-pc.home" % username[0].lower())
         self.user.set_text(username[0].lower())
 
-    def __init__(self):
-        self.box1 = gtk.VBox(False, 0)
+    def __init__(self, button3):
+        self.box1 = Gtk.VBox(False, 0)
         self.box1.show()
-        box2 = gtk.VBox(False, 0)
+        box2 = Gtk.VBox(False, 0)
         box2.set_border_width(10)
         self.box1.pack_start(box2, False, False, 0)
         box2.show()
         # title.
         ttext = "User Setup"
-        Title = gtk.Label("<b><span size='xx-large'>%s</span></b>" % ttext)
+        Title = Gtk.Label("<b><span size='xx-large'>%s</span></b>" % ttext)
         Title.set_use_markup(True)
         box2.pack_start(Title, False, False, 0)
         # password for root.
-        box2 = gtk.VBox(False, 10)
+        box2 = Gtk.VBox(False, 10)
         # box2.set_border_width(10)
         self.box1.pack_start(box2, False, False, 0)
         box2.show()
-        label = gtk.Label('<b>User Account</b>')
+        label = Gtk.Label('<b>User Account</b>')
         label.set_use_markup(True)
         label.set_alignment(.2, .2)
-        Username = gtk.Label("User name")
-        self.user = gtk.Entry()
-        self.label2 = gtk.Label("Real name")
-        self.name = gtk.Entry()
+        Username = Gtk.Label("User name")
+        self.user = Gtk.Entry()
+        self.label2 = Gtk.Label("Real name")
+        self.name = Gtk.Entry()
         self.name.connect("changed", self.userAndHost)
-        self.labelpass = gtk.Label("Password")
-        self.password = gtk.Entry()
+        self.labelpass = Gtk.Label("Password")
+        self.password = Gtk.Entry()
         self.password.set_visibility(False)
         self.password.connect("changed", self.passwdstrength)
-        self.label4 = gtk.Label("Verify Password")
-        self.repassword = gtk.Entry()
+        self.label4 = Gtk.Label("Verify Password")
+        self.repassword = Gtk.Entry()
         self.repassword.set_visibility(False)
-        self.repassword.connect("changed", self.passwdVerification)
-        self.label5 = gtk.Label("Shell")
-        shell = gtk.combo_box_new_text()
+        self.repassword.connect("changed", self.passwdVerification, button3)
+        self.label5 = Gtk.Label("Shell")
+        shell = Gtk.ComboBoxText()
         self.sh = '/usr/local/bin/fish'
         shell.append_text('sh')
         shell.append_text('csh')
@@ -189,13 +171,13 @@ class AddUser:
         shell.append_text('zsh')
         shell.set_active(3)
         shell.connect("changed", self.on_shell)
-        label = gtk.Label('<b>Set Hostname</b>')
+        label = Gtk.Label('<b>Set Hostname</b>')
         label.set_use_markup(True)
         label.set_alignment(0, .5)
-        table = gtk.Table(1, 3, True)
+        table = Gtk.Table(1, 3, True)
         table.set_row_spacings(10)
-        pcname = gtk.Label("Hostname")
-        self.host = gtk.Entry()
+        pcname = Gtk.Label("Hostname")
+        self.host = Gtk.Entry()
         # table.attach(label, 0, 2, 0, 1)
         table.attach(self.label2, 0, 1, 1, 2)
         table.attach(self.name, 1, 2, 1, 2)
@@ -205,21 +187,21 @@ class AddUser:
         table.attach(self.user, 1, 2, 3, 4)
         table.attach(self.labelpass, 0, 1, 4, 5)
         table.attach(self.password, 1, 2, 4, 5)
-        self.label3 = gtk.Label()
+        self.label3 = Gtk.Label()
         table.attach(self.label3, 2, 3, 4, 5)
         table.attach(self.label4, 0, 1, 5, 6)
         table.attach(self.repassword, 1, 2, 5, 6)
         # set image for password matching
-        self.img = gtk.Image()
+        self.img = Gtk.Image()
         table.attach(self.img, 2, 3, 5, 6)
         table.attach(self.label5, 0, 1, 6, 7)
         table.attach(shell, 1, 2, 6, 7)
         box2.pack_start(table, False, False, 0)
-        self.box3 = gtk.VBox(False, 10)
+        self.box3 = Gtk.VBox(False, 10)
         self.box3.set_border_width(10)
         self.box1.pack_start(self.box3, True, True, 0)
         self.box3.show()
-        # self.label3 = gtk.Label()
+        # self.label3 = Gtk.Label()
         # self.box3.pack_start(self.label3, False, False, 0)
 
     def get_model(self):
@@ -297,13 +279,16 @@ class AddUser:
         elif len(passwd) > 24:
             if lowerCase(passwd) or upperCase(passwd) or passwd.isdigit():
                 self.label3.set_text("Fairly Strong")
+                button3.set_sensitive(True)
             else:
                 self.label3.set_text("Super Strong")
+                button3.set_sensitive(False)
 
-    def passwdVerification(self, widget):
+    def passwdVerification(self, widget, button3):
         if self.password.get_text() == self.repassword.get_text():
-            self.img.set_from_stock(gtk.STOCK_YES, 10)
-        else:
-            self.img.set_from_stock(gtk.STOCK_NO, 10)
+            self.img.set_from_stock(Gtk.STOCK_YES, 10)
+            button3.set_sensitive(True)
 
-AddUser()
+        else:
+            self.img.set_from_stock(Gtk.STOCK_NO, 10)
+            button3.set_sensitive(False)

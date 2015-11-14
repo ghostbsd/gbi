@@ -33,8 +33,6 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #####################################################################
-# $Id: language.py v 0.4 Fryday, march 29 2011 15:20 Eric Turgeon $
-
 # language.py show the language for the installer.
 
 
@@ -82,7 +80,7 @@ class Language:
         column.set_sort_column_id(0)
         treeView.append_column(column)
 
-    def save_language(self):
+    def save_selection(self):
         lang_file = open(langfile, 'w')
         lang_file.writelines(self.language)
         lang_file.close()

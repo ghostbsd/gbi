@@ -32,7 +32,7 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-import gtk
+from gi.repository import Gtk
 import os
 import os.path
 from subprocess import Popen, PIPE, STDOUT
@@ -58,7 +58,7 @@ disk_list = '%sdisk-list.sh' % query
 
 
 class UFSDisk:
-    def Selection_Variant(self, tree_selection):
+    def Selection_Variant(self, tree_selection, button3):
         (model, pathlist) = tree_selection.get_selected_rows()
         for path in pathlist:
             tree_iter = model.get_iter(path)
@@ -71,6 +71,10 @@ class UFSDisk:
             self.schm = 'GPT'
         else:
             self.schm = value3
+        button3.set_sensitive(True)
+        return
+    
+    def save_selection(self,):
         sfile = open(part_schem, 'w')
         sfile.writelines('partscheme=%s' % self.schm)
         sfile.close()
@@ -93,43 +97,44 @@ class UFSDisk:
         pfile.close()
         return
 
-    def __init__(self):
-        self.box1 = gtk.VBox(False, 0)
+
+    def __init__(self, button3):
+        self.box1 = Gtk.VBox(False, 0)
         self.box1.show()
-        box2 = gtk.VBox(False, 10)
+        box2 = Gtk.VBox(False, 10)
         box2.set_border_width(10)
         self.box1.pack_start(box2, True, True, 0)
         box2.show()
         # Title
-        Title = gtk.Label("<b><span size='xx-large'>Install GhostBSD entirely on disk</span></b> ")
+        Title = Gtk.Label("<b><span size='xx-large'>Install GhostBSD entirely on disk</span></b> ")
         Title.set_use_markup(True)
         box2.pack_start(Title, False, False, 0)
         # chose Disk
-        sw = gtk.ScrolledWindow()
-        sw.set_shadow_type(gtk.SHADOW_ETCHED_IN)
-        sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        store = gtk.TreeStore(str, str, str, 'gboolean')
+        sw = Gtk.ScrolledWindow()
+        sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
+        sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+        store = Gtk.TreeStore(str, str, str, 'gboolean')
         for disk in disk_query():
             store.append(None, [disk[0], disk[1], disk[3], True])
-        treeView = gtk.TreeView(store)
+        treeView = Gtk.TreeView(store)
         treeView.set_model(store)
         treeView.set_rules_hint(True)
-        cell = gtk.CellRendererText()
-        column = gtk.TreeViewColumn(None, cell, text=0)
-        column_header = gtk.Label('Disk')
+        cell = Gtk.CellRendererText()
+        column = Gtk.TreeViewColumn(None, cell, text=0)
+        column_header = Gtk.Label('Disk')
         column_header.set_use_markup(True)
         column_header.show()
         column.set_widget(column_header)
         column.set_sort_column_id(0)
-        cell2 = gtk.CellRendererText()
-        column2 = gtk.TreeViewColumn(None, cell2, text=0)
-        column_header2 = gtk.Label('Size(MB)')
+        cell2 = Gtk.CellRendererText()
+        column2 = Gtk.TreeViewColumn(None, cell2, text=0)
+        column_header2 = Gtk.Label('Size(MB)')
         column_header2.set_use_markup(True)
         column_header2.show()
         column2.set_widget(column_header2)
-        cell3 = gtk.CellRendererText()
-        column3 = gtk.TreeViewColumn(None, cell3, text=0)
-        column_header3 = gtk.Label('Scheme')
+        cell3 = Gtk.CellRendererText()
+        column3 = Gtk.TreeViewColumn(None, cell3, text=0)
+        column_header3 = Gtk.Label('Scheme')
         column_header3.set_use_markup(True)
         column_header3.show()
         column3.set_widget(column_header3)
@@ -140,8 +145,8 @@ class UFSDisk:
         treeView.append_column(column2)
         treeView.append_column(column3)
         tree_selection = treeView.get_selection()
-        tree_selection.set_mode(gtk.SELECTION_SINGLE)
-        tree_selection.connect("changed", self.Selection_Variant)
+        tree_selection.set_mode(Gtk.SelectionMode.SINGLE)
+        tree_selection.connect("changed", self.Selection_Variant, button3)
         sw.add(treeView)
         sw.show()
         box2.pack_start(sw, True, True, 10)

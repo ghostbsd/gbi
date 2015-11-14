@@ -33,12 +33,10 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #####################################################################
-# $Id: language.py v 0.4 Fryday, march 29 2011 15:20 Eric Turgeon $
-
 # language.py show the language for the installer.
 
 
-import gtk
+from gi.repository import Gtk
 import os
 import os.path
 from defutil import close_application, language_bbox
@@ -62,7 +60,7 @@ title = "Welcome To GhostBSD!"
 welltext = """Select the language you want to use with GhostBSD."""
 
 
-class Language():
+class Language:
 
     # On selection it overwrite the delfaut language file.
     def Language_Selection(self, tree_selection):
@@ -71,94 +69,78 @@ class Language():
             tree_iter = model.get_iter(path)
             value = model.get_value(tree_iter, 0)
         self.language = value
-        lang_file = open(langfile, 'w')
-        lang_file.writelines(self.language)
-        lang_file.close()
+        return
 
     def Language_Columns(self, treeView):
-        cell = gtk.CellRendererText()
-        column = gtk.TreeViewColumn(None, cell, text=0)
-        column_header = gtk.Label('Language')
+        cell = Gtk.CellRendererText()
+        column = Gtk.TreeViewColumn(None, cell, text=0)
+        column_header = Gtk.Label('Language')
         column_header.set_use_markup(True)
         column_header.show()
         column.set_widget(column_header)
         column.set_sort_column_id(0)
         treeView.append_column(column)
+        return
+
+    def save_selection(self):
+        lang_file = open(langfile, 'w')
+        lang_file.writelines(self.language)
+        lang_file.close()
+        return
 
     # Initial definition.
     def __init__(self):
-
-        # Defalt Window configuration.
-        window = gtk.Window(gtk.WINDOW_TOPLEVEL)
-        window.connect("destroy", close_application)
-        window.set_size_request(700, 500)
-        window.set_title("GhostBSD Installer")
-        window.set_resizable(False)
-        window.set_border_width(0)
-        window.set_position(gtk.WIN_POS_CENTER)
-        window.set_icon_from_file(logo)
         # Add a Default vertical box
-        vbox1 = gtk.VBox(False, 0)
-        window.add(vbox1)
-        vbox1.show()
+        self.vbox1 = Gtk.VBox(False, 0)
+        self.vbox1.show()
         # Add a second vertical box
-        vbox2 = gtk.VBox(False, 10)
-        vbox2.set_border_width(10)
-        vbox1.pack_start(vbox2, True, True, 0)
+        vbox2 = Gtk.VBox(False, 0)
+        #vbox2.set_border_width(0)
+        self.vbox1.pack_start(vbox2, True, True, 0)
         vbox2.show()
         # Add a defalt horisontal
-        hbox = gtk.HBox(False, 10)
-        hbox.set_border_width(5)
-        vbox2.pack_start(hbox, True, True, 5)
+        hbox = Gtk.HBox(False, 0)
+        #hbox.set_border_width(5)
+        vbox2.pack_start(hbox, True, True, 0)
         hbox.show()
         # Adding a Scrolling Window
-        sw = gtk.ScrolledWindow()
-        sw.set_shadow_type(gtk.SHADOW_ETCHED_IN)
-        sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        sw = Gtk.ScrolledWindow()
+        sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
+        sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         # Adding a treestore and store language in it.
-        store = gtk.TreeStore(str)
+        store = Gtk.TreeStore(str)
         for line in langlist:
             store.append(None, [line.rstrip()])
-        treeView = gtk.TreeView(store)
+        treeView = Gtk.TreeView(store)
         treeView.set_model(store)
         treeView.set_rules_hint(True)
         self.Language_Columns(treeView)
         tree_selection = treeView.get_selection()
-        tree_selection.set_mode(gtk.SELECTION_SINGLE)
+        tree_selection.set_mode(Gtk.SelectionMode.SINGLE)
         tree_selection.connect("changed", self.Language_Selection)
         sw.add(treeView)
         sw.show()
-        hbox.pack_start(sw, True, True, 5)
+        hbox.pack_start(sw, True, True, 0)
         # add text in a label.
-        vhbox = gtk.VBox(False, 0)
+        vhbox = Gtk.VBox(False, 0)
         vhbox.set_border_width(10)
-        hbox.pack_start(vhbox, True, True, 5)
+        hbox.pack_start(vhbox, False, False, 5)
         vhbox.show()
-        self.wellcome = gtk.Label('<span size="xx-large">' + title + '</span>')
+        self.wellcome = Gtk.Label('<span size="xx-large">' + title + '</span>')
         self.wellcome.set_use_markup(True)
-        self.wellcometext = gtk.Label(welltext)
+        self.wellcometext = Gtk.Label(welltext)
         self.wellcometext.set_use_markup(True)
-        table = gtk.Table()
-        wall = gtk.Label()
-        # table.attach(wall, 0, 1, 0, 1)
+        table = Gtk.Table()
         table.attach(self.wellcome, 0, 1, 1, 2)
-        wall = gtk.Label()
+        wall = Gtk.Label()
         table.attach(wall, 0, 1, 2, 3)
         table.attach(self.wellcometext, 0, 1, 3, 4)
         vhbox.pack_start(table, False, False, 5)
-        image = gtk.Image()
+        image = Gtk.Image()
         image.set_from_file(logo)
         image.show()
         vhbox.pack_start(image, True, True, 5)
-        # Redoing vbox For bottom button.
-        vbox2 = gtk.HBox(False, 10)
-        vbox2.set_border_width(5)
-        vbox1.pack_start(vbox2, False, False, 0)
-        vbox2.show()
-        # Button from defutil.
-        vbox2.pack_start(language_bbox(True, 10, gtk.BUTTONBOX_END),
-                         True, True, 5)
-        window.show_all()
+        return
 
-Language()
-gtk.main()
+    def get_model(self):
+        return self.vbox1
