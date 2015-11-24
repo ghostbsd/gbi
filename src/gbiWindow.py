@@ -65,7 +65,7 @@ class MainWindow:
             if self.types.get_type() == "disk":
                 Udbox = Gtk.VBox(False, 0)
                 Udbox.show()
-                self.ud = UFSDisk(self.button3)
+                self.partition = UFSDisk(self.button3)
                 get_UD = self.ud.get_model()
                 Udbox.pack_start(get_UD, True, True, 0)
                 label = Gtk.Label("UFS Disk Configuration")
@@ -76,7 +76,7 @@ class MainWindow:
             elif self.types.get_type() == "custom":
                 Pbox = Gtk.VBox(False, 0)
                 Pbox.show()
-                self.partition = Partitions()
+                self.partition = Partitions(self.button3)
                 get_part = self.partition.get_model()
                 Pbox.pack_start(get_part, True, True, 0)
                 label = Gtk.Label("UFS Custom Configuration")
@@ -87,8 +87,8 @@ class MainWindow:
             elif self.types.get_type() == "zfs":
                 Zbox = Gtk.VBox(False, 0)
                 Zbox.show()
-                self.zfsconf = ZFS()
-                get_ZFS = self.zfsconf.get_model()
+                self.partition = ZFS(self.button3)
+                get_ZFS = self.partition.get_model()
                 Zbox.pack_start(get_ZFS, True, True, 0)
                 label = Gtk.Label("ZFS Configuration")
                 self.notebook.insert_page(Zbox, label, 4)
@@ -96,6 +96,7 @@ class MainWindow:
                 self.notebook.next_page()
                 self.button3.set_sensitive(False)
         elif page == 4:
+            self.partition.save_selection()
             Rbox = Gtk.VBox(False, 0)
             Rbox.show()
             self.rootuser = RootUser(self.button3)

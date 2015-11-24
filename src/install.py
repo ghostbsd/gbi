@@ -37,8 +37,6 @@ def read_output(command, probar):
     probar.set_fraction(0.004)
     probar.set_text("Creating pcinstall.cfg")
     cfg_data()
-    probar.set_text("Beginning installation")
-    sleep(2)
     probar.set_text("Partition table Configuration")
     sleep(2)
     if os.path.exists(tmp + 'delete'):
@@ -58,6 +56,8 @@ def read_output(command, probar):
         probar.set_text("Creating new partitions")
         makingParttion()
         sleep(2)
+    probar.set_text("Beginning installation")
+    sleep(2)
     p = Popen(command, shell=True, stdin=PIPE, stdout=PIPE,
               stderr=STDOUT, close_fds=True)
     while 1:
@@ -98,10 +98,8 @@ class Installs():
         self.box1.pack_start(box2, True, True, 0)
         box2.show()
         self.pbar = Gtk.ProgressBar()
-        #self.pbar.set_orientation(Gtk.PROGRESS_LEFT_TO_RIGHT)
         self.pbar.set_fraction(0.0)
         self.pbar.set_size_request(-1, 20)
-        # self.timer = gobject.timeout_add(150, progress_timeout, self.pbar)
         box2.pack_start(self.pbar, False, False, 0)
         web_view = WebKit.WebView()
         web_view.open(self.default_site)

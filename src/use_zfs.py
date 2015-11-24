@@ -94,23 +94,7 @@ def allCharacter(strg, search=re.compile(r'[^a-zA-Z0-9~\!@#\$%\^&\*_\+":;\'\-]')
 
 
 class ZFS():
-    def zfs_bbox(self, horizontal, spacing, layout):
-        bbox = Gtk.HButtonBox()
-        bbox.set_border_width(5)
-        bbox.set_layout(layout)
-        bbox.set_spacing(spacing)
-        button = Gtk.Button(stock=Gtk.STOCK_GO_BACK)
-        bbox.add(button)
-        button.connect("clicked", type_window)
-        button = Gtk.Button(stock=Gtk.STOCK_CANCEL)
-        bbox.add(button)
-        button.connect("clicked", close_application)
-        self.forward_button = Gtk.Button(stock=Gtk.STOCK_GO_FORWARD)
-        bbox.add(self.forward_button)
-        self.forward_button.connect("clicked", self.next_to_root)
-        return bbox
-
-    def next_to_root(self, widget):
+    def save_selection(self, widget):
         SIZE = int(zfs_dsk_list[0].partition('-')[2].rstrip()) - 2
         SWAP = int(self.swap_entry.get_text())
         ZFS_NUM = SIZE - SWAP
@@ -135,7 +119,7 @@ class ZFS():
         pfile.writelines('partition=ALL\n')
         pfile.writelines('partscheme=%s\n' % self.scheme)
         pfile.writelines('commitDiskPart\n\n')
-        if self.mirror == 'None':
+        if self.mirror == 'none':
             pool_type = '\n'
         else:
             ZFS_disk = zfs_dsk_list
@@ -155,9 +139,6 @@ class ZFS():
             pfile.writelines('#encpass=None\n')
         pfile.writelines('commitDiskLabel\n')
         pfile.close()
-        Popen(to_root, shell=True)
-        Gtk.main_quit()
-
 
     def sheme_selection(self, combobox):
         model = combobox.get_model()
@@ -170,6 +151,20 @@ class ZFS():
         index = combobox.get_active()
         data = model[index][0]
         self.mirror = data
+        if self.mirror == "none": 
+            self.mirrorTips.set_text("Please select one drive")
+        elif self.mirror == "mirror":
+            self.mirrorTips.set_text("Please select at less 2 drive for mirroring")
+        elif self.mirror == "raidz1":
+            self.mirrorTips.set_text("Please select 3 or 5 drive for raidz1")
+        elif self.mirror == "raidz2":
+            self.mirrorTips.set_text("Please select 4, 6, or 10 drive for raidz2")
+        elif self.mirror == "raidz3":
+            self.mirrorTips.set_text("Please select 5, 7, or 11 drive for raidz3")
+        elif self.mirror == "strip":
+            self.mirrorTips.set_text("Please select 3 drive to strip")
+
+
 
     def on_check_poll(self, widget):
         if widget.get_active():
@@ -191,11 +186,13 @@ class ZFS():
             self.repassword.set_sensitive(True)
             self.disk_encript = True
             #self.swap_encrypt_check.set_active(True)
+            self.button3.set_sensitive(False)
         else:
             self.password.set_sensitive(False)
             self.repassword.set_sensitive(False)
             self.disk_encript = False
             #self.swap_encrypt_check.set_active(False)
+            self.button3.set_sensitive(True)
 
     def on_check_swap_encrypt(self, widget):
         if widget.get_active():
@@ -209,21 +206,20 @@ class ZFS():
         else:
             self.swap_mirror = False
 
-    def __init__(self):
+    def __init__(self, button3):
+        self.button3 = button3
         self.box1 = Gtk.VBox(False, 0)
         self.box1.show()
-        box2 = Gtk.VBox(False, 10)
-        box2.set_border_width(10)
+        box2 = Gtk.HBox(False, 0)
         self.box1.pack_start(box2, True, True, 0)
         box2.show()
         # Title
         Title = Gtk.Label("<b><span size='xx-large'>ZFS Configuration</span></b>")
         Title.set_use_markup(True)
-        box2.pack_start(Title, False, False, 0)
         # Chose disk
-        sw = Gtk.ScrolledWindow()
-        sw.set_shadow_type(Gtk.SHADOW_ETCHED_IN)
-        sw.set_policy(Gtk.POLICY_AUTOMATIC, Gtk.POLICY_AUTOMATIC)
+        sw = Gtk.ScrolledWindow(hexpand=True, vexpand=True)
+        sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
+        sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         store = Gtk.TreeStore(str, str, str,'gboolean')
         for disk in zfs_disk_query():
             dsk = disk.partition(':')[0].rstrip()
@@ -265,22 +261,26 @@ class ZFS():
         treeView.append_column(column2)
         treeView.append_column(column3)
         tree_selection = treeView.get_selection()
-        tree_selection.set_mode(Gtk.SELECTION_SINGLE)
+        tree_selection.set_mode(Gtk.SelectionMode.SINGLE)
         sw.add(treeView)
         sw.show()
+        self.mirrorTips = Gtk.Label('Please select one drive')
+        self.mirrorTips.set_justify(Gtk.Justification.LEFT)
+        self.mirrorTips.set_alignment(0.01, 0.5)
         # Mirro, raidz and strip 
-        self.mirror = 'None'
+        self.mirror = 'none'
         mirror_label = Gtk.Label('<b>Pool Type</b>')
         mirror_label.set_use_markup(True)
-        mirror_box = Gtk.combo_box_new_text()
-        mirror_box.append_text("None")
+        mirror_box = Gtk.ComboBoxText()
+        mirror_box.append_text("none")
         mirror_box.append_text("mirror")
         mirror_box.append_text("raidz1")
         mirror_box.append_text("raidz2")
         mirror_box.append_text("raidz3")
-        mirror_box.append_text("striop")
+        mirror_box.append_text("strip")
         mirror_box.connect('changed', self.mirror_selection)
         mirror_box.set_active(0)
+
         # Pool Name
         self.zpool = False
         pool_check = Gtk.CheckButton('Pool Name')
@@ -293,7 +293,7 @@ class ZFS():
         label.set_use_markup(True)
         # Adding a combo box to selecting MBR or GPT sheme.
         self.scheme = 'GPT'
-        shemebox = Gtk.combo_box_new_text()
+        shemebox = Gtk.ComboBoxText()
         shemebox.append_text("GPT")
         shemebox.append_text("MBR")
         shemebox.connect('changed', self.sheme_selection)
@@ -329,9 +329,9 @@ class ZFS():
         self.password = Gtk.Entry()
         self.password.set_sensitive(False)
         self.password.set_visibility(False)
-
         self.password.connect("changed", self.passwdstrength)
         self.strenght_label = Gtk.Label()
+        self.strenght_label.set_alignment(0.1, 0.5)
         self.vpasswd_label = Gtk.Label("Verify it")
         self.repassword = Gtk.Entry()
         self.repassword.set_sensitive(False)
@@ -339,27 +339,34 @@ class ZFS():
         self.repassword.connect("changed", self.passwdVerification)
         # set image for password matching
         self.img = Gtk.Image()
-        table = Gtk.Table(1, 16, True)
-        table.attach(mirror_label, 0, 4, 1, 2)
-        table.attach(mirror_box, 4, 7, 1, 2)
-        table.attach(label, 9, 12, 1, 2)
-        table.attach(shemebox, 12, 15, 1, 2)
-        table.attach(sw, 1, 15, 3, 6)
-        table.attach(pool_check, 1, 4, 7, 8)
-        table.attach(self.pool, 4, 7, 7, 8)
-        table.attach(check, 9, 15, 7, 8)
-        table.attach(swp_size_label, 9, 12, 9, 10)
-        table.attach(self.swap_entry, 12, 15, 9, 10)
-        #table.attach(self.swap_encrypt_check, 9, 15, 11, 12)
-        #table.attach(swap_mirror_check, 9, 15, 11, 12)
-        table.attach(encrypt_check, 1, 7, 9, 10)
-        table.attach(self.passwd_label, 1, 3, 10, 11)
-        table.attach(self.password, 3, 7, 10, 11)
-        table.attach(self.strenght_label, 7, 10, 10, 11)
-        table.attach(self.vpasswd_label, 1, 3, 11, 12)
-        table.attach(self.repassword, 3, 7, 11, 12)
-        table.attach(self.img, 7, 8, 11, 12)
-        box2.pack_start(table, False, False, 0)
+        self.img.set_alignment(0.2, 0.5)
+        #table = Gtk.Table(12, 12, True)
+        grid = Gtk.Grid()
+        grid.set_row_spacing(10)
+        # grid.set_column_homogeneous(True)
+        # grid.set_row_homogeneous(True)
+        grid.attach(Title, 1, 0, 8, 2)
+        grid.attach(mirror_label, 1, 2, 1, 1)
+        grid.attach(mirror_box, 2, 2, 1, 1)
+        grid.attach(label, 6, 2, 2, 1)
+        grid.attach(shemebox, 8, 2, 1, 1)
+        grid.attach(self.mirrorTips, 1, 3, 8, 1)
+        grid.attach(sw, 1, 4, 8, 3)
+        grid.attach(pool_check, 5, 8, 2, 1)
+        grid.attach(self.pool, 7, 8, 2, 1)
+        grid.attach(check, 1, 8, 3, 1)
+        grid.attach(swp_size_label, 5, 9, 2, 1)
+        grid.attach(self.swap_entry, 7, 9, 2, 1)
+        #grid.attach(self.swap_encrypt_check, 9, 15, 11, 12)
+        #grid.attach(swap_mirror_check, 9, 15, 11, 12)
+        grid.attach(encrypt_check, 1, 9, 2, 1)
+        grid.attach(self.passwd_label, 1, 10, 1, 1)
+        grid.attach(self.password, 2, 10, 2, 1)
+        grid.attach(self.strenght_label, 4, 10, 2, 1)
+        grid.attach(self.vpasswd_label, 1, 11, 1, 1)
+        grid.attach(self.repassword, 2, 11, 2, 1)
+        grid.attach(self.img, 4, 11, 2, 1)
+        box2.pack_start(grid, True, True, 10)
         return
 
     def get_model(self):
@@ -373,8 +380,69 @@ class ZFS():
         model[path][3] = not model[path][3]
         if model[path][3] is False:
             zfs_dsk_list.remove(model[path][0] + "-" + model[path][1])
+            if self.mirror == "none":
+                if len(zfs_dsk_list) != 1:
+                    self.button3.set_sensitive(False)
+                else:
+                    self.button3.set_sensitive(True)
+            elif self.mirror == "mirror":
+                if len(zfs_dsk_list) > 1:
+                    self.button3.set_sensitive(True)
+                else:
+                    self.button3.set_sensitive(False)
+            elif self.mirror == "raidz1":
+                if len(zfs_dsk_list) == 4 or len(zfs_dsk_list) == 6 or len(zfs_dsk_list) == 10:
+                    self.button3.set_sensitive(True)
+                else:
+                    self.button3.set_sensitive(False)
+            elif self.mirror == "raidz2":
+                if len(zfs_dsk_list) == 3 or len(zfs_dsk_list) == 5:
+                    self.button3.set_sensitive(True)
+                else:
+                    self.button3.set_sensitive(False)
+            elif self.mirror == "raidz3":
+                if len(zfs_dsk_list) == 5 or len(zfs_dsk_list) == 7 or len(zfs_dsk_list) == 11:
+                    self.button3.set_sensitive(True)
+                else:
+                    self.button3.set_sensitive(False)
+            elif self.mirror == "strip":
+                if len(zfs_dsk_list) > 2:
+                    self.button3.set_sensitive(True)
+                else:
+                    self.button3.set_sensitive(False)
+
         else:
             zfs_dsk_list.extend([model[path][0] + "-" + model[path][1]])
+            if self.mirror == "none":
+                if len(zfs_dsk_list) != 1:
+                    self.button3.set_sensitive(False)
+                else:
+                    self.button3.set_sensitive(True)
+            elif self.mirror == "mirror":
+                if len(zfs_dsk_list) > 1:
+                    self.button3.set_sensitive(True)
+                else:
+                    self.button3.set_sensitive(False)
+            elif self.mirror == "raidz1":
+                if len(zfs_dsk_list) == 3 or len(zfs_dsk_list) == 5:
+                    self.button3.set_sensitive(True)
+                else:
+                    self.button3.set_sensitive(False)
+            elif self.mirror == "raidz2":
+                if len(zfs_dsk_list) == 4 or len(zfs_dsk_list) == 6 or len(zfs_dsk_list) == 10:
+                    self.button3.set_sensitive(True)
+                else:
+                    self.button3.set_sensitive(False)
+            elif self.mirror == "raidz3":
+                if len(zfs_dsk_list) == 5 or len(zfs_dsk_list) == 7 or len(zfs_dsk_list) == 11:
+                    self.button3.set_sensitive(True)
+                else:
+                    self.button3.set_sensitive(False)
+            elif self.mirror == "strip":
+                if len(zfs_dsk_list) > 2:
+                    self.button3.set_sensitive(True)
+                else:
+                    self.button3.set_sensitive(False)
         return
 
     def passwdstrength(self, widget):
@@ -455,5 +523,7 @@ class ZFS():
     def passwdVerification(self, widget):
         if self.password.get_text() == self.repassword.get_text():
             self.img.set_from_stock(Gtk.STOCK_YES, 10)
+            self.button3.set_sensitive(True)
         else:
             self.img.set_from_stock(Gtk.STOCK_NO, 10)
+            self.button3.set_sensitive(False)
