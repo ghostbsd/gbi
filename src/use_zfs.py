@@ -153,16 +153,40 @@ class ZFS():
         self.mirror = data
         if self.mirror == "none": 
             self.mirrorTips.set_text("Please select one drive")
+            if len(zfs_dsk_list) != 1:
+                self.button3.set_sensitive(False)
+            else:
+                self.button3.set_sensitive(True)
         elif self.mirror == "mirror":
             self.mirrorTips.set_text("Please select at less 2 drive for mirroring")
+            if len(zfs_dsk_list) > 1:
+                self.button3.set_sensitive(True)
+            else:
+                self.button3.set_sensitive(False)
         elif self.mirror == "raidz1":
             self.mirrorTips.set_text("Please select 3 or 5 drive for raidz1")
+            if len(zfs_dsk_list) == 3 or len(zfs_dsk_list) == 5:
+                self.button3.set_sensitive(True)
+            else:
+                self.button3.set_sensitive(False)
         elif self.mirror == "raidz2":
             self.mirrorTips.set_text("Please select 4, 6, or 10 drive for raidz2")
+            if len(zfs_dsk_list) == 4 or len(zfs_dsk_list) == 6 or len(zfs_dsk_list) == 10:
+                self.button3.set_sensitive(True)
+            else:
+                self.button3.set_sensitive(False)
         elif self.mirror == "raidz3":
             self.mirrorTips.set_text("Please select 5, 7, or 11 drive for raidz3")
+            if len(zfs_dsk_list) == 5 or len(zfs_dsk_list) == 7 or len(zfs_dsk_list) == 11:
+                self.button3.set_sensitive(True)
+            else:
+                self.button3.set_sensitive(False)
         elif self.mirror == "strip":
             self.mirrorTips.set_text("Please select 3 drive to strip")
+            if len(zfs_dsk_list) > 2:
+                self.button3.set_sensitive(True)
+            else:
+                self.button3.set_sensitive(False)
 
 
 
@@ -192,7 +216,36 @@ class ZFS():
             self.repassword.set_sensitive(False)
             self.disk_encript = False
             #self.swap_encrypt_check.set_active(False)
-            self.button3.set_sensitive(True)
+            if self.mirror == "none":
+                if len(zfs_dsk_list) != 1:
+                    self.button3.set_sensitive(False)
+                else:
+                    self.button3.set_sensitive(True)
+            elif self.mirror == "mirror":
+                if len(zfs_dsk_list) > 1:
+                    self.button3.set_sensitive(True)
+                else:
+                    self.button3.set_sensitive(False)
+            elif self.mirror == "raidz1":
+                if len(zfs_dsk_list) == 3 or len(zfs_dsk_list) == 5:
+                    self.button3.set_sensitive(True)
+                else:
+                    self.button3.set_sensitive(False)
+            elif self.mirror == "raidz2":
+                if len(zfs_dsk_list) == 4 or len(zfs_dsk_list) == 6 or len(zfs_dsk_list) == 10:
+                    self.button3.set_sensitive(True)
+                else:
+                    self.button3.set_sensitive(False)
+            elif self.mirror == "raidz3":
+                if len(zfs_dsk_list) == 5 or len(zfs_dsk_list) == 7 or len(zfs_dsk_list) == 11:
+                    self.button3.set_sensitive(True)
+                else:
+                    self.button3.set_sensitive(False)
+            elif self.mirror == "strip":
+                if len(zfs_dsk_list) > 2:
+                    self.button3.set_sensitive(True)
+                else:
+                    self.button3.set_sensitive(False)
 
     def on_check_swap_encrypt(self, widget):
         if widget.get_active():
@@ -410,7 +463,6 @@ class ZFS():
                     self.button3.set_sensitive(True)
                 else:
                     self.button3.set_sensitive(False)
-
         else:
             zfs_dsk_list.extend([model[path][0] + "-" + model[path][1]])
             if self.mirror == "none":
@@ -523,7 +575,36 @@ class ZFS():
     def passwdVerification(self, widget):
         if self.password.get_text() == self.repassword.get_text():
             self.img.set_from_stock(Gtk.STOCK_YES, 10)
-            self.button3.set_sensitive(True)
+            if self.mirror == "none":
+                if len(zfs_dsk_list) != 1:
+                    self.button3.set_sensitive(False)
+                else:
+                    self.button3.set_sensitive(True)
+            elif self.mirror == "mirror":
+                if len(zfs_dsk_list) > 1:
+                    self.button3.set_sensitive(True)
+                else:
+                    self.button3.set_sensitive(False)
+            elif self.mirror == "raidz1":
+                if len(zfs_dsk_list) == 3 or len(zfs_dsk_list) == 5:
+                    self.button3.set_sensitive(True)
+                else:
+                    self.button3.set_sensitive(False)
+            elif self.mirror == "raidz2":
+                if len(zfs_dsk_list) == 4 or len(zfs_dsk_list) == 6 or len(zfs_dsk_list) == 10:
+                    self.button3.set_sensitive(True)
+                else:
+                    self.button3.set_sensitive(False)
+            elif self.mirror == "raidz3":
+                if len(zfs_dsk_list) == 5 or len(zfs_dsk_list) == 7 or len(zfs_dsk_list) == 11:
+                    self.button3.set_sensitive(True)
+                else:
+                    self.button3.set_sensitive(False)
+            elif self.mirror == "strip":
+                if len(zfs_dsk_list) > 2:
+                    self.button3.set_sensitive(True)
+                else:
+                    self.button3.set_sensitive(False)
         else:
             self.img.set_from_stock(Gtk.STOCK_NO, 10)
             self.button3.set_sensitive(False)

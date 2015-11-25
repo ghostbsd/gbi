@@ -332,11 +332,10 @@ class Partitions():
         Delete_partition(part, self.path)
         self.update()
 
-    def delete_create_button(self, horizontal, spacing, layout):
+    def delete_create_button(self):
         bbox = Gtk.HButtonBox()
         bbox.set_border_width(5)
-        bbox.set_layout(layout)
-        bbox.set_spacing(spacing)
+        bbox.set_spacing(10)
         self.create_bt = Gtk.Button("Create")
         self.create_bt.connect("clicked", self.create_partition)
         bbox.add(self.create_bt)
@@ -457,23 +456,24 @@ class Partitions():
                 else:
                     self.create_bt.set_sensitive(False)
 
-    def __init__(self):
+    def __init__(self, button3):
+        self.button3 = button3
         self.box1 = Gtk.VBox(False, 0)
         self.box1.show()
         box2 = Gtk.VBox(False, 10)
-        box2.set_border_width(10)
+        box2.set_border_width(0)
         self.box1.pack_start(box2, True, True, 0)
         box2.show()
         # Title
         Title = Gtk.Label("<b><span size='xx-large'>Partition Editor</span></b> ")
         Title.set_use_markup(True)
-        box2.pack_start(Title, False, False, 0)
+        box2.pack_start(Title, False, False, 20)
         # Choosing disk to Select Create or delete partition.
         label = Gtk.Label("<b>Select a drive:</b>")
         label.set_use_markup(True)
-        sw = Gtk.ScrolledWindow()
-        sw.set_shadow_type(Gtk.SHADOW_ETCHED_IN)
-        sw.set_policy(Gtk.POLICY_AUTOMATIC, Gtk.POLICY_AUTOMATIC)
+        sw = Gtk.ScrolledWindow(hexpand=True, vexpand=True)
+        sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
+        sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         self.store = Gtk.TreeStore(str, str, str, str, 'gboolean')
         self.Tree_Store()
         self.treeview = Gtk.TreeView(self.store)
@@ -515,19 +515,18 @@ class Partitions():
         self.treeview.set_reorderable(True)
         self.treeview.expand_all()
         tree_selection = self.treeview.get_selection()
-        tree_selection.set_mode(Gtk.SELECTION_SINGLE)
+        tree_selection.set_mode(Gtk.SelectionMode.SINGLE)
         tree_selection.connect("changed", self.partition_selection)
         sw.add(self.treeview)
         sw.show()
-        box2.pack_start(sw)
+        box2.pack_start(sw, True, True, 0)
         box2 = Gtk.HBox(False, 10)
-        box2.set_border_width(5)
-        self.box1.pack_start(box2, False, True, 0)
+        box2.set_border_width(10)
+        self.box1.pack_start(box2, False, False, 10)
         box2.show()
         self.scheme = 'GPT'
-        box2.pack_start(self.delete_create_button(True,
-                                                  10, Gtk.BUTTONBOX_START),
-                        True, True, 5)
+        box2.pack_start(self.delete_create_button(),
+                        False, False, 10)
         return
 
     def Tree_Store(self):
@@ -535,19 +534,18 @@ class Partitions():
         for disk in disk_query():
             shem = disk[-1]
             piter = self.store.append(None, [disk[0],
-                                            disk[1], disk[2], disk[3], True])
+                                            str(disk[1]), disk[2], disk[3], True])
             if shem == "GPT":
                 for pi in partition_query(disk[0]):
-                    self.store.append(piter, [pi[0],
-                                              pi[1], pi[2], pi[3], True])
+                    self.store.append(piter, [pi[0], str(pi[1]), pi[2], pi[3], True])
             elif shem == "MBR":
                 for pi in partition_query(disk[0]):
-                    piter1 = self.store.append(piter, [pi[0], pi[1], pi[2], pi[3], True])
+                    piter1 = self.store.append(piter, [pi[0], str(pi[1]), pi[2], pi[3], True])
                     if pi[0] == 'freespace':
                         pass
                     else:
                         for li in label_query(pi[0]):
-                            self.store.append(piter1, [li[0], li[1], li[2], li[3], True])
+                            self.store.append(piter1, [li[0], str(li[1]), li[2], li[3], True])
         return self.store
 
     def get_model(self):
