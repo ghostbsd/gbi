@@ -33,7 +33,7 @@ from setuptools import setup
 # ,,python setup.py build_i18n -m''
 
 # silence pyflakes, __VERSION__ is properly assigned below...
-__VERSION__ = '2.0'
+__VERSION__ = '3.0'
 # for line in file('networkmgr').readlines():
 #    if (line.startswith('__VERSION__')):
 #        exec(line.strip())
@@ -64,7 +64,6 @@ data_files = [
     ('{prefix}/lib/gbi'.format(prefix=sys.prefix), ['src/partition_handler.py',]),
     ('{prefix}/lib/gbi'.format(prefix=sys.prefix), ['src/root.py',]),
     ('{prefix}/lib/gbi'.format(prefix=sys.prefix), ['src/timezone.py',]),
-    ('{prefix}/lib/gbi'.format(prefix=sys.prefix), ['src/untitled.py',]),
     ('{prefix}/lib/gbi'.format(prefix=sys.prefix), ['src/use_disk.py',]),
     ('{prefix}/lib/gbi'.format(prefix=sys.prefix), ['src/use_zfs.py',]),
     ('{prefix}/lib/gbi'.format(prefix=sys.prefix), ['src/user.py',]),
