@@ -36,7 +36,6 @@ import os
 import os.path
 import re
 from subprocess import Popen, PIPE, STDOUT
-from defutil import use_disk_bbox, close_application, root_window, type_window
 from partition_handler import zfs_disk_query, zfs_disk_size_query
 
 # Folder use pr the installer.
@@ -145,13 +144,13 @@ class ZFS():
         index = combobox.get_active()
         data = model[index][0]
         self.scheme = data.partition(':')[0]
-        
+
     def mirror_selection(self, combobox):
         model = combobox.get_model()
         index = combobox.get_active()
         data = model[index][0]
         self.mirror = data
-        if self.mirror == "none": 
+        if self.mirror == "none":
             self.mirrorTips.set_text("Please select one drive")
             if len(zfs_dsk_list) != 1:
                 self.button3.set_sensitive(False)
@@ -252,7 +251,7 @@ class ZFS():
             self.swap_encrypt = True
         else:
             self.swap_encrypt = False
-            
+
     def on_check_swap_mirror(self, widget):
         if widget.get_active():
             self.swap_mirror = True
@@ -320,7 +319,7 @@ class ZFS():
         self.mirrorTips = Gtk.Label('Please select one drive')
         self.mirrorTips.set_justify(Gtk.Justification.LEFT)
         self.mirrorTips.set_alignment(0.01, 0.5)
-        # Mirro, raidz and strip 
+        # Mirro, raidz and strip
         self.mirror = 'none'
         mirror_label = Gtk.Label('<b>Pool Type</b>')
         mirror_label.set_use_markup(True)

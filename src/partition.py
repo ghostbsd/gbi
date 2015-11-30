@@ -38,7 +38,6 @@
 from gi.repository import Gtk, GObject
 import os
 import shutil
-from defutil import partition_bbox, close_application
 from partition_handler import partition_repos, disk_query, Delete_partition
 from partition_handler import partition_query, label_query
 from partition_handler import autoDiskPartition, autoFreeSpace

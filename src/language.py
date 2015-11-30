@@ -39,7 +39,6 @@
 from gi.repository import Gtk
 import os
 import os.path
-from defutil import close_application, language_bbox
 from subprocess import Popen, PIPE, STDOUT
 
 # Folder use for the installer.

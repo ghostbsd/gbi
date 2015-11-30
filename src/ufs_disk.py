@@ -36,7 +36,6 @@ import gtk
 import os
 import os.path
 from subprocess import Popen, PIPE, STDOUT
-from defutil import use_disk_bbox, close_application
 from partition_handler import disk_query
 
 # Folder use pr the installer.
@@ -131,7 +130,7 @@ class Entire():
 
     def __init__(self):
         window = gtk.Window(gtk.WINDOW_TOPLEVEL)
-        window.connect("destroy", close_application)
+
         window.set_size_request(700, 500)
         window.set_resizable(False)
         window.set_title("GhostBSD Installer")

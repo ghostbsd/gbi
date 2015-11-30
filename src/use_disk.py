@@ -36,7 +36,6 @@ from gi.repository import Gtk
 import os
 import os.path
 from subprocess import Popen, PIPE, STDOUT
-from defutil import use_disk_bbox, close_application
 from partition_handler import disk_query
 
 # Folder use pr the installer.

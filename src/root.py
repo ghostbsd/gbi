@@ -39,7 +39,6 @@ from gi.repository import Gtk
 import os
 import re
 from subprocess import Popen
-from defutil import close_application, back_window
 import pickle
 
 # Directory use from the installer.

@@ -11,7 +11,6 @@
 from gi.repository import Gtk
 import os
 import os.path
-from defutil import type_bbox, close_application
 
 # Folder use pr the installer.
 tmp = "/home/ghostbsd/.gbi/"
@@ -37,7 +36,7 @@ class Types():
         pass_file.writelines(self.ne)
         pass_file.close
         return
-        
+
     def get_type(self):
         return self.ne
 

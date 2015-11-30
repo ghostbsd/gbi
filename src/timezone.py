@@ -40,7 +40,7 @@
 from gi.repository import Gtk
 import os.path
 import os
-from defutil import time_bbox, close_application
+
 # Folder use for the installer.
 tmp = "/home/ghostbsd/.gbi/"
 installer = "/usr/local/lib/gbi/"

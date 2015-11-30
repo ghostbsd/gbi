@@ -39,7 +39,7 @@
 from gi.repository import Gtk, GObject
 import os
 from subprocess import Popen, PIPE, call
-from defutil import Keyboard_bbox, close_application
+
 
 # Folder use for the installer.
 tmp = "/home/ghostbsd/.gbi/"
