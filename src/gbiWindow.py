@@ -66,7 +66,7 @@ class MainWindow:
                 Udbox = Gtk.VBox(False, 0)
                 Udbox.show()
                 self.partition = UFSDisk(self.button3)
-                get_UD = self.ud.get_model()
+                get_UD = self.partition.get_model()
                 Udbox.pack_start(get_UD, True, True, 0)
                 label = Gtk.Label("UFS Disk Configuration")
                 self.notebook.insert_page(Udbox, label, 4)

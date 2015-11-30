@@ -15,12 +15,12 @@ import os
 from subprocess import Popen, PIPE, STDOUT, call
 from time import sleep
 from partition_handler import rDeleteParttion, destroyParttion, makingParttion
-from create_cfg import cfg_data
+from create_cfg import gbsd_cfg
 
 tmp = "/home/ghostbsd/.gbi/"
 gbi_path = "/usr/local/lib/gbi/"
 sysinstall = "/usr/local/sbin/pc-sysinstall"
-
+rcconfgbsd = "/etc/rc.conf.ghostbsd"
 encoding = locale.getpreferredencoding()
 utf8conv = lambda x: str(x, encoding).encode('utf8')
 threadBreak = False
@@ -36,7 +36,8 @@ def read_output(command, probar):
     call('umount /media/GhostBSD', shell=True)
     probar.set_fraction(0.004)
     probar.set_text("Creating pcinstall.cfg")
-    cfg_data()
+    if os.path.exists(rcconfgbsd):
+        gbsd_cfg()
     probar.set_text("Partition table Configuration")
     sleep(2)
     if os.path.exists(tmp + 'delete'):

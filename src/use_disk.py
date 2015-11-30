@@ -73,8 +73,8 @@ class UFSDisk:
             self.schm = value3
         button3.set_sensitive(True)
         return
-    
-    def save_selection(self,):
+
+    def save_selection(self):
         sfile = open(part_schem, 'w')
         sfile.writelines('partscheme=%s' % self.schm)
         sfile.close()

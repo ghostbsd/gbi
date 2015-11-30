@@ -26,13 +26,13 @@ dslice = '%sslice' % tmp
 left = '%sleft' % tmp
 partlabel = '%spartlabel' % tmp
 timezone = '%stimezone' % tmp
-variant = '%svariant' % tmp
+KBFile= '%skeyboard' % tmp
 boot_file = '%sboot' % tmp
 disk_schem = '%sscheme' % tmp
 zfs_config = '%szfs_config' % tmp
 
 
-class cfg_data():
+class gbsd_cfg():
     def __init__(self):
         f = open('%spcinstall.cfg' % tmp, 'w')
         # Installation Mode
@@ -52,16 +52,18 @@ class cfg_data():
         if os.path.exists(model):
             f.writelines('\n# Keyboard Setting\n')
             os.remove(model)
-        if os.path.exists(layout):
-            lay = open(layout, 'r')
-            l_output = lay.readlines()[0].strip().partition('-')[2].strip()
-            f.writelines('localizeKeyLayout=%s\n' % l_output)
-            os.remove(layout)
-        if os.path.exists(variant):
-            var = open(variant, 'r')
-            v_output = var.readlines()[0].strip().partition(':')[2].strip()
-            f.writelines('localizeKeyVariant=%s\n' % v_output)
-            os.remove(variant)
+        if os.path.exists(KBFile):
+            rkb = open(KBFile, 'r')
+            kb = rkb.readlines()
+            if len(kb) == 2:
+                l_output = kb[0].strip().partition('-')[2].strip()
+                f.writelines('localizeKeyLayout=%s\n' % l_output)
+                v_output = kb[1].strip().partition(':')[2].strip()
+                f.writelines('localizeKeyVariant=%s\n' % v_output)
+            else:
+                l_output = kb[0].strip().partition('-')[2].strip()
+                f.writelines('localizeKeyLayout=%s\n' % l_output)
+            os.remove(KBFile)
         # Timezone
         if os.path.exists(timezone):
             time = open(timezone, 'r')

@@ -69,7 +69,7 @@ logo = "/usr/local/lib/gbi/logo.png"
 Part_label = '%spartlabel' % tmp
 part_schem = '%sscheme' % tmp
 partitiondb = "%spartitiondb/" % tmp
-
+ufs_Partiton_list = []
 
 class Partitions():
 
@@ -78,6 +78,9 @@ class Partitions():
 
     def on_label(self, widget):
         self.label = widget.get_active_text()
+
+    def save_selection(self):
+        pass
 
     def on_add_label(self, widget, entry, inumb, path, data):
         if self.fs == '' or self.label == '':
@@ -90,6 +93,34 @@ class Partitions():
             createLabel(path, lnumb, cnumb, lb, fs, data)
         self.window.hide()
         self.update()
+        partlabel = '%spartlabel' % tmp
+        if os.path.exists(partlabel):
+            rd = open(partlabel, 'r')
+            part = rd.readlines()
+            # Find GPT scheme.
+            rschm = open(disk_schem, 'r')
+            schm = rschm.readlines()[0]
+            if 'GPT' in schm:
+                fs = part[1].split()[-1]
+                boot = part[0]
+                print fs
+                if 'BOOT' in boot:
+                    pass
+                else:
+                    self.button3.set_sensitive(False)
+                if '/' in fs:
+                    self.button3.set_sensitive(True)
+                else:
+                    self.button3.set_sensitive(False)
+            else:
+                fs = part[0]
+                print fs
+                if '/' in fs:
+                    self.button3.set_sensitive(True)
+                else:
+                    self.button3.set_sensitive(False)
+        else:
+            self.button3.set_sensitive(False)
 
     def on_add_partition(self, widget, entry, inumb, path, data):
         if self.fs == '' or self.label == '':
@@ -102,6 +133,33 @@ class Partitions():
             createPartition(path, lnumb, inumb, cnumb, lb, fs, data)
         self.window.hide()
         self.update()
+        partlabel = '%spartlabel' % tmp
+        if os.path.exists(partlabel):
+            rd = open(partlabel, 'r')
+            part = rd.readlines()
+            # Find GPT scheme.
+            rschm = open(disk_schem, 'r')
+            schm = rschm.readlines()[0]
+            if 'GPT' in schm:
+                fs = part[1].split()[-1]
+                boot = part[0]
+                if 'BOOT' in boot:
+                    pass
+                else:
+                    self.button3.set_sensitive(False)
+                if '/' in fs:
+                    self.button3.set_sensitive(True)
+                else:
+                    self.button3.set_sensitive(False)
+            else:
+                fs = part[0]
+                print fs
+                if '/' in fs:
+                    self.button3.set_sensitive(True)
+                else:
+                    self.button3.set_sensitive(False)
+        else:
+            self.button3.set_sensitive(False)
 
     def cancel(self, widget):
         self.window.hide()
@@ -111,7 +169,6 @@ class Partitions():
         self.window = Gtk.Window()
         self.window.set_title("Add Partition")
         self.window.set_border_width(0)
-        self.window.set_position(Gtk.WIN_POS_CENTER)
         self.window.set_size_request(480, 200)
         self.window.set_icon_from_file(logo)
         box1 = Gtk.VBox(False, 0)
@@ -128,7 +185,7 @@ class Partitions():
         label2 = Gtk.Label("Size(MB):")
         label3 = Gtk.Label("Mount point:")
         self.fs = 'UFS+SUJ'
-        self.fstype = Gtk.combo_box_new_text()
+        self.fstype = Gtk.ComboBoxText()
         self.fstype.append_text('UFS')
         self.fstype.append_text('UFS+S')
         self.fstype.append_text('UFS+J')
@@ -139,17 +196,17 @@ class Partitions():
         self.fstype.set_active(3)
         self.fstype.connect("changed", self.on_fs)
         adj = Gtk.Adjustment(numb, 0, numb, 1, 100, 0)
-        self.entry = Gtk.SpinButton(adj, 10, 0)
+        self.entry = Gtk.SpinButton(adjustment=adj)
         if data2 == 0:
             self.entry.set_editable(False)
         else:
             self.entry.set_editable(True)
-        self.mountpoint = Gtk.combo_box_entry_new_text()
+        self.mountpoint = Gtk.ComboBoxText()
         # self.mountpoint.append_text('select labels')
         self.label = "none"
         self.mountpoint.append_text('none')
         # The space for root '/ ' is to recognise / from the file.
-        self.mountpoint.append_text('/ ')
+        self.mountpoint.append_text('/')
         self.mountpoint.append_text('/boot')
         self.mountpoint.append_text('/etc')
         self.mountpoint.append_text('/home')
@@ -174,7 +231,6 @@ class Partitions():
         # Add button
         bbox = Gtk.HButtonBox()
         bbox.set_border_width(5)
-        bbox.set_layout(Gtk.BUTTONBOX_END)
         bbox.set_spacing(10)
         button = Gtk.Button(stock=Gtk.STOCK_CANCEL)
         button.connect("clicked", self.cancel)
@@ -191,7 +247,7 @@ class Partitions():
             elif data1 == 1:
                 button.connect("clicked", self.on_add_partition, self.entry, numb, path, False)
         bbox.add(button)
-        box2.pack_start(bbox, True, True, 5)
+        box2.pack_end(bbox, True, True, 5)
         self.window.show_all()
 
     def sheme_selection(self, combobox):
@@ -205,16 +261,6 @@ class Partitions():
         diskSchemeChanger(self.scheme, self.path, self.slice, self.size)
         self.update()
         self.window.hide()
-        # if scheme_query(self.path) == "MBR" and len(self.path) == 1:
-        #     self.update()
-        #     self.sliceEditor()
-        #     self.update()
-        # elif scheme_query(self.path) == "MBR" and self.path[1] < 4:
-        #     self.update()
-        #     self.sliceEditor()
-        #     self.update()
-        # elif scheme_query(self.path) == "GPT":
-        #     self.labelEditor(self.path, self.slice, self.size, 1, 1)
 
     def autoSchemePartition(self, widget):
         diskSchemeChanger(self.scheme, self.path, self.slice, self.size)
@@ -227,7 +273,6 @@ class Partitions():
         self.window = Gtk.Window()
         self.window.set_title("Partition Scheme")
         self.window.set_border_width(0)
-        self.window.set_position(Gtk.WIN_POS_CENTER)
         self.window.set_size_request(400, 150)
         self.window.set_icon_from_file("/usr/local/lib/gbi/logo.png")
         box1 = Gtk.VBox(False, 0)
@@ -258,7 +303,6 @@ class Partitions():
         # Add create_scheme button
         bbox = Gtk.HButtonBox()
         bbox.set_border_width(5)
-        bbox.set_layout(Gtk.BUTTONBOX_END)
         bbox.set_spacing(10)
         button = Gtk.Button(stock=Gtk.STOCK_ADD)
         if data is None:
@@ -266,7 +310,7 @@ class Partitions():
         else:
             button.connect("clicked", self.add_gpt_mbr)
         bbox.add(button)
-        box2.pack_start(bbox, True, True, 5)
+        box2.pack_end(bbox, True, True, 5)
         self.window.show_all()
 
     def get_value(self, widget, entry):
@@ -281,7 +325,6 @@ class Partitions():
         self.window = Gtk.Window()
         self.window.set_title("Add Partition")
         self.window.set_border_width(0)
-        self.window.set_position(Gtk.WIN_POS_CENTER)
         self.window.set_size_request(400, 150)
         self.window.set_icon_from_file("/usr/local/lib/gbi/logo.png")
         box1 = Gtk.VBox(False, 0)
@@ -298,7 +341,7 @@ class Partitions():
         table = Gtk.Table(1, 2, True)
         label1 = Gtk.Label("Size(MB):")
         adj = Gtk.Adjustment(numb, 0, numb, 1, 100, 0)
-        self.entry = Gtk.SpinButton(adj, 10, 0)
+        self.entry = Gtk.SpinButton(adjustment=adj)
         self.entry.set_numeric(True)
         # table.attach(label, 0, 2, 0, 1)
         table.attach(label1, 0, 1, 1, 2)
@@ -311,7 +354,6 @@ class Partitions():
         # Add button
         bbox = Gtk.HButtonBox()
         bbox.set_border_width(5)
-        bbox.set_layout(Gtk.BUTTONBOX_END)
         bbox.set_spacing(10)
         button = Gtk.Button(stock=Gtk.STOCK_CANCEL)
         button.connect("clicked", self.cancel)
@@ -319,7 +361,7 @@ class Partitions():
         button = Gtk.Button(stock=Gtk.STOCK_ADD)
         button.connect("clicked", self.get_value, self.entry)
         bbox.add(button)
-        box2.pack_start(bbox, True, True, 5)
+        box2.pack_end(bbox, True, True, 5)
         self.window.show_all()
 
     def update(self):
@@ -372,6 +414,34 @@ class Partitions():
             self.Tree_Store()
             self.treeview.expand_all()
             self.treeview.set_cursor(self.path)
+            partlabel = '%spartlabel' % tmp
+            if os.path.exists(partlabel):
+                rd = open(partlabel, 'r')
+                part = rd.readlines()
+                # Find GPT scheme.
+                rschm = open(disk_schem, 'r')
+                schm = rschm.readlines()[0]
+                if 'GPT' in schm:
+                    fs = part[1]
+                    boot = part[0]
+                    print fs
+                    if 'BOOT' in boot:
+                        pass
+                    else:
+                        self.button3.set_sensitive(False)
+                    if '/' in fs:
+                        self.button3.set_sensitive(True)
+                    else:
+                        self.button3.set_sensitive(False)
+                else:
+                    fs = part[0].split()[-1]
+                    print fs
+                    if '/' in fs:
+                        self.button3.set_sensitive(True)
+                    else:
+                        self.button3.set_sensitive(False)
+            else:
+                self.button3.set_sensitive(Faulse)
         elif self.slice == 'freespace':
             print self.path
             print self.size
@@ -379,6 +449,34 @@ class Partitions():
             self.Tree_Store()
             self.treeview.expand_all()
             self.treeview.set_cursor(self.path)
+            partlabel = '%spartlabel' % tmp
+            if os.path.exists(partlabel):
+                rd = open(partlabel, 'r')
+                part = rd.readlines()
+                # Find GPT scheme.
+                rschm = open(disk_schem, 'r')
+                schm = rschm.readlines()[0]
+                if 'GPT' in schm:
+                    fs = part[1]
+                    boot = part[0]
+                    print fs
+                    if 'BOOT' in boot:
+                        pass
+                    else:
+                        self.button3.set_sensitive(False)
+                    if '/' in fs:
+                        self.button3.set_sensitive(True)
+                    else:
+                        self.button3.set_sensitive(False)
+                else:
+                    fs = part[0]
+                    print fs
+                    if '/' in fs:
+                        self.button3.set_sensitive(True)
+                    else:
+                        self.button3.set_sensitive(False)
+            else:
+                self.button3.set_sensitive(False)
         elif len(self.path) == 2:
             pass
         else:
@@ -398,6 +496,34 @@ class Partitions():
         partition_repos()
         self.Tree_Store()
         self.treeview.expand_all()
+        partlabel = '%spartlabel' % tmp
+        if os.path.exists(partlabel):
+            rd = open(partlabel, 'r')
+            part = rd.readlines()
+            # Find GPT scheme.
+            rschm = open(disk_schem, 'r')
+            schm = rschm.readlines()[0]
+            if 'GPT' in schm:
+                fs = part[1]
+                boot = part[0]
+                print fs
+                if 'BOOT' in boot:
+                    pass
+                else:
+                    self.button3.set_sensitive(False)
+                if '/' in fs:
+                    self.button3.set_sensitive(True)
+                else:
+                    self.button3.set_sensitive(False)
+            else:
+                fs = part[0]
+                print fs
+                if '/' in fs:
+                    self.button3.set_sensitive(True)
+                else:
+                    self.button3.set_sensitive(False)
+        else:
+            self.button3.set_sensitive(False)
 
     def create_partition(self, widget):
         print self.path
