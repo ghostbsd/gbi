@@ -77,12 +77,12 @@ def read_output(command, probar):
     probar.set_fraction(1.0)
     call('service hald start',shell=True)
     if bartext.rstrip() == "Installation finished!":
-        call('python %send.py' % gbi_path, shell=True, close_fds=True)
+        Popen('python %send.py' % gbi_path, shell=True, close_fds=True)
         call("rm -rf /home/ghostbsd/.gbi/", shell=True, close_fds=True)
-        #GObject.idle_add(window.destroy)
+        GObject.idle_add(window.destroy)
     else:
-        call('python %serror.py' % gbi_path, shell=True, close_fds=True)
-        #GObject.idle_add(window.destroy)
+        Popen('python %serror.py' % gbi_path, shell=True, close_fds=True)
+        GObject.idle_add(window.destroy)
 
 
 class Installs():
@@ -109,8 +109,6 @@ class Installs():
         sw.show()
         box2.pack_start(sw, True, True, 0)
         command = '%s -c %spcinstall.cfg' % (sysinstall, tmp)
-        # This is only for testing
-        # command = 'cd /usr/ports/editors/openoffice-4 && make install clean'
         thr = threading.Thread(target=read_output,
                                args=(command, self.pbar))
         thr.setDaemon(True)
