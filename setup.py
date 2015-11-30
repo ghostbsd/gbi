@@ -62,7 +62,6 @@ data_files = [
     ('{prefix}/lib/gbi'.format(prefix=sys.prefix), ['src/language.py',]),
     ('{prefix}/lib/gbi'.format(prefix=sys.prefix), ['src/partition.py',]),
     ('{prefix}/lib/gbi'.format(prefix=sys.prefix), ['src/partition_handler.py',]),
-    ('{prefix}/lib/gbi'.format(prefix=sys.prefix), ['src/prepart.py',]),
     ('{prefix}/lib/gbi'.format(prefix=sys.prefix), ['src/root.py',]),
     ('{prefix}/lib/gbi'.format(prefix=sys.prefix), ['src/timezone.py',]),
     ('{prefix}/lib/gbi'.format(prefix=sys.prefix), ['src/untitled.py',]),
