@@ -3,8 +3,9 @@ from sys import path
 from gi.repository import Gtk
 
 installer = "/usr/local/lib/gbi/"
-path.append("/home/ericbsd/gbi/src/")
-# path.append(installer)
+
+# path.append("/home/ericbsd/gbi/src/")
+path.append(installer)
 
 from gbiWindow import MainWindow
 from partition_handler import partition_repos

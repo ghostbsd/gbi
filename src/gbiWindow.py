@@ -3,8 +3,8 @@
 from gi.repository import Gtk, GObject
 import sys
 installer = "/usr/local/lib/gbi/"
-#sys.path.append(installer)
-sys.path.append("/home/ericbsd/gbi/src/")
+sys.path.append(installer)
+# sys.path.append("/home/ericbsd/gbi/src/")
 from language import Language
 from installType import Types
 from keyboard import Keyboard
@@ -182,12 +182,12 @@ class MainWindow:
         self.table.attach(self.button1, 3, 4, 0, 1)
         self.button1.show()
         self.button1.set_sensitive(False)
-        
+
         self.button2 = Gtk.Button(label='Cancel')
         self.button2.connect("clicked", self.delete)
         self.table.attach(self.button2, 4, 5, 0, 1)
         self.button2.show()
-        
+
         self.button3 = Gtk.Button(label='Next')
         self.button3.connect("clicked", self.next_page, self.notebook)
         self.table.attach(self.button3, 5, 6, 0, 1)
