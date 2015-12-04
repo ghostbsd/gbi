@@ -93,7 +93,7 @@ def allCharacter(strg, search=re.compile(r'[^a-zA-Z0-9~\!@#\$%\^&\*_\+":;\'\-]')
 
 
 class ZFS():
-    def save_selection(self, widget):
+    def save_selection(self):
         SIZE = int(zfs_dsk_list[0].partition('-')[2].rstrip()) - 2
         SWAP = int(self.swap_entry.get_text())
         ZFS_NUM = SIZE - SWAP
