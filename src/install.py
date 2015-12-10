@@ -34,30 +34,30 @@ def close_application(self, widget):
 def read_output(command, probar):
     call('service hald stop', shell=True)
     call('umount /media/GhostBSD', shell=True)
-    probar.set_fraction(0.004)
-    probar.set_text("Creating pcinstall.cfg")
+    probar.set_fraction(0.002)
+    # probar.set_text("Creating pcinstall.cfg")
     if os.path.exists(rcconfgbsd):
         gbsd_cfg()
-    probar.set_text("Partition table Configuration")
+    # probar.set_text("Partition table Configuration")
     sleep(2)
     if os.path.exists(tmp + 'delete'):
         probar.set_fraction(0.004)
-        probar.set_text("Deleting partition")
+        # probar.set_text("Deleting partition")
         rDeleteParttion()
         sleep(2)
     # destroy disk partition and create scheme
     if os.path.exists(tmp + 'destroy'):
         probar.set_fraction(0.005)
-        probar.set_text("Creating new disk with partitions")
+        # probar.set_text("Creating new disk with partitions")
         destroyParttion()
         sleep(2)
     # create partition
     if os.path.exists(tmp + 'create'):
         probar.set_fraction(0.008)
-        probar.set_text("Creating new partitions")
+        # probar.set_text("Creating new partitions")
         makingParttion()
         sleep(2)
-    probar.set_text("Beginning installation")
+    # probar.set_text("Beginning installation")
     sleep(2)
     p = Popen(command, shell=True, stdin=PIPE, stdout=PIPE,
               stderr=STDOUT, close_fds=True)
@@ -68,7 +68,7 @@ def read_output(command, probar):
         new_val = probar.get_fraction() + 0.000003
         probar.set_fraction(new_val)
         bartext = line
-        probar.set_text("%s" % bartext.rstrip())
+        # probar.set_text("%s" % bartext.rstrip())
         ## Those for next 4 line is for debugin only.
         # filer = open("/home/ghostbsd/.gbi/tmp", "a")
         # filer.writelines(bartext)
