@@ -154,121 +154,121 @@ class gbsd_cfg():
         f.writelines('commitUser\n')
         f.writelines('runScript=/usr/local/bin/iso_to_hd\n')
         f.writelines('runCommand=echo \'gdm_lang="%s.UTF-8"\' >> /etc/rc.conf\n' % lang_output)
-        if "af" = lang_output:
+        if "af" == lang_output:
             f.writelines('runCommand=pkg install af-libreoffice')
-        elif "ar" = lang_output:
+        elif "ar" == lang_output:
             f.writelines('runCommand=pkg install ar-libreoffice')
-        elif "bg" = lang_output:
+        elif "bg" == lang_output:
             f.writelines('runCommand=pkg install bg-libreoffice')
-        elif "bn" = lang_output:
+        elif "bn" == lang_output:
             f.writelines('runCommand=pkg install bn-libreoffice')
-        elif "br" = lang_output:
+        elif "br" == lang_output:
             f.writelines('runCommand=pkg install br-libreoffice')
-        elif "bs" = lang_output:
+        elif "bs" == lang_output:
             f.writelines('runCommand=pkg install bs-libreoffice')
-        elif "ca" = lang_output:
+        elif "ca" == lang_output:
             f.writelines('runCommand=pkg install ca-libreoffice')
-        elif "cs" = lang_output:
+        elif "cs" == lang_output:
             f.writelines('runCommand=pkg install cs-libreoffice')
-        elif "cy" = lang_output:
+        elif "cy" == lang_output:
             f.writelines('runCommand=pkg install cy-libreoffice')
-        elif "da" = lang_output:
+        elif "da" == lang_output:
             f.writelines('runCommand=pkg install da-libreoffice')
-        elif "de" = lang_output:
+        elif "de" == lang_output:
             f.writelines('runCommand=pkg install de-libreoffice')
-        elif "el" = lang_output:
+        elif "el" == lang_output:
             f.writelines('runCommand=pkg install el-libreoffice')
-        elif "en_GB" = lang_output:
+        elif "en_GB" == lang_output:
             f.writelines('runCommand=pkg install en_GB-libreoffice')
-        elif "en_ZA" = lang_output:
+        elif "en_ZA" == lang_output:
             f.writelines('runCommand=pkg install en_ZA-libreoffice')
-        elif "es" = lang_output:
+        elif "es" == lang_output:
             f.writelines('runCommand=pkg install es-libreoffice')
-        elif "et" = lang_output:
+        elif "et" == lang_output:
             f.writelines('runCommand=pkg install et-libreoffice')
-        elif "eu" = lang_output:
+        elif "eu" == lang_output:
             f.writelines('runCommand=pkg install eu-libreoffice')
-        elif "fa" = lang_output:
+        elif "fa" == lang_output:
             f.writelines('runCommand=pkg install fa-libreoffice')
-        elif "fi" = lang_output:
+        elif "fi" == lang_output:
             f.writelines('runCommand=pkg install fi-libreoffice')
         elif "fr" in lang_output:
             f.writelines('runCommand=pkg install fr-libreoffice')
-        elif "ga" = lang_output:
+        elif "ga" == lang_output:
             f.writelines('runCommand=pkg install ga-libreoffice')
-        elif "gb" = lang_output:
+        elif "gb" == lang_output:
             f.writelines('runCommand=pkg install gd-libreoffice')
-        elif "gl" = lang_output:
+        elif "gl" == lang_output:
             f.writelines('runCommand=pkg install gl-libreoffice')
-        elif "he" = lang_output:
+        elif "he" == lang_output:
             f.writelines('runCommand=pkg install he-libreoffice')
-        elif "hi" = lang_output:
+        elif "hi" == lang_output:
             f.writelines('runCommand=pkg install hi-libreoffice')
-        elif "hr" = lang_output:
+        elif "hr" == lang_output:
             f.writelines('runCommand=pkg install hr-libreoffice')
-        elif "hu" = lang_output:
+        elif "hu" == lang_output:
             f.writelines('runCommand=pkg install hu-libreoffice')
-        elif "id" = lang_output:
+        elif "id" == lang_output:
             f.writelines('runCommand=pkg install id-libreoffice')
-        elif "is" = lang_output:
+        elif "is" == lang_output:
             f.writelines('runCommand=pkg install is-libreoffice')
-        elif "it" = lang_output:
+        elif "it" == lang_output:
             f.writelines('runCommand=pkg install it-libreoffice')
-        elif "ja" = lang_output:
+        elif "ja" == lang_output:
             f.writelines('runCommand=pkg install ja-libreoffice')
-        elif "ko" = lang_output:
+        elif "ko" == lang_output:
             f.writelines('runCommand=pkg install ko-libreoffice')
-        elif "lt" = lang_output:
+        elif "lt" == lang_output:
             f.writelines('runCommand=pkg install lt-libreoffice')
-        elif "lv" = lang_output:
+        elif "lv" == lang_output:
             f.writelines('runCommand=pkg install lv-libreoffice')
-        elif "mk" = lang_output:
+        elif "mk" == lang_output:
             f.writelines('runCommand=pkg install mk-libreoffice')
-        elif "mn" = lang_output:
+        elif "mn" == lang_output:
             f.writelines('runCommand=pkg install mn-libreoffice')
-        elif "nb" = lang_output:
+        elif "nb" == lang_output:
             f.writelines('runCommand=pkg install nb-libreoffice')
-        elif "ne" = lang_output:
+        elif "ne" == lang_output:
             f.writelines('runCommand=pkg install ne-libreoffice')
-        elif "nl" = lang_output:
+        elif "nl" == lang_output:
             f.writelines('runCommand=pkg install nl-libreoffice')
-        elif "pa_IN" = lang_output:
+        elif "pa_IN" == lang_output:
             f.writelines('runCommand=pkg install pa_IN-libreoffice')
-        elif "pl" = lang_output:
+        elif "pl" == lang_output:
             f.writelines('runCommand=pkg install pl-libreoffice')
-        elif "pt" = lang_output:
+        elif "pt" == lang_output:
             f.writelines('runCommand=pkg install pt-libreoffice')
-        elif "pt_BR" = lang_output:
+        elif "pt_BR" == lang_output:
             f.writelines('runCommand=pkg install pt_BR-libreoffice')
-        elif "ro" = lang_output:
+        elif "ro" == lang_output:
             f.writelines('runCommand=pkg install ro-libreoffice')
-        elif "ru" = lang_output:
+        elif "ru" == lang_output:
             f.writelines('runCommand=pkg install ru-libreoffice')
-        elif "sd" = lang_output:
+        elif "sd" == lang_output:
             f.writelines('runCommand=pkg install sd-libreoffice')
-        elif "sk" = lang_output:
+        elif "sk" == lang_output:
             f.writelines('runCommand=pkg install sk-libreoffice')
-        elif "sl" = lang_output:
+        elif "sl" == lang_output:
             f.writelines('runCommand=pkg install sl-libreoffice')
-        elif "sr" = lang_output:
+        elif "sr" == lang_output:
             f.writelines('runCommand=pkg install sr-libreoffice')
-        elif "sv" = lang_output:
+        elif "sv" == lang_output:
             f.writelines('runCommand=pkg install sv-libreoffice')
-        elif "ta" = lang_output:
+        elif "ta" == lang_output:
             f.writelines('runCommand=pkg install ta-libreoffice')
-        elif "tg" = lang_output:
+        elif "tg" == lang_output:
             f.writelines('runCommand=pkg install tg-libreoffice')
-        elif "tr" = lang_output:
+        elif "tr" == lang_output:
             f.writelines('runCommand=pkg install tr-libreoffice')
-        elif "uk" = lang_output:
+        elif "uk" == lang_output:
             f.writelines('runCommand=pkg install uk-libreoffice')
-        elif "vi" = lang_output:
+        elif "vi" == lang_output:
             f.writelines('runCommand=pkg install vi-libreoffice')
-        elif "zh_CN" = lang_output:
+        elif "zh_CN" == lang_output:
             f.writelines('runCommand=pkg install zh_CN-libreoffice')
-        elif "zh_TW" = lang_output:
+        elif "zh_TW" == lang_output:
             f.writelines('runCommand=pkg install zh_TW-libreoffice')
-        elif "zu" = lang_output:
+        elif "zu" == lang_output:
             f.writelines('runCommand=pkg install zu-libreoffice')
         f.close()
         os.remove(user_passwd)
