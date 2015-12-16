@@ -167,6 +167,8 @@ class MainWindow:
         vbox.show()
         self.lang = Language()
         get_lang = self.lang.get_model()
+        # self.lang = Installs()
+        # get_lang = self.lang.get_model()
         vbox.pack_start(get_lang, True, True, 0)
         label = Gtk.Label("Language")
         self.notebook.insert_page(vbox, label, 0)

@@ -16,7 +16,11 @@ from subprocess import Popen, PIPE, STDOUT, call
 from time import sleep
 from partition_handler import rDeleteParttion, destroyParttion, makingParttion
 from create_cfg import gbsd_cfg
-
+from slides import Slides
+import sys
+installer = "/usr/local/lib/gbi/"
+sys.path.append(installer)
+# sys.path.append("/home/ericbsd/gbi/src/")
 tmp = "/home/ghostbsd/.gbi/"
 gbi_path = "/usr/local/lib/gbi/"
 sysinstall = "/usr/local/sbin/pc-sysinstall"
@@ -92,22 +96,25 @@ class Installs():
         Gtk.main_quit()
 
     def __init__(self, button1, button2, button3, notebook):
+        # def __init__(self):
         self.box1 = Gtk.VBox(False, 0)
         self.box1.show()
-        box2 = Gtk.VBox(False, 10)
-        box2.set_border_width(10)
+        box2 = Gtk.VBox(False, 0)
+        box2.set_border_width(0)
         self.box1.pack_start(box2, True, True, 0)
         box2.show()
         self.pbar = Gtk.ProgressBar()
         self.pbar.set_fraction(0.0)
-        self.pbar.set_size_request(-1, 20)
-        box2.pack_start(self.pbar, False, False, 0)
-        web_view = WebKit.WebView()
-        web_view.open(self.default_site)
-        sw = Gtk.ScrolledWindow()
-        sw.add(web_view)
-        sw.show()
-        box2.pack_start(sw, True, True, 0)
+        # self.pbar.set_size_request(-1, 20)
+        box2.pack_start(self.pbar, False, False, 10)
+        slide = Slides()
+        getSlides = slide.get_slide()
+        # web_view = WebKit.WebView()
+        # web_view.open(self.default_site)
+        # sw = Gtk.ScrolledWindow()
+        # sw.add(web_view)
+        # sw.show()
+        box2.pack_start(getSlides, True, True, 0)
         command = '%s -c %spcinstall.cfg' % (sysinstall, tmp)
         thr = threading.Thread(target=read_output,
                                args=(command, self.pbar))
