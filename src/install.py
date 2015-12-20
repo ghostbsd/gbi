@@ -114,7 +114,7 @@ class Installs():
         # sw = Gtk.ScrolledWindow()
         # sw.add(web_view)
         # sw.show()
-        box2.pack_start(getSlides, True, True, 0)
+        #box2.pack_start(getSlides, True, True, 0)
         command = '%s -c %spcinstall.cfg' % (sysinstall, tmp)
         thr = threading.Thread(target=read_output,
                                args=(command, self.pbar))
