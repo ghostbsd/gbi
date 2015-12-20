@@ -7,8 +7,7 @@
 # install.py v 0.4 Sunday, February 08 2015 Eric Turgeon
 #
 # install.py give the job to pc-sysinstall to install GhostBSD.
-from gi.repository import Gtk, GObject
-from gi.repository import WebKit
+from gi.repository import Gtk,
 import threading
 import locale
 import os
@@ -25,10 +24,6 @@ tmp = "/home/ghostbsd/.gbi/"
 gbi_path = "/usr/local/lib/gbi/"
 sysinstall = "/usr/local/sbin/pc-sysinstall"
 rcconfgbsd = "/etc/rc.conf.ghostbsd"
-# encoding = locale.getpreferredencoding()
-# utf8conv = lambda x: str(x, encoding).encode('utf8')
-#threadBreak = False
-#GObject.threads_init()
 
 
 def close_application(self, widget):
@@ -43,7 +38,7 @@ def read_output(command, probar):
     if os.path.exists(rcconfgbsd):
         gbsd_cfg()
     # probar.set_text("Partition table Configuration")
-    sleep(2)
+        sleep(2)
     if os.path.exists(tmp + 'delete'):
         probar.set_fraction(0.004)
         # probar.set_text("Deleting partition")
@@ -62,7 +57,7 @@ def read_output(command, probar):
         makingParttion()
         sleep(2)
     # probar.set_text("Beginning installation")
-    sleep(2)
+
     p = Popen(command, shell=True, stdin=PIPE, stdout=PIPE,
               stderr=STDOUT, close_fds=True)
     while 1:
@@ -71,8 +66,8 @@ def read_output(command, probar):
             break
         new_val = probar.get_fraction() + 0.000003
         probar.set_fraction(new_val)
-        #bartext = line
-        # probar.set_text("%s" % bartext.rstrip())
+        bartext = line
+        probar.set_text("%s" % bartext.rstrip())
         ## Those for next 4 line is for debugin only.
         # filer = open("/home/ghostbsd/.gbi/tmp", "a")
         # filer.writelines(bartext)
@@ -104,9 +99,7 @@ class Installs():
         self.box1.pack_start(box2, True, True, 0)
         box2.show()
         self.pbar = Gtk.ProgressBar()
-        self.pbar.set_fraction(0.0)
-        self.pbar.set_size_request(10, 20)
-        box2.pack_start(self.pbar, False, False, 10)
+        box2.pack_start(self.pbar, True, True, 10)
         slide = Slides()
         getSlides = slide.get_slide()
         # web_view = WebKit.WebView()
@@ -118,7 +111,7 @@ class Installs():
         command = '%s -c %spcinstall.cfg' % (sysinstall, tmp)
         thr = threading.Thread(target=read_output,
                                args=(command, self.pbar))
-        thr.setDaemon(True)
+        # thr.setDaemon(True)
         thr.start()
         return
 
