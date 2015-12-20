@@ -126,7 +126,7 @@ class MainWindow:
             Ibox.show()
             self.isntall = Installs(self.button1, self.button2, self.button3, self.notebook)
             get_install = self.isntall.get_model()
-            Ibox.pack_start(get_install, True, True, 0)
+            Ibox.pack_start(get_install, False, False, 0)
             label = Gtk.Label("Installation")
             self.notebook.insert_page(Ibox, label, 7)
             self.window.show_all()

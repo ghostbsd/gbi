@@ -25,10 +25,10 @@ tmp = "/home/ghostbsd/.gbi/"
 gbi_path = "/usr/local/lib/gbi/"
 sysinstall = "/usr/local/sbin/pc-sysinstall"
 rcconfgbsd = "/etc/rc.conf.ghostbsd"
-encoding = locale.getpreferredencoding()
-utf8conv = lambda x: str(x, encoding).encode('utf8')
-threadBreak = False
-GObject.threads_init()
+# encoding = locale.getpreferredencoding()
+# utf8conv = lambda x: str(x, encoding).encode('utf8')
+#threadBreak = False
+#GObject.threads_init()
 
 
 def close_application(self, widget):
@@ -71,22 +71,22 @@ def read_output(command, probar):
             break
         new_val = probar.get_fraction() + 0.000003
         probar.set_fraction(new_val)
-        bartext = line
+        #bartext = line
         # probar.set_text("%s" % bartext.rstrip())
         ## Those for next 4 line is for debugin only.
         # filer = open("/home/ghostbsd/.gbi/tmp", "a")
         # filer.writelines(bartext)
         # filer.close
-        print(bartext)
+        #print(bartext)
     probar.set_fraction(1.0)
     call('service hald start',shell=True)
     if bartext.rstrip() == "Installation finished!":
         Popen('python %send.py' % gbi_path, shell=True, close_fds=True)
         call("rm -rf /home/ghostbsd/.gbi/", shell=True, close_fds=True)
-        GObject.idle_add(window.destroy)
+        Gtk.main_quit()
     else:
         Popen('python %serror.py' % gbi_path, shell=True, close_fds=True)
-        GObject.idle_add(window.destroy)
+        Gtk.main_quit()
 
 
 class Installs():
@@ -105,7 +105,7 @@ class Installs():
         box2.show()
         self.pbar = Gtk.ProgressBar()
         self.pbar.set_fraction(0.0)
-        # self.pbar.set_size_request(-1, 20)
+        self.pbar.set_size_request(10, 20)
         box2.pack_start(self.pbar, False, False, 10)
         slide = Slides()
         getSlides = slide.get_slide()
