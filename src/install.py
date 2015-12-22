@@ -46,13 +46,13 @@ def read_output(command, probar):
         sleep(1)
     # destroy disk partition and create scheme
     if os.path.exists(tmp + 'destroy'):
-        probar.set_fraction(0.005)
+        #probar.set_fraction(0.005)
         GLib.idle_add(update_progess, probar, "Creating disk partition")
         destroyParttion()
         sleep(1)
     # create partition
     if os.path.exists(tmp + 'create'):
-        probar.set_fraction(0.008)
+        #probar.set_fraction(0.008)
         # probar.set_text("Creating new partitions")
         GLib.idle_add(update_progess, probar, "Creating new partitions")
         makingParttion()
@@ -63,11 +63,11 @@ def read_output(command, probar):
         line = p.stdout.readline()
         if not line:
             break
-        new_val = probar.get_fraction() + 0.000003
-        probar.set_fraction(new_val)
+        #new_val = probar.get_fraction() + 0.000003
+        #probar.set_fraction(new_val)
         bartext = line
         GLib.idle_add(update_progess, probar, bartext)
-        probar.set_text("%s" % bartext.rstrip())
+        #probar.set_text("%s" % bartext.rstrip())
         ## Those for next 4 line is for debugin only.
         # filer = open("/home/ghostbsd/.gbi/tmp", "a")
         # filer.writelines(bartext)
@@ -75,7 +75,6 @@ def read_output(command, probar):
         #print(bartext)
         # while Gtk.events_pending():
         #     Gtk.main_iteration()
-    probar.set_fraction(1.0)
     call('service hald start',shell=True)
     if bartext.rstrip() == "Installation finished!":
         Popen('python %send.py' % gbi_path, shell=True, close_fds=True)
@@ -101,6 +100,7 @@ class Installs():
         self.box1.pack_start(box2, True, True, 0)
         box2.show()
         self.pbar = Gtk.ProgressBar()
+        self.pbar.set_show_text(True)
         box2.pack_start(self.pbar, True, True, 10)
         slide = Slides()
         getSlides = slide.get_slide()
