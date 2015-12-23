@@ -63,18 +63,13 @@ def read_output(command, probar):
         line = p.stdout.readline()
         if not line:
             break
-        #new_val = probar.get_fraction() + 0.000003
-        #probar.set_fraction(new_val)
         bartext = line
         GLib.idle_add(update_progess, probar, bartext)
-        #probar.set_text("%s" % bartext.rstrip())
         ## Those for next 4 line is for debugin only.
         # filer = open("/home/ghostbsd/.gbi/tmp", "a")
         # filer.writelines(bartext)
         # filer.close
         #print(bartext)
-        # while Gtk.events_pending():
-        #     Gtk.main_iteration()
     call('service hald start',shell=True)
     if bartext.rstrip() == "Installation finished!":
         Popen('python %send.py' % gbi_path, shell=True, close_fds=True)
@@ -109,7 +104,7 @@ class Installs():
         # sw = Gtk.ScrolledWindow()
         # sw.add(web_view)
         # sw.show()
-        #box2.pack_start(getSlides, True, True, 0)
+        box2.pack_start(getSlides, True, True, 0)
         command = '%s -c %spcinstall.cfg' % (sysinstall, tmp)
         thr = threading.Thread(target=read_output,
                                args=(command, self.pbar))
