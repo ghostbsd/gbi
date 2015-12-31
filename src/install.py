@@ -96,7 +96,7 @@ class Installs():
         box2.show()
         self.pbar = Gtk.ProgressBar()
         self.pbar.set_show_text(True)
-        box2.pack_start(self.pbar, expand=False)
+        box2.pack_start(self.pbar, False, True, 0)
         slide = Slides()
         getSlides = slide.get_slide()
         # web_view = WebKit.WebView()
