@@ -42,7 +42,7 @@ import os.path
 import os
 
 # Folder use for the installer.
-tmp = "/home/ghostbsd/.gbi/"
+tmp = "/tmp/.gbi/"
 installer = "/usr/local/lib/gbi/"
 if not os.path.exists(tmp):
     os.makedirs(tmp)

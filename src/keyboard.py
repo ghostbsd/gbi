@@ -42,7 +42,7 @@ from subprocess import Popen, PIPE, call
 
 
 # Folder use for the installer.
-tmp = "/home/ghostbsd/.gbi/"
+tmp = "/tmp/.gbi/"
 installer = "/usr/local/lib/gbi/"
 pc_sysinstall = "/usr/local/bin/pc-sysinstall"
 query = "sh /usr/local/lib/gbi/backend-query/"

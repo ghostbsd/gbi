@@ -39,7 +39,7 @@ from subprocess import Popen, PIPE, STDOUT
 from partition_handler import disk_query
 
 # Folder use pr the installer.
-tmp = "/home/ghostbsd/.gbi/"
+tmp = "/tmp/.gbi/"
 installer = "/usr/local/lib/gbi/"
 query = "sh /usr/local/lib/gbi/backend-query/"
 if not os.path.exists(tmp):

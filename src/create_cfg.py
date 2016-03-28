@@ -12,7 +12,7 @@ import pickle
 from subprocess import Popen
 
 # Directory use from the installer.
-tmp = "/home/ghostbsd/.gbi/"
+tmp = "/tmp/.gbi/"
 installer = "/usr/local/lib/gbi/"
 start_Install = 'python %sinstall.py' % installer
 # Installer data file.
