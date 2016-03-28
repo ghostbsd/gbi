@@ -45,7 +45,7 @@ from partition_handler import createLabel, scheme_query, how_partition
 from partition_handler import diskSchemeChanger, createSlice, createPartition
 
 # Folder use pr the installer.
-tmp = "/home/ghostbsd/.gbi/"
+tmp = "/tmp/.gbi/"
 installer = "/usr/local/lib/gbi/"
 query = "sh /usr/local/lib/gbi/backend-query/"
 if not os.path.exists(tmp):

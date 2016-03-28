@@ -5,7 +5,7 @@ import re
 from subprocess import Popen, PIPE, STDOUT, call
 import pickle
 
-tmp = "/home/ghostbsd/.gbi/"
+tmp = "/tmp/.gbi/"
 if not os.path.exists(tmp):
     os.makedirs(tmp)
 installer = "/usr/local/lib/gbi/"

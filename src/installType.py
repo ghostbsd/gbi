@@ -13,7 +13,7 @@ import os
 import os.path
 
 # Folder use pr the installer.
-tmp = "/home/ghostbsd/.gbi/"
+tmp = "/tmp/.gbi/"
 installer = "/usr/local/lib/gbi/"
 query = "sh /usr/local/etc/lib/backend-query/"
 if not os.path.exists(tmp):

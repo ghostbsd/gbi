@@ -13,11 +13,11 @@ from subprocess import Popen, PIPE, STDOUT, call
 import getpass
 from time import sleep
 
-# Path need to the installer.
-PATH = "/home/ghostbsd"
+# Path needed for the installer.
+PATH = "/tmp"
 PC_SYS = "sudo pc-sysinstall"
 CFG = "%s/pcinstall.cfg" % PATH
-tmp = "/home/ghostbsd/.gbi"
+tmp = "/tmp/.gbi"
 installer = "/usr/local/etc/gbi/"
 query = "sh /usr/local/etc/gbi/backend-query/"
 if not os.path.exists(tmp):

@@ -20,7 +20,7 @@ import sys
 installer = "/usr/local/lib/gbi/"
 sys.path.append(installer)
 # sys.path.append("/home/ericbsd/gbi/src/")
-tmp = "/home/ghostbsd/.gbi/"
+tmp = "/tmp/.gbi/"
 gbi_path = "/usr/local/lib/gbi/"
 sysinstall = "/usr/local/sbin/pc-sysinstall"
 rcconfgbsd = "/etc/rc.conf.ghostbsd"
@@ -66,14 +66,14 @@ def read_output(command, probar):
         bartext = line
         GLib.idle_add(update_progess, probar, bartext)
         ## Those for next 4 line is for debugin only.
-        # filer = open("/home/ghostbsd/.gbi/tmp", "a")
+        # filer = open("/tmp/.gbi/tmp", "a")
         # filer.writelines(bartext)
         # filer.close
         #print(bartext)
     call('service hald start',shell=True)
     if bartext.rstrip() == "Installation finished!":
         Popen('python %send.py' % gbi_path, shell=True, close_fds=True)
-        call("rm -rf /home/ghostbsd/.gbi/", shell=True, close_fds=True)
+        call("rm -rf /tmp/.gbi/", shell=True, close_fds=True)
         Gtk.main_quit()
     else:
         Popen('python %serror.py' % gbi_path, shell=True, close_fds=True)

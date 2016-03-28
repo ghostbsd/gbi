@@ -42,7 +42,7 @@ import os.path
 from subprocess import Popen, PIPE, STDOUT
 
 # Folder use for the installer.
-tmp = "/home/ghostbsd/.gbi/"
+tmp = "/tmp/.gbi/"
 installer = "/usr/local/lib/gbi/"
 query = "sh /usr/local/lib/gbi/backend-query/"
 if not os.path.exists(tmp):
