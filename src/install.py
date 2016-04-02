@@ -31,7 +31,7 @@ GObject.threads_init()
 def update_progess(probar, bartext):
     new_val = probar.get_fraction() + 0.000003
     probar.set_fraction(new_val)
-    probar.set_text("%s" % bartext.rstrip())
+    #probar.set_text("%s" % bartext.rstrip())
 
 def read_output(command, probar):
     call('service hald stop', shell=True)
@@ -64,7 +64,7 @@ def read_output(command, probar):
         if not line:
             break
         bartext = line
-        GLib.idle_add(update_progess, probar, bartext)
+        GLib.idle_add(update_progess, probar, "installing GhostBSD")
         ## Those for next 4 line is for debugin only.
         # filer = open("/tmp/.gbi/tmp", "a")
         # filer.writelines(bartext)
