@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-
+import gi
+gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GObject
 import sys
 installer = "/usr/local/lib/gbi/"
@@ -14,7 +15,8 @@ from partition import Partitions
 from use_zfs import ZFS
 from root import RootUser
 from addUser import AddUser
-from install import Installs
+from install import Installs, read_output
+import threading
 
 logo = "/usr/local/lib/gbi/logo.png"
 
@@ -121,19 +123,29 @@ class MainWindow:
             self.notebook.next_page()
             self.button3.set_sensitive(False)
         elif page == 6:
-            self.adduser.save_selection()
+            #self.adduser.save_selection()
             Ibox = Gtk.VBox(False, 0)
             Ibox.show()
-            self.isntall = Installs(self.button1, self.button2, self.button3, self.notebook)
+            self.isntall = Installs()
             get_install = self.isntall.get_model()
-            Ibox.pack_start(get_install, False, False, 0)
+            Ibox.pack_start(get_install, True, True, 0)
             label = Gtk.Label("Installation")
             self.notebook.insert_page(Ibox, label, 7)
-            self.window.show_all()
             self.notebook.next_page()
-            self.button1.set_sensitive(False)
-            self.button2.set_sensitive(False)
-            self.button3.set_sensitive(False)
+            self.pbar = Gtk.ProgressBar()
+            self.pbar.set_show_text(True)
+            box1 = Gtk.VBox(False, 0)
+            box1.show()
+            label = Gtk.Label("Progress Bar")
+            box1.pack_end(self.pbar, False, False, 0)
+            self.nbButton.insert_page(box1, label, 1)
+            self.nbButton.next_page()
+            command = '%s -c %spcinstall.cfg' % (sysinstall, tmp)
+            thr = threading.Thread(target=read_output,
+                                    args=(command, self.pbar))
+            thr.setDaemon(True)
+            thr.start()
+            self.window.show_all()
 
     def back_page(self, widget):
         page = self.notebook.get_current_page()
@@ -149,14 +161,17 @@ class MainWindow:
         self.window = Gtk.Window()
         self.window.connect("delete_event", self.delete)
         self.window.set_border_width(0)
+        self.window.set_default_size(700, 500)
         self.window.set_size_request(700, 500)
-        self.window.set_resizable(False)
         self.window.set_title("GhostBSD Installer")
         self.window.set_border_width(0)
         self.window.set_icon_from_file(logo)
+        mainHBox = Gtk.HBox(False, 0)
+        mainHBox.show()
         mainVbox = Gtk.VBox(False, 0)
         mainVbox.show()
-        self.window.add(mainVbox)
+        self.window.add(mainHBox)
+        mainHBox.pack_start(mainVbox, True, True, 0)
         # Create a new self.notebook
         self.notebook = Gtk.Notebook()
         mainVbox.pack_start(self.notebook, True, True, 0)
@@ -197,6 +212,12 @@ class MainWindow:
 
         self.table.set_col_spacings(5)
         self.table.show()
-        mainVbox.pack_start(self.table, False, False, 0)
-        mainVbox.set_border_width(5)
+        # Create a new notebook
+        self.nbButton = Gtk.Notebook()
+        mainVbox.pack_end(self.nbButton, False, False, 5)
+        self.nbButton.show()
+        self.nbButton.set_show_tabs(False)
+        self.nbButton.set_show_border(False)
+        label = Gtk.Label("Button")
+        self.nbButton.insert_page(self.table, label, 0)
         self.window.show_all()

@@ -1,0 +1,65 @@
+GtkHBox#welcome {
+    background-image: url("/usr/local/lib/gbi/slide-images/ghostbsd/welcome.png");
+    background-size: 100%;
+}
+
+GtkHBox#software {
+    background-image: url("/usr/local/lib/gbi/slide-images/ghostbsd/software.png");
+    background-size: 100%;
+}
+
+GtkHBox#web {
+    background-image: url("/usr/local/lib/gbi/slide-images/ghostbsd/browser.png");
+    background-size: 100%;
+}
+
+GtkHBox#email {
+    background-image: url("/usr/local/lib/gbi/slide-images/ghostbsd/email.png");
+    background-size: 100%;
+}
+
+GtkHBox#communicate {
+    background-image: url("/usr/local/lib/gbi/slide-images/ghostbsd/social.png");
+    background-size: 100%;
+}
+
+GtkHBox#office {
+    background-image: url("/usr/local/lib/gbi/slide-images/ghostbsd/office.png");
+    background-size: 100%;
+}
+
+GtkHBox#mutimedia {
+    background-image: url("/usr/local/lib/gbi/slide-images/ghostbsd/music.png");
+    background-size: 100%;
+}
+
+GtkHBox#photo {
+    background-image: url("/usr/local/lib/gbi/slide-images/ghostbsd/photo.png");
+    background-size: 100%;
+}
+
+GtkHBox#customize {
+    background-image: url("/usr/local/lib/gbi/slide-images/ghostbsd/customize.png");
+    background-size: 100%;
+}
+
+GtkHBox#help {
+    background-image: url("/usr/local/lib/gbi/slide-images/ghostbsd/help.png");
+    background-size: 100%;
+}
+
+GtkLabel#slideText {
+    color: #F9F9F9;
+    font-weight:bold;
+    font-size: 10px;
+}
+
+GtkHBox#TransBox {
+    background-color: rgba(0, 0, 0, 0.5)
+}
+
+GtkLabel#Header {
+    color: #F9F9F9;
+    background-color: #3C3B37;
+    font-size: 15px;
+}
