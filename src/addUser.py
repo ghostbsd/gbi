@@ -38,7 +38,6 @@
 from gi.repository import Gtk
 import os
 import re
-from subprocess import Popen
 import pickle
 
 # Directory use from the installer.
@@ -47,7 +46,7 @@ installer = "/usr/local/lib/gbi/"
 query = "sh /usr/local/lib/gbi/backend-query/"
 if not os.path.exists(tmp):
     os.makedirs(tmp)
-to_cfg = 'python %screate_cfg.py' % installer
+userfile = tmp + "user"
 
 
 # Find if pasword contain only lower case and number
@@ -87,17 +86,16 @@ def allCharacter(strg, search=re.compile(r'[^a-zA-Z0-9~\!@#\$%\^&\*_\+":;\'\-]')
 
 class AddUser:
     def save_selection(self):
-        f = open('%suser' % tmp, 'wb')
+        f = open(userfile, 'wb')
         uname = self.user.get_text()
         name = self.name.get_text()
-        if self.password.get_text() == self.repassword.get_text():
-            up = self.password.get_text()
-            shell = self.sh
-            hf = '/home/%s' % self.user.get_text()
-            hst = self.host.get_text()
-            ul = [uname, name, up, shell, hf, hst]
-            pickle.dump(ul, f)
-            f.close()
+        up = self.password.get_text()
+        shell = self.sh
+        hf = '/home/%s' % self.user.get_text()
+        hst = self.host.get_text()
+        ul = [uname, name, up, shell, hf, hst]
+        pickle.dump(ul, f)
+        f.close()
 
     def on_shell(self, widget):
         SHELL = widget.get_active_text()
@@ -117,7 +115,6 @@ class AddUser:
             self.sh = '/usr/local/bin/zsh'
         elif SHELL == 'ksh':
             self.sh = '/usr/local/bin/ksh93'
-
 
     def userAndHost(self, widget):
         username = self.name.get_text().split()
@@ -278,10 +275,8 @@ class AddUser:
         elif len(passwd) > 24:
             if lowerCase(passwd) or upperCase(passwd) or passwd.isdigit():
                 self.label3.set_text("Fairly Strong")
-                button3.set_sensitive(True)
             else:
                 self.label3.set_text("Super Strong")
-                button3.set_sensitive(False)
 
     def passwdVerification(self, widget, button3):
         if self.password.get_text() == self.repassword.get_text():

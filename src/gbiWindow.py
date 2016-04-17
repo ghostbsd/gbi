@@ -124,7 +124,7 @@ class MainWindow:
             self.notebook.next_page()
             self.button3.set_sensitive(False)
         elif page == 6:
-            # self.adduser.save_selection()
+            self.adduser.save_selection()
             Ibox = Gtk.VBox(False, 0)
             Ibox.show()
             install = installSlide()
@@ -133,7 +133,7 @@ class MainWindow:
             label = Gtk.Label("Installation")
             self.notebook.insert_page(Ibox, label, 7)
             self.notebook.next_page()
-            instpro = installProgress
+            instpro = installProgress()
             progressBar = instpro.getProgressBar()
             box1 = Gtk.VBox(False, 0)
             box1.show()
