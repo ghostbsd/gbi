@@ -34,11 +34,12 @@ def update_progess(probar, bartext):
     probar.set_fraction(new_val)
     probar.set_text("Copying system to drive")
 
+
 def read_output(command, probar):
     call('service hald stop', shell=True)
     call('umount /media/GhostBSD', shell=True)
     GLib.idle_add(update_progess, probar, "Creating pcinstall.cfg")
-    ## If rc.conf.ghostbsd run gbsd_cfg function this alow other *BSD to Use their own .cfg.
+    # If rc.conf.ghostbsd run gbsd_cfg.
     if os.path.exists(rcconfgbsd):
         gbsd_cfg()
         sleep(1)
@@ -64,12 +65,12 @@ def read_output(command, probar):
             break
         bartext = line
         GLib.idle_add(update_progess, probar, "Copying system to drive")
-        ## Those for next 4 line is for debugin only.
+        # Those for next 4 line is for debugin only.
         # filer = open("/tmp/.gbi/tmp", "a")
         # filer.writelines(bartext)
         # filer.close
         # print(bartext)
-    call('service hald start',shell=True)
+    call('service hald start', shell=True)
     if bartext.rstrip() == "Installation finished!":
         Popen('python %send.py' % gbi_path, shell=True, close_fds=True)
         call("rm -rf /tmp/.gbi/", shell=True, close_fds=True)
@@ -79,7 +80,7 @@ def read_output(command, probar):
         Gtk.main_quit()
 
 
-class Installs():
+class installSlide():
 
     def close_application(self, widget, event=None):
         Gtk.main_quit()
@@ -94,8 +95,22 @@ class Installs():
         slide = gbsdSlides()
         getSlides = slide.get_slide()
         self.mainVbox.pack_start(getSlides, True, True, 0)
+
     def get_model(self):
         return self.mainHbox
 
-# Installs()
-# Gtk.main()
+
+class installProgress():
+
+    def __init__(self):
+        self.pbar = Gtk.ProgressBar()
+        self.pbar.set_show_text(True)
+        command = '%s -c %spcinstall.cfg' % (sysinstall, tmp)
+        thr = threading.Thread(target=read_output,
+                               args=(command, self.pbar))
+        thr.setDaemon(True)
+        thr.start()
+        self.pbar.show()
+
+    def getProgressBar(self):
+        return self.pbar

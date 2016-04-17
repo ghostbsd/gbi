@@ -34,7 +34,6 @@ class gbsdSlides:
         hBox.pack_start(hBox2, True, True, 0)
         hBox2.pack_start(label2, True, True, 30)
         label3 = Gtk.Label()
-        # image = Gtk.Image.new_from_file('/usr/local/lib/gbi/slide-images/G-logo.png')
         hBox.pack_end(label3, True, True, 160)
         return vBox
 
@@ -220,7 +219,6 @@ class gbsdSlides:
             self.stack.set_visible_child(self.help)
         elif self.stack.get_visible_child() == self.help:
             self.stack.set_visible_child(self.welcome)
-
 
     def __init__(self):
         self.hBox = Gtk.HBox(False, 0)

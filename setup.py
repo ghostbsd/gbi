@@ -1,28 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2015 by Mike Gabriel <mike.gabriel@das-netzwerkteam.de>
-#
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the
-# Free Software Foundation, Inc.,
-# 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
-
 import os
 import sys
-
-from glob import glob
-
+# from glob import glob
 from setuptools import setup
 
 # import DistUtilsExtra.command.build_extra
@@ -38,6 +19,7 @@ __VERSION__ = '3.0'
 #    if (line.startswith('__VERSION__')):
 #        exec(line.strip())
 PROGRAM_VERSION = __VERSION__
+
 
 def datafilelist(installbase, sourcebase):
     datafileList = []
@@ -165,17 +147,6 @@ data_files = [
     ('{prefix}/lib/gbi/keyboard/variant'.format(prefix=sys.prefix), ['src/keyboard/variant/ua',]),
     ('{prefix}/lib/gbi/keyboard/variant'.format(prefix=sys.prefix), ['src/keyboard/variant/us',]),
     ('{prefix}/lib/gbi/keyboard/variant'.format(prefix=sys.prefix), ['src/keyboard/variant/uz',]),
-    ('{prefix}/lib/gbi/slides'.format(prefix=sys.prefix), ['src/slides/accessibility.html',]),
-    ('{prefix}/lib/gbi/slides'.format(prefix=sys.prefix), ['src/slides/browse.html',]),
-    ('{prefix}/lib/gbi/slides'.format(prefix=sys.prefix), ['src/slides/chat.html',]),
-    ('{prefix}/lib/gbi/slides'.format(prefix=sys.prefix), ['src/slides/gethelp.html',]),
-    ('{prefix}/lib/gbi/slides'.format(prefix=sys.prefix), ['src/slides/index.html',]),
-    ('{prefix}/lib/gbi/slides'.format(prefix=sys.prefix), ['src/slides/music.html',]),
-    ('{prefix}/lib/gbi/slides'.format(prefix=sys.prefix), ['src/slides/office.html',]),
-    ('{prefix}/lib/gbi/slides'.format(prefix=sys.prefix), ['src/slides/photos.html',]),
-    ('{prefix}/lib/gbi/slides'.format(prefix=sys.prefix), ['src/slides/privacy.html',]),
-    ('{prefix}/lib/gbi/slides'.format(prefix=sys.prefix), ['src/slides/software.html',]),
-    ('{prefix}/lib/gbi/slides'.format(prefix=sys.prefix), ['src/slides/welcome.html',]),
     ('{prefix}/lib/gbi/slide-images/ghostbsd'.format(prefix=sys.prefix), ['src/slide-images/ghostbsd/browser.png',]),
     ('{prefix}/lib/gbi/slide-images/ghostbsd'.format(prefix=sys.prefix), ['src/slide-images/ghostbsd/customize.png',]),
     ('{prefix}/lib/gbi/slide-images/ghostbsd'.format(prefix=sys.prefix), ['src/slide-images/ghostbsd/email.png',]),
@@ -207,16 +178,14 @@ data_files.extend(datafilelist('{prefix}/share/locale'.format(prefix=sys.prefix)
 #             "clean": DistUtilsExtra.command.clean_i18n.clean_i18n,
 # }
 
-setup(
-    name = "gbi",
-    version = PROGRAM_VERSION,
-    description = "GBI is the GhostBSD front end user interface for pc-sysinstall",
-    license = 'BSD',
-    author = 'Eric Turgeon',
-    url = 'https://github/GhostBSD/gbi/',
-    package_dir = {'': '.'},
-    data_files = data_files,
-    # install_requires = [ 'setuptools', ],
-    scripts = ['gbi'],
-)
+setup(name="gbi",
+      version=PROGRAM_VERSION,
+      description="GBI is the GhostBSD front end user interface for pc-sysinstall",
+      license='BSD',
+      author='Eric Turgeon',
+      url='https://github/GhostBSD/gbi/',
+      package_dir={'': '.'},
+      data_files=data_files,
+      # install_requires = [ 'setuptools', ],
+      scripts=['gbi'],)
 # cmdclass = cmdclass,

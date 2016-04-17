@@ -15,10 +15,11 @@ from partition import Partitions
 from use_zfs import ZFS
 from root import RootUser
 from addUser import AddUser
-from install import Installs, read_output
+from install import installSlide, read_output, installProgress
 import threading
 
 logo = "/usr/local/lib/gbi/logo.png"
+
 
 class MainWindow:
 
@@ -123,28 +124,23 @@ class MainWindow:
             self.notebook.next_page()
             self.button3.set_sensitive(False)
         elif page == 6:
-            #self.adduser.save_selection()
+            # self.adduser.save_selection()
             Ibox = Gtk.VBox(False, 0)
             Ibox.show()
-            self.isntall = Installs()
-            get_install = self.isntall.get_model()
+            install = installSlide()
+            get_install = install.get_model()
             Ibox.pack_start(get_install, True, True, 0)
             label = Gtk.Label("Installation")
             self.notebook.insert_page(Ibox, label, 7)
             self.notebook.next_page()
-            self.pbar = Gtk.ProgressBar()
-            self.pbar.set_show_text(True)
+            instpro = installProgress
+            progressBar = instpro.getProgressBar()
             box1 = Gtk.VBox(False, 0)
             box1.show()
             label = Gtk.Label("Progress Bar")
-            box1.pack_end(self.pbar, False, False, 0)
+            box1.pack_end(progressBar, False, False, 0)
             self.nbButton.insert_page(box1, label, 1)
             self.nbButton.next_page()
-            command = '%s -c %spcinstall.cfg' % (sysinstall, tmp)
-            thr = threading.Thread(target=read_output,
-                                    args=(command, self.pbar))
-            thr.setDaemon(True)
-            thr.start()
             self.window.show_all()
 
     def back_page(self, widget):
