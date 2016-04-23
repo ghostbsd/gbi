@@ -39,6 +39,7 @@ def update_progess(probar, bartext):
 
 def read_output(command, probar):
     call('service hald stop', shell=True)
+    call('umount /media/GhostBSD', shell=True)
     GLib.idle_add(update_progess, probar, "Creating pcinstall.cfg")
     # If rc.conf.ghostbsd exists run gbsd_cfg
     if os.path.exists(rcconfgbsd):
