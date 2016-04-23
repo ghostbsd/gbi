@@ -281,7 +281,7 @@ class dbsd_cfg():
         f.writelines('# Installation Mode\n')
         f.writelines('installMode=fresh\n')
         f.writelines('installInteractive=no\n')
-        f.writelines('installType=GhostBSD\n')
+        f.writelines('installType=DesktopBSD\n')
         f.writelines('installMedium=dvd\n')
         f.writelines('packageType=livecd\n')
         # System Language

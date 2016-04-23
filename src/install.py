@@ -16,7 +16,8 @@ import os
 from subprocess import Popen, PIPE, STDOUT, call
 from time import sleep
 from partition_handler import rDeleteParttion, destroyParttion, makingParttion
-from create_cfg import gbsd_cfg dbsd_cfg
+from create_cfg import gbsd_cfg 
+from create_cfg import dbsd_cfg
 from slides import gbsdSlides
 import sys
 installer = "/usr/local/lib/gbi/"
@@ -38,7 +39,6 @@ def update_progess(probar, bartext):
 
 def read_output(command, probar):
     call('service hald stop', shell=True)
-    call('umount /media/GhostBSD', shell=True)
     GLib.idle_add(update_progess, probar, "Creating pcinstall.cfg")
     # If rc.conf.ghostbsd exists run gbsd_cfg
     if os.path.exists(rcconfgbsd):
