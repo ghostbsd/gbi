@@ -273,3 +273,122 @@ class gbsd_cfg():
         f.close()
         os.remove(user_passwd)
         Popen(start_Install, shell=True)
+
+class dbsd_cfg():
+    def __init__(self):
+        f = open('%spcinstall.cfg' % tmp, 'w')
+        # Installation Mode
+        f.writelines('# Installation Mode\n')
+        f.writelines('installMode=fresh\n')
+        f.writelines('installInteractive=no\n')
+        f.writelines('installType=DesktopBSD\n')
+        f.writelines('installMedium=dvd\n')
+        f.writelines('packageType=livecd\n')
+        # Keyboard Setting
+        if os.path.exists(model):
+            f.writelines('\n# Keyboard Setting\n')
+            os.remove(model)
+        if os.path.exists(KBFile):
+            rkb = open(KBFile, 'r')
+            kb = rkb.readlines()
+            if len(kb) == 2:
+                l_output = kb[0].strip().partition('-')[2].strip()
+                f.writelines('localizeKeyLayout=%s\n' % l_output)
+                v_output = kb[1].strip().partition(':')[2].strip()
+                f.writelines('localizeKeyVariant=%s\n' % v_output)
+            else:
+                l_output = kb[0].strip().partition('-')[2].strip()
+                f.writelines('localizeKeyLayout=%s\n' % l_output)
+            os.remove(KBFile)
+        # Timezone
+        if os.path.exists(timezone):
+            time = open(timezone, 'r')
+            t_output = time.readlines()[0].strip()
+            f.writelines('\n# Timezone\n')
+            f.writelines('timeZone=%s\n' % t_output)
+            # f.writelines('enableNTP=yes\n')
+            os.remove(timezone)
+        if os.path.exists(zfs_config):
+            # Disk Setup
+            r = open(zfs_config, 'r')
+            zfsconf = r.readlines()
+            for line in zfsconf:
+                if 'partscheme' in line:
+                    f.writelines(line)
+                    read = open(boot_file, 'r')
+                    boot = read.readlines()[0].strip()
+                    f.writelines('bootManager=%s\n' % boot)
+                    os.remove(boot_file)
+                else:
+                    f.writelines(line)
+            # os.remove(zfs_config)
+        else:
+            # Disk Setup
+            r = open(disk, 'r')
+            drive = r.readlines()
+            d_output = drive[0].strip()
+            f.writelines('\n# Disk Setup\n')
+            f.writelines('disk0=%s\n' % d_output)
+            os.remove(disk)
+            # Partition Slice.
+            p = open(dslice, 'r')
+            line = p.readlines()
+            part = line[0].rstrip()
+            f.writelines('partition=%s\n' % part)
+            os.remove(dslice)
+            # Boot Menu
+            read = open(boot_file, 'r')
+            line = read.readlines()
+            boot = line[0].strip()
+            f.writelines('bootManager=%s\n' % boot)
+            os.remove(boot_file)
+            # Sheme sheme
+            read = open(disk_schem, 'r')
+            shem = read.readlines()[0]
+            f.writelines(shem + '\n')
+            f.writelines('commitDiskPart\n')
+            # os.remove(disk_schem)
+            # Partition Setup
+            f.writelines('\n# Partition Setup\n')
+            part = open(partlabel, 'r')
+            # If slice and auto file exist add first partition line.
+            # But Swap need to be 0 it will take the rest of the freespace.
+            for line in part:
+                if 'BOOT' in line:
+                    pass
+                else:
+                    f.writelines('disk0-part=%s\n' % line.strip())
+            f.writelines('commitDiskLabel\n')
+            os.remove(partlabel)
+        # Network Configuration
+        f.writelines('\n# Network Configuration\n')
+        readu = open(user_passwd, 'rb')
+        uf = pickle.load(readu)
+        net = uf[5]
+        f.writelines('hostname=%s\n' % net)
+        # Set the root pass
+        f.writelines('\n# Network Configuration\n')
+        readr = open('%sroot' % tmp, 'rb')
+        rf = pickle.load(readr)
+        root = rf[0]
+        f.writelines('\n# Set the root pass\n')
+        f.writelines('rootPass=%s\n' % root)
+        # Setup our users
+        user = uf[0]
+        f.writelines('\n# Setup user\n')
+        f.writelines('userName=%s\n' % user)
+        name = uf[1]
+        f.writelines('userComment=%s\n' % name)
+        passwd = uf[2]
+        f.writelines('userPass=%s\n' % passwd.rstrip())
+        shell = uf[3]
+        f.writelines('userShell=%s\n' % shell)
+        upath = uf[4]
+        f.writelines('userHome=%s\n' % upath.rstrip())
+        f.writelines('defaultGroup=wheel\n')
+        f.writelines('userGroups=operator\n')
+        f.writelines('commitUser\n')
+        f.writelines('runScript=/usr/local/bin/iso_to_hd\n')
+        f.close()
+        os.remove(user_passwd)
+        Popen(start_Install, shell=True)
