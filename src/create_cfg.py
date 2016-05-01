@@ -153,7 +153,6 @@ class gbsd_cfg():
         f.writelines('userGroups=operator\n')
         f.writelines('commitUser\n')
         f.writelines('runScript=/usr/local/bin/iso_to_hd\n')
-        f.writelines('runCommand=echo \'gdm_lang="%s.UTF-8"\' >> /etc/rc.conf\n' % lang_output)
         if "af" == lang_output:
             f.writelines('runCommand=pkg install -y af-libreoffice\n')
         elif "ar" == lang_output:
