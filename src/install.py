@@ -16,7 +16,8 @@ import os
 from subprocess import Popen, PIPE, STDOUT, call
 from time import sleep
 from partition_handler import rDeleteParttion, destroyParttion, makingParttion
-from create_cfg import gbsd_cfg
+from create_cfg import gbsd_cfg 
+from create_cfg import dbsd_cfg
 from slides import gbsdSlides
 import sys
 installer = "/usr/local/lib/gbi/"
@@ -25,6 +26,7 @@ tmp = "/tmp/.gbi/"
 gbi_path = "/usr/local/lib/gbi/"
 sysinstall = "/usr/local/sbin/pc-sysinstall"
 rcconfgbsd = "/etc/rc.conf.ghostbsd"
+rcconfdbsd = "/etc/rc.conf.desktopbsd"
 default_site = "/usr/local/lib/gbi/slides/welcome.html"
 logo = "/usr/local/lib/gbi/logo.png"
 
@@ -39,9 +41,13 @@ def read_output(command, probar):
     call('service hald stop', shell=True)
     call('umount /media/GhostBSD', shell=True)
     GLib.idle_add(update_progess, probar, "Creating pcinstall.cfg")
-    # If rc.conf.ghostbsd run gbsd_cfg.
+    # If rc.conf.ghostbsd exists run gbsd_cfg
     if os.path.exists(rcconfgbsd):
         gbsd_cfg()
+        sleep(1)
+    # If rc.conf.desktopbsd exists run dbsd_cfg
+    if os.path.exists(rcconfdbsd):
+        dbsd_cfg()
         sleep(1)
     if os.path.exists(tmp + 'delete'):
         GLib.idle_add(update_progess, probar, "Deleting partition")
