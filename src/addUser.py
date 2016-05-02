@@ -279,7 +279,7 @@ class AddUser:
                 self.label3.set_text("Super Strong")
 
     def passwdVerification(self, widget, button3):
-        if self.password.get_text() == self.repassword.get_text():
+        if self.password.get_text() == self.repassword.get_text() and self.password.get_text() != "":
             self.img.set_from_stock(Gtk.STOCK_YES, 10)
             button3.set_sensitive(True)
 
