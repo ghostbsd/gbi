@@ -221,6 +221,12 @@ class gbsdSlides:
             self.stack.set_visible_child(self.welcome)
 
     def __init__(self):
+        cssProvider = Gtk.CssProvider()
+        cssProvider.load_from_path('/usr/local/lib/gbi/desktopbsd-style.css')
+        screen = Gdk.Screen.get_default()
+        styleContext = Gtk.StyleContext()
+        styleContext.add_provider_for_screen(screen, cssProvider,
+                                     Gtk.STYLE_PROVIDER_PRIORITY_USER)
         self.hBox = Gtk.HBox(False, 0)
         self.hBox.show()
         self.stack = Gtk.Stack()
@@ -252,12 +258,6 @@ class gbsdSlides:
             sleep(60)
             GLib.idle_add(self.SlideRight)
 
-cssProvider = Gtk.CssProvider()
-cssProvider.load_from_path('/usr/local/lib/gbi/ghostbsd-style.css')
-screen = Gdk.Screen.get_default()
-styleContext = Gtk.StyleContext()
-styleContext.add_provider_for_screen(screen, cssProvider,
-                                     Gtk.STYLE_PROVIDER_PRIORITY_USER)
                                      
 class dbsdSlides:
     def Welcome(self):
@@ -471,6 +471,13 @@ class dbsdSlides:
             self.stack.set_visible_child(self.welcome)
 
     def __init__(self):
+        cssProvider = Gtk.CssProvider()
+        cssProvider.load_from_path('/usr/local/lib/gbi/desktopbsd-style.css')
+        screen = Gdk.Screen.get_default()
+        styleContext = Gtk.StyleContext()
+        styleContext.add_provider_for_screen(screen, cssProvider,
+                                     Gtk.STYLE_PROVIDER_PRIORITY_USER)
+
         self.hBox = Gtk.HBox(False, 0)
         self.hBox.show()
         self.stack = Gtk.Stack()
@@ -493,7 +500,7 @@ class dbsdSlides:
         thr = threading.Thread(target=self.slidesThreading)
         thr.setDaemon(True)
         thr.start()
-
+        
     def get_slide(self):
         return self.hBox
 
@@ -502,9 +509,3 @@ class dbsdSlides:
             sleep(60)
             GLib.idle_add(self.SlideRight)
 
-cssProvider = Gtk.CssProvider()
-cssProvider.load_from_path('/usr/local/lib/gbi/desktopbsd-style.css')
-screen = Gdk.Screen.get_default()
-styleContext = Gtk.StyleContext()
-styleContext.add_provider_for_screen(screen, cssProvider,
-                                     Gtk.STYLE_PROVIDER_PRIORITY_USER)

@@ -46,7 +46,7 @@ def read_output(command, probar):
         gbsd_cfg()
         sleep(1)
     # If rc.conf.desktopbsd exists run dbsd_cfg
-    if os.path.exists(rcconfdbsd):
+    elif os.path.exists(rcconfdbsd):
         dbsd_cfg()
         sleep(1)
     if os.path.exists(tmp + 'delete'):

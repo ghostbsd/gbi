@@ -286,7 +286,7 @@ class Partitions():
         label.set_use_markup(True)
         # Adding a combo box to selecting MBR or GPT sheme.
         self.scheme = 'GPT'
-        shemebox = Gtk.combo_box_new_text()
+        shemebox = Gtk.ComboBoxText()
         shemebox.append_text("GPT: GUID Partition Table")
         shemebox.append_text("MBR: DOS Partition")
         shemebox.connect('changed', self.sheme_selection)
