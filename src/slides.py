@@ -6,7 +6,19 @@ import threading
 from time import sleep
 import sys
 installer = "/usr/local/lib/gbi/"
+rcconfgbsd = "/etc/rc.conf.ghostbsd"
+rcconfdbsd = "/etc/rc.conf.desktopbsd"
+
 sys.path.append(installer)
+cssProvider = Gtk.CssProvider()
+if os.path.exists(rcconfgbsd):
+    cssProvider.load_from_path('/usr/local/lib/gbi/ghostbsd-style.css')
+elif os.path.exists(rcconfdbsd):
+    cssProvider.load_from_path('/usr/local/lib/gbi/desktopbsd-style.css')
+screen = Gdk.Screen.get_default()
+styleContext = Gtk.StyleContext()
+styleContext.add_provider_for_screen(screen, cssProvider,
+                                     Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
 
 class gbsdSlides:
@@ -221,12 +233,6 @@ class gbsdSlides:
             self.stack.set_visible_child(self.welcome)
 
     def __init__(self):
-        cssProvider = Gtk.CssProvider()
-        cssProvider.load_from_path('/usr/local/lib/gbi/desktopbsd-style.css')
-        screen = Gdk.Screen.get_default()
-        styleContext = Gtk.StyleContext()
-        styleContext.add_provider_for_screen(screen, cssProvider,
-                                     Gtk.STYLE_PROVIDER_PRIORITY_USER)
         self.hBox = Gtk.HBox(False, 0)
         self.hBox.show()
         self.stack = Gtk.Stack()
@@ -471,13 +477,6 @@ class dbsdSlides:
             self.stack.set_visible_child(self.welcome)
 
     def __init__(self):
-        cssProvider = Gtk.CssProvider()
-        cssProvider.load_from_path('/usr/local/lib/gbi/desktopbsd-style.css')
-        screen = Gdk.Screen.get_default()
-        styleContext = Gtk.StyleContext()
-        styleContext.add_provider_for_screen(screen, cssProvider,
-                                     Gtk.STYLE_PROVIDER_PRIORITY_USER)
-
         self.hBox = Gtk.HBox(False, 0)
         self.hBox.show()
         self.stack = Gtk.Stack()
