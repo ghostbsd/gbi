@@ -5,6 +5,7 @@ from gi.repository import Gtk, Gdk, GLib
 import threading
 from time import sleep
 import sys
+import os
 installer = "/usr/local/lib/gbi/"
 rcconfgbsd = "/etc/rc.conf.ghostbsd"
 rcconfdbsd = "/etc/rc.conf.desktopbsd"
