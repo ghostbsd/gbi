@@ -12,10 +12,10 @@ rcconfgbsd = "/etc/rc.conf.ghostbsd"
 
 sys.path.append(installer)
 cssProvider = Gtk.CssProvider()
-#if os.path.exists(rcconfgbsd):
-cssProvider.load_from_path('/usr/local/lib/gbi/ghostbsd-style.css')
-#elif os.path.exists(rcconfdbsd):
-#    cssProvider.load_from_path('/usr/local/lib/gbi/desktopbsd-style.css')
+if os.path.exists(rcconfgbsd):
+    cssProvider.load_from_path('/usr/local/lib/gbi/ghostbsd-style.css')
+elif os.path.exists(rcconfdbsd):
+    cssProvider.load_from_path('/usr/local/lib/gbi/desktopbsd-style.css')
 screen = Gdk.Screen.get_default()
 styleContext = Gtk.StyleContext()
 styleContext.add_provider_for_screen(screen, cssProvider,

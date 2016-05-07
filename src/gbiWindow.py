@@ -55,6 +55,7 @@ class MainWindow:
             self.notebook.next_page()
             self.button3.set_sensitive(False)
         elif page == 2:
+            self.tz.save_selection() 
             typebox = Gtk.VBox(False, 0)
             typebox.show()
             self.types = Types()
