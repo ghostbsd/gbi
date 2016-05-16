@@ -70,7 +70,7 @@ class gbsd_cfg():
             t_output = time.readlines()[0].strip()
             f.writelines('\n# Timezone\n')
             f.writelines('timeZone=%s\n' % t_output)
-            # f.writelines('enableNTP=yes\n')
+            f.writelines('enableNTP=yes\n')
             os.remove(timezone)
         if os.path.exists(zfs_config):
             # Disk Setup

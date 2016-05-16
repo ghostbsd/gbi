@@ -19,7 +19,11 @@ from install import installSlide, read_output, installProgress
 import threading
 
 logo = "/usr/local/lib/gbi/logo.png"
-
+tmp = "/tmp/.gbi/"
+disk = '%sdisk' % tmp
+dslice = '%sslice' % tmp
+disk_schem = '%sscheme' % tmp
+zfs_config = '%szfs_config' % tmp
 
 class MainWindow:
 
@@ -145,13 +149,20 @@ class MainWindow:
             self.window.show_all()
 
     def back_page(self, widget):
-        page = self.notebook.get_current_page()
+        current_page = self.notebook.get_current_page()
         if page == 1:
             self.button1.set_sensitive(False)
         elif page == 6:
             print page
             self.button3.set_label("Next")
         self.notebook.prev_page()
+        new_page = self.notebook.get_current_page()
+        if current_page == 4 and new_page == 3:
+            os.remove(zfs_config)
+            os.remove(disk)
+            os.remove(dslice)
+            os.remove(disk_schem)
+            os.remove(partlabel)
         self.button3.set_sensitive(True)
 
     def __init__(self):

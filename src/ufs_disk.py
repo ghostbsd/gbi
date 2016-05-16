@@ -31,10 +31,12 @@
 # LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-
-import gtk
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk, GObject
 import os
 import os.path
+import re
 from subprocess import Popen, PIPE, STDOUT
 from partition_handler import disk_query
 
@@ -129,78 +131,127 @@ class Entire():
         pfile.close()
 
     def __init__(self):
-        window = gtk.Window(gtk.WINDOW_TOPLEVEL)
+        window = Gtk.Window()
 
         window.set_size_request(700, 500)
         window.set_resizable(False)
         window.set_title("GhostBSD Installer")
         window.set_border_width(0)
-        window.set_position(gtk.WIN_POS_CENTER)
         window.set_icon_from_file("/usr/local/lib/gbi/logo.png")
-        box1 = gtk.VBox(False, 0)
+        box1 = Gtk.VBox(False, 0)
         window.add(box1)
         box1.show()
-        box2 = gtk.VBox(False, 10)
+        box2 = Gtk.VBox(False, 10)
         box2.set_border_width(10)
         box1.pack_start(box2, True, True, 0)
         box2.show()
         # Title
-        Title = gtk.Label("<b><span size='xx-large'>Install GhostBSD entirely on disk</span></b> ")
+        Title = Gtk.Label("<b><span size='xx-large'>Install GhostBSD entirely on disk</span></b> ")
         Title.set_use_markup(True)
         box2.pack_start(Title, False, False, 0)
         # chose Disk
-        sw = gtk.ScrolledWindow()
-        sw.set_shadow_type(gtk.SHADOW_ETCHED_IN)
-        sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        store = gtk.TreeStore(str, str, str, 'gboolean')
+        sw = Gtk.ScrolledWindow()
+        sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
+        sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+        store = Gtk.TreeStore(str, str, str, 'gboolean')
         for disk in disk_query():
-            store.append(None, [disk[0], disk[1], disk[3], True])
-        treeView = gtk.TreeView(store)
+            store.append(None, [disk[0], disk[1], disk[3], False])
+        treeView = Gtk.TreeView(store)
         treeView.set_model(store)
         treeView.set_rules_hint(True)
-        cell = gtk.CellRendererText()
-        column = gtk.TreeViewColumn(None, cell, text=0)
-        column_header = gtk.Label('Disk')
+        self.checkcell = Gtk.CellRendererToggle()
+        self.checkcell.set_property('activatable', True)
+        self.checkcell.connect('toggled', self.col1_toggled_cb, store)
+        column1 = Gtk.TreeViewColumn("Check", self.checkcell)
+        cell = Gtk.CellRendererText()
+        column = Gtk.TreeViewColumn(None, cell, text=0)
+        column_header = Gtk.Label('Disk')
         column_header.set_use_markup(True)
         column_header.show()
         column.set_widget(column_header)
         column.set_sort_column_id(0)
-        cell2 = gtk.CellRendererText()
-        column2 = gtk.TreeViewColumn(None, cell2, text=0)
-        column_header2 = gtk.Label('Size(MB)')
+        cell2 = Gtk.CellRendererText()
+        column2 = Gtk.TreeViewColumn(None, cell2, text=0)
+        column_header2 = Gtk.Label('Size(MB)')
         column_header2.set_use_markup(True)
         column_header2.show()
         column2.set_widget(column_header2)
-        cell3 = gtk.CellRendererText()
-        column3 = gtk.TreeViewColumn(None, cell3, text=0)
-        column_header3 = gtk.Label('Scheme')
+        cell3 = Gtk.CellRendererText()
+        column3 = Gtk.TreeViewColumn(None, cell3, text=0)
+        column_header3 = Gtk.Label('Scheme')
         column_header3.set_use_markup(True)
         column_header3.show()
         column3.set_widget(column_header3)
+        column1.add_attribute(self.checkcell, "active", 3)
         column.set_attributes(cell, text=0)
         column2.set_attributes(cell2, text=1)
         column3.set_attributes(cell3, text=2)
+        treeView.append_column(column1)
         treeView.append_column(column)
         treeView.append_column(column2)
         treeView.append_column(column3)
         tree_selection = treeView.get_selection()
-        tree_selection.set_mode(gtk.SELECTION_SINGLE)
+        tree_selection.set_mode(Gtk.SelectionMode.SINGLE)
         tree_selection.connect("changed", self.Selection_Variant)
         sw.add(treeView)
         sw.show()
-        box2.pack_start(sw, True, True, 10)
+        self.Gmirror = False
+        gMirror_check = Gtk.CheckButton("Mirror Swap")
+        gMirror_check.connect("toggled", self.on_check_Gmirror)
+        grid = Gtk.Grid()
+        grid.set_row_spacing(10)
+        grid.set_column_homogeneous(True)
+        grid.set_row_homogeneous(True)
+        grid.show()
+        grid.attach(sw, 1, 4, 8, 3)
+        box2.pack_start(grid, True, True, 10)
         sfile = open(part_schem, 'w')
         sfile.writelines('partscheme=GPT')
         sfile.close()
-        box2 = gtk.HBox(False, 10)
+        box2 = Gtk.HBox(False, 10)
         box2.set_border_width(5)
         box1.pack_start(box2, False, False, 0)
         box2.show()
         # Add button
-        box2.pack_start(use_disk_bbox(True,
-                        10, gtk.BUTTONBOX_END),
-                        True, True, 5)
+        #box2.pack_start(use_disk_bbox(True,
+        #                10, Gtk.BUTTONBOX_END),
+        #                True, True, 5)
         window.show_all()
 
+    def col1_toggled_cb(self, cell, path, model):
+        model[path][3] = not model[path][3]
+        if model[path][3] is False:
+            zfs_dsk_list.remove(model[path][0] + "-" + model[path][1])
+            if self.mirror == "none":
+                if len(zfs_dsk_list) != 1:
+                    self.button3.set_sensitive(False)
+                else:
+                    self.button3.set_sensitive(True)
+            elif self.mirror == "mirror":
+                if len(zfs_dsk_list) > 1:
+                    self.button3.set_sensitive(True)
+                else:
+                    self.button3.set_sensitive(False)
+            elif self.mirror == "raidz1":
+                if len(zfs_dsk_list) == 4 or len(zfs_dsk_list) == 6 or len(zfs_dsk_list) == 10:
+                    self.button3.set_sensitive(True)
+                else:
+                    self.button3.set_sensitive(False)
+            elif self.mirror == "raidz2":
+                if len(zfs_dsk_list) == 3 or len(zfs_dsk_list) == 5:
+                    self.button3.set_sensitive(True)
+                else:
+                    self.button3.set_sensitive(False)
+            elif self.mirror == "raidz3":
+                if len(zfs_dsk_list) == 5 or len(zfs_dsk_list) == 7 or len(zfs_dsk_list) == 11:
+                    self.button3.set_sensitive(True)
+                else:
+                    self.button3.set_sensitive(False)
+            elif self.mirror == "strip":
+                if len(zfs_dsk_list) > 2:
+                    self.button3.set_sensitive(True)
+                else:
+                    self.butt
+
 Entire()
-gtk.main()
+Gtk.main()
