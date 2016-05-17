@@ -927,7 +927,7 @@ class makingParttion():
                     # if pc_or_efi() == 'efi':
                     #     cmd = 'gpart add -s 100M -t efi -i %s %s' % (sl, drive)
                     # else:
-                    cmd = 'gpart add -s 1M -t freebsd-boot -i %s %s' % (sl, drive)
+                    cmd = 'gpart add -a 4k -s 1M -t freebsd-boot -i %s %s' % (sl, drive)
                     call(cmd, shell=True)
                 elif slicePartition(part) == 's':
                     size = int(line[1])

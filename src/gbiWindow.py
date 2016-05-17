@@ -150,10 +150,9 @@ class MainWindow:
 
     def back_page(self, widget):
         current_page = self.notebook.get_current_page()
-        if page == 1:
+        if current_page == 1:
             self.button1.set_sensitive(False)
-        elif page == 6:
-            print page
+        elif current_page == 6:
             self.button3.set_label("Next")
         self.notebook.prev_page()
         new_page = self.notebook.get_current_page()
