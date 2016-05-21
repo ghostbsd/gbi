@@ -19,6 +19,7 @@ from partition_handler import rDeleteParttion, destroyParttion, makingParttion
 from create_cfg import gbsd_cfg 
 from create_cfg import dbsd_cfg
 from slides import gbsdSlides
+from slides import dbsdSlides
 import sys
 installer = "/usr/local/lib/gbi/"
 sys.path.append(installer)
@@ -39,16 +40,17 @@ def update_progess(probar, bartext):
 
 def read_output(command, probar):
     call('service hald stop', shell=True)
-    call('umount /media/GhostBSD', shell=True)
     GLib.idle_add(update_progess, probar, "Creating pcinstall.cfg")
     # If rc.conf.ghostbsd exists run gbsd_cfg
     if os.path.exists(rcconfgbsd):
         gbsd_cfg()
-        sleep(1)
+        call('umount /media/GhostBSD', shell=True)
+        sleep (1)
     # If rc.conf.desktopbsd exists run dbsd_cfg
     elif os.path.exists(rcconfdbsd):
         dbsd_cfg()
-        sleep(1)
+        call('umount /media/DESKTOPBSD', shell=True)
+        sleep (1)
     if os.path.exists(tmp + 'delete'):
         GLib.idle_add(update_progess, probar, "Deleting partition")
         rDeleteParttion()
@@ -98,7 +100,10 @@ class installSlide():
         self.mainVbox = Gtk.VBox(False, 0)
         self.mainVbox.show()
         self.mainHbox.pack_start(self.mainVbox, True, True, 0)
-        slide = gbsdSlides()
+        if os.path.exists(rcconfgbsd):
+            slide = gbsdSlides()
+        elif os.path.exists(rcconfdbsd):
+            slide = dbsdSlides()
         getSlides = slide.get_slide()
         self.mainVbox.pack_start(getSlides, True, True, 0)
 

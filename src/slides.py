@@ -8,7 +8,7 @@ import sys
 import os
 installer = "/usr/local/lib/gbi/"
 rcconfgbsd = "/etc/rc.conf.ghostbsd"
-#rcconfdbsd = "/etc/rc.conf.desktopbsd"
+rcconfdbsd = "/etc/rc.conf.desktopbsd"
 
 sys.path.append(installer)
 cssProvider = Gtk.CssProvider()
