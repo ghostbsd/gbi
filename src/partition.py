@@ -440,7 +440,7 @@ class Partitions():
                     else:
                         self.button3.set_sensitive(False)
             else:
-                self.button3.set_sensitive(Faulse)
+                self.button3.set_sensitive(False)
         elif self.slice == 'freespace':
             print self.path
             print self.size
@@ -519,7 +519,7 @@ class Partitions():
                 print fs
                 if '/' in fs:
                     self.button3.set_sensitive(True)
-                else:
+                else
                     self.button3.set_sensitive(False)
         else:
             self.button3.set_sensitive(False)
