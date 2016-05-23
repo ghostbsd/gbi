@@ -17,17 +17,25 @@ from root import RootUser
 from addUser import AddUser
 from install import installSlide, read_output, installProgress
 import threading
+from partition_handler import partition_repos
+import os
+import shutil
 
 logo = "/usr/local/lib/gbi/logo.png"
 tmp = "/tmp/.gbi/"
+if not os.path.exists(tmp):
+    os.makedirs(tmp)
 disk = '%sdisk' % tmp
 dslice = '%sslice' % tmp
 disk_schem = '%sscheme' % tmp
 zfs_config = '%szfs_config' % tmp
+partitiondb = "%spartitiondb/" % tmp
 
 class MainWindow:
 
     def delete(self, widget, event=None):
+        if os.path.exists('/tmp/.gbi'):
+            shutil.rmtree('/tmp/.gbi')
         Gtk.main_quit()
         return False
 
@@ -70,6 +78,7 @@ class MainWindow:
             self.window.show_all()
             self.notebook.next_page()
         elif page == 3:
+            partition_repos()
             if self.types.get_type() == "disk":
                 Udbox = Gtk.VBox(False, 0)
                 Udbox.show()
@@ -157,11 +166,24 @@ class MainWindow:
         self.notebook.prev_page()
         new_page = self.notebook.get_current_page()
         if current_page == 4 and new_page == 3:
-            os.remove(zfs_config)
-            os.remove(disk)
-            os.remove(dslice)
-            os.remove(disk_schem)
-            os.remove(partlabel)
+            if os.path.exists(partitiondb):
+                shutil.rmtree(partitiondb)
+            if os.path.exists(tmp + 'create'):
+                os.remove(tmp + 'create')
+            if os.path.exists(tmp + 'delete'):
+                os.remove(tmp + 'delete')
+            if os.path.exists(tmp + 'destroy'):
+                os.remove(tmp + 'destroy')
+            if os.path.exists(tmp + 'partlabel'):
+                os.remove(tmp + 'partlabel')
+            if os.path.exists(zfs_config):
+                os.remove(zfs_config)
+            if os.path.exists(disk):
+                os.remove(disk)
+            if os.path.exists(dslice):
+                os.remove(dslice)
+            if os.path.exists(disk_schem):
+                os.remove(disk_schem)
         self.button3.set_sensitive(True)
 
     def __init__(self):

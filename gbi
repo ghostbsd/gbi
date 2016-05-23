@@ -9,7 +9,8 @@ installer = "/usr/local/lib/gbi/"
 path.append(installer)
 
 from gbiWindow import MainWindow
-from partition_handler import partition_repos
+import os
+import shutil
 
 
 def main():
@@ -17,6 +18,5 @@ def main():
     return 0
 
 if __name__ == "__main__":
-    partition_repos()
     MainWindow()
     main()
