@@ -149,7 +149,7 @@ class Keyboard:
     def save_selection(self):
         File = open(KBFile, 'w')
         File.writelines("%s\n" % self.layout_txt)
-        if self.variant_txt is None:
+        if self.variant_txt != None:
             File.writelines("%s\n" % self.variant_txt)
         File.close()
         return
