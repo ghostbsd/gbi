@@ -904,33 +904,38 @@ class destroyParttion():
                  drive), shell=True)
 
 
-def pc_or_efi():
-    cmd = "kenv grub.platform"
-    kenv_output = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE,
-                    stderr=STDOUT, close_fds=True)
-    kenv = kenv_output.stdout.readlines()[0].rstrip()
-    return kenv
+def bios_or_uefi():
+    cmd = "sysctl -n machdep.bootmethod"
+    output = Popen(cmd, shell=True, stdout=PIPE, close_fds=True)
+    return output.stdout.readlines()[0].rstrip()
 
 
 class makingParttion():
-
     def __init__(self):
         if os.path.exists(tmp + 'create'):
             pf = open(tmp + 'create', 'rb')
             pl = pickle.load(pf)
+            read = open(tmp + "boot", 'r')
+            boot = read.readlines()[0].strip()
             size = 0
             for line in pl:
                 part = line[0]
                 drive = rpartslice(part)
                 sl = sliceNum(part)
                 if slicePartition(part) == 'p':
-                    # if pc_or_efi() == 'efi':
-                    #     cmd = 'gpart add -s 100M -t efi -i %s %s' % (sl, drive)
-                    # else:
-                    cmd = 'gpart add -a 4k -s 1M -t freebsd-boot -i %s %s' % (sl, drive)
-                    call(cmd, shell=True)
+                    if bios_or_uefi() == 'UEFI':
+                        cmd = 'gpart add -s 100M -t efi -i %s %s' % (sl, drive)
+                        cmd2 = 'newfs_msdos -F 16 ${_intDISK}p1' 
+                        call(cmd, shell=True)
+                        call(cmd2, shell=True)
+                    else:
+                        if boot == "GRUB":
+                            cmd = 'gpart add -a 4k -s 1M -t bios-boot -i %s %s' % (sl, drive)
+                        else:
+                            cmd = 'gpart add -a 4k -s 512M -t freebsd-boot -i %s %s' % (sl, drive)
+                        call(cmd, shell=True)
                 elif slicePartition(part) == 's':
                     size = int(line[1])
                     block = int(size * 2048)
-                    cmd = 'gpart add -s %s -t freebsd %s' % (block, drive)
+                    cmd = 'gpart add -a 4k -s %s -t freebsd -i %s %s' % (block, sl, drive)
                     call(cmd, shell=True)
