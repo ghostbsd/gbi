@@ -910,7 +910,7 @@ def bios_or_uefi():
     if "grub.platform" in kenvoutput.read():
         cmd = "kenv grub.platform"
         output = Popen(cmd, shell=True, stdout=PIPE, close_fds=True)
-        if output.stdout.readlines()[0].rstrip() = "efi":
+        if output.stdout.readlines()[0].rstrip() == "efi":
             return "UEFI"
         else:
             return "BIOS"
