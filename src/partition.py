@@ -39,7 +39,7 @@ from gi.repository import Gtk, GObject
 import os
 import shutil
 from partition_handler import partition_repos, disk_query, Delete_partition
-from partition_handler import partition_query, label_query
+from partition_handler import partition_query, label_query, bios_or_uefi
 from partition_handler import autoDiskPartition, autoFreeSpace
 from partition_handler import createLabel, scheme_query, how_partition
 from partition_handler import diskSchemeChanger, createSlice, createPartition

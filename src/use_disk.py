@@ -90,6 +90,9 @@ class UFSDisk:
         mem = ram.stdout.read()
         SWAP = int(mem.partition(':')[2].strip()) / (1024 * 1024)
         NUM1 = NUMBER - SWAP
+        read = open(boot_file, 'r')
+        line = read.readlines()
+        boot = line[0].strip()
         if bios_or_uefi() == "UEFI":
             NUM1 = NUM1 - 100
         elif boot == 'GRUB':
