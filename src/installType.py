@@ -43,25 +43,28 @@ class Types():
     def get_model(self):
         return self.box1
 
+    def boot_manager(self, radiobutton, val):
+        self.boot = val
+        boot = open(boot_file, 'w')
+        boot.writelines(self.boot)
+        boot.close()
+
     def __init__(self):
         self.box1 = Gtk.VBox(False, 0)
         self.box1.show()
         box2 = Gtk.VBox(False, 10)
-        box2.set_border_width(10)
-        self.box1.pack_start(box2, True, True, 0)
+        # box2.set_border_width(10)
+        self.box1.pack_start(box2, False, False, 0)
 
         box2.show()
         # auto partition or Customize Disk Partition.
         bbox = Gtk.VBox()
-        label = Gtk.Label()
-        box2.pack_start(label, False, False, 0)
-        label = Gtk.Label(
-            '<b><span size="xx-large">Installation Type</span></b>')
+        label = Gtk.Label('<b><span size="xx-large">Installation Type And Boot Manager</span></b>')
         label.set_use_markup(True)
         box2.pack_start(label, False, False, 10)
         # create a Hbox to center the radio button.
         hbox = Gtk.HBox()
-        box2.pack_start(hbox, True, True, 10)
+        box2.pack_start(hbox, False, False, 10)
         radio = Gtk.RadioButton.new_with_label_from_widget(None, "UFS full disk Configuration")
         bbox.pack_start(radio, False, True, 10)
         radio.connect("toggled", self.partition, "disk")
@@ -80,12 +83,39 @@ class Types():
         bbox.pack_start(radio, False, True, 10)
         radio.connect("toggled", self.partition, "zfs")
         radio.show()
-        hbox.pack_start(bbox, True, True, 100)
+        hbox.pack_start(bbox, False, False, 50)
         # hbox.pack_start(bbox, True, True, 50)
-        label = Gtk.Label()
-        box2.pack_start(label, False, False, 0)
-        box2 = Gtk.HBox(False, 10)
-        box2.set_border_width(5)
-        self.box1.pack_start(box2, False, False, 0)
-        box2.show()
+        # Boot option.
+        box3 = Gtk.VBox(False, 0)
+        box3.set_border_width(10)
+        self.box1.pack_start(box3, False, False, 0)
+        box3.show()
+        label = Gtk.Label('<b><span size="x-large">Boot Manager Option</span></b>')
+        label.set_use_markup(True)
+        box3.pack_start(label, False, False, 10)
+        hbox = Gtk.HBox()
+        hbox.show()
+        box3.pack_start(hbox, True, True, 0)
+        bbox1 = Gtk.VBox()
+        bbox1.show()
+        none = Gtk.RadioButton.new_with_label_from_widget(None, "No Boot Manager")
+        bbox1.pack_start(none, False, True, 10)
+        none.connect("toggled", self.boot_manager, "none")
+        none.show()
+        bsd = Gtk.RadioButton.new_with_label_from_widget(none, "BSD Boot Manager(MBR only)")
+        bbox1.pack_start(bsd, False, True, 10)
+        bsd.connect("toggled", self.boot_manager, "bsd")
+        bsd.show()
+        grub = Gtk.RadioButton.new_with_label_from_widget(bsd, "Grub Boot Manager")
+        bbox1.pack_start(grub, False, True, 10)
+        grub.connect("toggled", self.boot_manager, "grub")
+        grub.show()
+        hbox.pack_start(bbox1, False, False, 50)
+        self.boot = "none"
+        boot = open(boot_file, 'w')
+        boot.writelines(self.boot)
+        boot.close()
+        self.box3 = Gtk.VBox(False, 0)
+        self.box3.set_border_width(0)
+        self.box1.pack_start(self.box3, True, True, 0)
         return

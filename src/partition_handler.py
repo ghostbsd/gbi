@@ -907,10 +907,10 @@ class destroyParttion():
 def bios_or_uefi():
     kenvcmd = "kenv"
     kenvoutput = Popen(kenvcmd, shell=True, stdout=PIPE, close_fds=True)
-    if "grub.platform" in kenvoutput.read():
+    if "grub.platform" in kenvoutput.stdout.read():
         cmd = "kenv grub.platform"
         output = Popen(cmd, shell=True, stdout=PIPE, close_fds=True)
-        if output.stdout.readlines()[0].rstrip() = "efi":
+        if output.stdout.readlines()[0].rstrip() == "efi":
             return "UEFI"
         else:
             return "BIOS"

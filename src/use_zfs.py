@@ -36,7 +36,7 @@ import os
 import os.path
 import re
 from subprocess import Popen, PIPE, STDOUT
-from partition_handler import zfs_disk_query, zfs_disk_size_query
+from partition_handler import zfs_disk_query, zfs_disk_size_query, bios_or_uefi
 
 # Folder use pr the installer.
 tmp = "/tmp/.gbi/"
@@ -53,8 +53,9 @@ disk_file = '%sdisk' % tmp
 dslice = '%sslice' % tmp
 Part_label = '%szfs_config' % tmp
 part_schem = '%sscheme' % tmp
+boot_file = '%sboot' % tmp
+
 zfs_dsk_list = []
-to_root = 'python %sroot.py' % installer
 
 
 # Find if pasword contain only lower case and number
@@ -129,8 +130,17 @@ class ZFS():
                 num += 1
                 disk_len -= 1
             pool_type = ' (%s:%s)\n' % (self.mirror, mirror_dsk)
+        read = open(boot_file, 'r')
+        line = read.readlines()
+        boot = line[0].strip()
+        if bios_or_uefi() == "UEFI":
+            ZFS_NUM = ZFS_NUM - 100
+        elif boot == 'GRUB':
+            ZFS_NUM = ZFS_NUM - 1
+        else:
+            ZFS_NUM = ZFS_NUM - 1
         pfile.writelines('disk0-part=ZFS%s%s /, /usr, /var%s' % (dgeli, ZFS_NUM, pool_type))
-        if SWAP != 0:
+        if SWAP != 0: 
             pfile.writelines('disk0-part=SWAP%s%s none\n' % (sgeli, SWAP))
         if self.disk_encript is True:
             pfile.writelines('encpass=%s\n' % self.password.get_text())
