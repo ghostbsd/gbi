@@ -36,7 +36,7 @@ from gi.repository import Gtk
 import os
 import os.path
 from subprocess import Popen, PIPE, STDOUT
-from partition_handler import disk_query
+from partition_handler import disk_query, bios_or_uefi
 
 # Folder use pr the installer.
 tmp = "/tmp/.gbi/"
@@ -80,7 +80,7 @@ class UFSDisk:
         file_disk = open(disk_file, 'w')
         file_disk.writelines('%s\n' % self.disk)
         file_disk.close()
-        NUMBER = int(self.size)
+        NUMBER = int(self.size) - 1
         slice_file = open(dslice, 'w')
         slice_file.writelines('all\n')
         #slice_file.writelines('%s\n' % NUMBER)
@@ -90,6 +90,12 @@ class UFSDisk:
         mem = ram.stdout.read()
         SWAP = int(mem.partition(':')[2].strip()) / (1024 * 1024)
         NUM1 = NUMBER - SWAP
+        if bios_or_uefi() == "UEFI":
+            NUM1 = NUM1 - 100
+        elif boot == 'GRUB':
+            NUM1 = NUM1 - 1
+        else:
+            NUM1 = NUM1 - 1
         pfile = open(Part_label, 'w')
         pfile.writelines('UFS+SUJ %s /\n' % NUM1)
         pfile.writelines('SWAP 0 none\n')
