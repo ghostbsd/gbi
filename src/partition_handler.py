@@ -494,13 +494,24 @@ class autoDiskPartition():
         stderr=STDOUT, close_fds=True)
         mem = ram.stdout.read()
         swap = int(mem.partition(':')[2].strip()) / (1024 * 1024)
-        bnum = 1
+        if bios_or_uefi == "UEFI":
+            bnum = 100
+        else:
+            bnum = 1
         rootNum = number - swap
         rnum = rootNum - bnum
         plist = []
         mplist = []
         plf = open(partitiondb + disk, 'wb')
-        plist.extend(([disk + 'p1', bnum, 'none', 'freebsd-boot']))
+        read = open(boot_file, 'r')
+        line = read.readlines()
+        boot = line[0].strip()
+        if bios_or_uefi == "UEFI":
+            plist.extend(([disk + 'p1', bnum, 'none', 'efi']))
+        elif boot == "GRUB":
+            plist.extend(([disk + 'p1', bnum, 'none', 'bios-boot']))
+        else:
+            plist.extend(([disk + 'p1', bnum, 'none', 'freebsd-boot']))
         mplist.append(plist)
         plist = []
         plist.extend(([disk + 'p2', rnum, '/', 'freebsd-ufs']))
@@ -511,7 +522,12 @@ class autoDiskPartition():
         pickle.dump(mplist, plf)
         plf.close()
         pfile = open(Part_label, 'w')
-        pfile.writelines('BOOT %s none\n' % bnum)
+        if bios_or_uefi == "UEFI":
+            pfile.writelines('UEFI %s none\n' % bnum)
+        elif boot == "GRUB":
+            pfile.writelines('BIOS %s none\n' % bnum)
+        else:
+            pfile.writelines('BOOT %s none\n' % bnum)
         pfile.writelines('UFS+SUJ %s /\n' % rnum)
         pfile.writelines('SWAP 0 none\n')
         pfile.close()
@@ -595,12 +611,20 @@ class autoFreeSpace():
         mem = ram.stdout.read()
         swap = int(mem.partition(':')[2].strip()) / (1024 * 1024)
         rootNum = number - swap
-        bs = 1
+        if bios_or_uefi == "UEFI":
+            bs = 100
+        else:
+            bs = 1
         rootNum = rootNum - bs
         plist = []
         mplist = partition_query(disk)
         plf = open(partitiondb + disk, 'wb')
-        plist.extend(([disk + 'p%s' % sl, bs, 'none', 'freebsd-boot']))
+        if bios_or_uefi == "UEFI":
+            plist.extend(([disk + 'p%s' % sl, bs, 'none', 'efi']))
+        elif boot == "GRUB":
+            plist.extend(([disk + 'p%s' % sl, bs, 'none', 'bios-boot']))
+        else:
+            plist.extend(([disk + 'p%s' % sl, bs, 'none', 'freebsd-boot']))
         mplist[path] = plist
         plist = []
         plist.extend((

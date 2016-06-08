@@ -68,6 +68,7 @@ logo = "/usr/local/lib/gbi/logo.png"
 Part_label = '%spartlabel' % tmp
 part_schem = '%sscheme' % tmp
 partitiondb = "%spartitiondb/" % tmp
+bootFile = "%sboot" % tmp
 ufs_Partiton_list = []
 
 class Partitions():
@@ -191,7 +192,15 @@ class Partitions():
         self.fstype.append_text('UFS+SUJ')
         self.fstype.append_text('SWAP')
         if data1 == 1:
-            self.fstype.append_text('BOOT')
+            read = open(boot_file, 'r')
+            line = read.readlines()
+            boot = line[0].strip()
+            if bios_or_uefi == "UEFI":
+                self.fstype.append_text("EFI")
+            elif boot == "GRUB":
+                self.fstype.append_text("BIOS")
+            else:
+                self.fstype.append_text('BOOT')
         self.fstype.set_active(3)
         self.fstype.connect("changed", self.on_fs)
         adj = Gtk.Adjustment(numb, 0, numb, 1, 100, 0)
