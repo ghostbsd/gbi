@@ -54,7 +54,7 @@ dslice = '%sslice' % tmp
 Part_label = '%spartlabel' % tmp
 part_schem = '%sscheme' % tmp
 disk_list = '%sdisk-list.sh' % query
-
+boot_file = '%sboot' % tmp
 
 class UFSDisk:
     def Selection_Variant(self, tree_selection, button3):
