@@ -118,7 +118,7 @@ class gbsd_cfg():
             # If slice and auto file exist add first partition line.
             # But Swap need to be 0 it will take the rest of the freespace.
             for line in part:
-                if 'BOOT' in line:
+                if 'BOOT' in line or 'BIOS' in line or 'UEFI' in line:
                     pass
                 else:
                     f.writelines('disk0-part=%s\n' % line.strip())
