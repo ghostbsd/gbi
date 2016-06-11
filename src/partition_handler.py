@@ -24,6 +24,7 @@ disk_file = '%sdisk' % tmp
 dslice = '%sslice' % tmp
 Part_label = '%spartlabel' % tmp
 part_schem = '%sscheme' % tmp
+boot_file = '%sboot' % tmp
 
 
 def disk_query():
