@@ -68,7 +68,7 @@ logo = "/usr/local/lib/gbi/logo.png"
 Part_label = '%spartlabel' % tmp
 part_schem = '%sscheme' % tmp
 partitiondb = "%spartitiondb/" % tmp
-bootFile = "%sboot" % tmp
+boot_file = "%sboot" % tmp
 ufs_Partiton_list = []
 
 class Partitions():
