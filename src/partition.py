@@ -195,8 +195,8 @@ class Partitions():
             read = open(boot_file, 'r')
             line = read.readlines()
             boot = line[0].strip()
-            if bios_or_uefi == "UEFI":
-                self.fstype.append_text("EFI")
+            if bios_or_uefi() == "UEFI":
+                self.fstype.append_text("UEFI")
             elif boot == "GRUB":
                 self.fstype.append_text("BIOS")
             else:

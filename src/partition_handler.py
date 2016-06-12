@@ -495,7 +495,7 @@ class autoDiskPartition():
         stderr=STDOUT, close_fds=True)
         mem = ram.stdout.read()
         swap = int(mem.partition(':')[2].strip()) / (1024 * 1024)
-        if bios_or_uefi == "UEFI":
+        if bios_or_uefi() == "UEFI":
             bnum = 100
         else:
             bnum = 1
@@ -507,7 +507,7 @@ class autoDiskPartition():
         read = open(boot_file, 'r')
         line = read.readlines()
         boot = line[0].strip()
-        if bios_or_uefi == "UEFI":
+        if bios_or_uefi() == "UEFI":
             plist.extend(([disk + 'p1', bnum, 'none', 'efi']))
         elif boot == "GRUB":
             plist.extend(([disk + 'p1', bnum, 'none', 'bios-boot']))
@@ -523,7 +523,7 @@ class autoDiskPartition():
         pickle.dump(mplist, plf)
         plf.close()
         pfile = open(Part_label, 'w')
-        if bios_or_uefi == "UEFI":
+        if bios_or_uefi() == "UEFI":
             pfile.writelines('UEFI %s none\n' % bnum)
         elif boot == "GRUB":
             pfile.writelines('BIOS %s none\n' % bnum)
@@ -612,7 +612,7 @@ class autoFreeSpace():
         mem = ram.stdout.read()
         swap = int(mem.partition(':')[2].strip()) / (1024 * 1024)
         rootNum = number - swap
-        if bios_or_uefi == "UEFI":
+        if bios_or_uefi() == "UEFI":
             bs = 100
         else:
             bs = 1
@@ -620,7 +620,7 @@ class autoFreeSpace():
         plist = []
         mplist = partition_query(disk)
         plf = open(partitiondb + disk, 'wb')
-        if bios_or_uefi == "UEFI":
+        if bios_or_uefi() == "UEFI":
             plist.extend(([disk + 'p%s' % sl, bs, 'none', 'efi']))
         elif boot == "GRUB":
             plist.extend(([disk + 'p%s' % sl, bs, 'none', 'bios-boot']))
