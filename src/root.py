@@ -44,11 +44,8 @@ import pickle
 # Directory use from the installer.
 tmp = "/tmp/.gbi/"
 installer = "/usr/local/lib/gbi/"
-query = "sh /usr/local/lib/gbi/backend-query/"
 if not os.path.exists(tmp):
     os.makedirs(tmp)
-to_user = 'python %suser.py' % installer
-boot_file = '%sboot' % tmp
 
 
 # Find if pasword contain only lower case and number
@@ -94,12 +91,6 @@ class RootUser:
             ul = [rp]
             pickle.dump(ul, f)
             f.close()
-
-    def boot_manager(self, radiobutton, val):
-        self.boot = val
-        boot = open(boot_file, 'w')
-        boot.writelines(self.boot)
-        boot.close()
 
     def __init__(self, button3):
         self.box1 = Gtk.VBox(False, 0)
