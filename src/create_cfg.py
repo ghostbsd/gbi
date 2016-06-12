@@ -105,7 +105,7 @@ class gbsd_cfg():
             line = read.readlines()
             boot = line[0].strip()
             f.writelines('bootManager=%s\n' % boot)
-            os.remove(boot_file)
+            #os.remove(boot_file)
             # Sheme sheme
             read = open(disk_schem, 'r')
             shem = read.readlines()[0]
