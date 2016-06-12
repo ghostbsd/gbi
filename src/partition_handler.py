@@ -950,7 +950,7 @@ class makingParttion():
         if os.path.exists(tmp + 'create'):
             pf = open(tmp + 'create', 'rb')
             pl = pickle.load(pf)
-            read = open(tmp + "boot", 'r')
+            read = open(boot_file, 'r')
             boot = read.readlines()[0].strip()
             size = 0
             for line in pl:
@@ -960,7 +960,7 @@ class makingParttion():
                 if slicePartition(part) == 'p':
                     if bios_or_uefi() == 'UEFI':
                         cmd = 'gpart add -s 100M -t efi -i %s %s' % (sl, drive)
-                        cmd2 = 'newfs_msdos -F 16 ${_intDISK}p1' 
+                        cmd2 = 'newfs_msdos -F 16 %sp%s' % (drive, sl) 
                         call(cmd, shell=True)
                         call(cmd2, shell=True)
                     else:
