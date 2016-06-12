@@ -823,6 +823,10 @@ class createPartition():
             plist.extend(([disk + 'p%s' % pl, cnumb, lb, 'freebsd-swap']))
         elif fs == 'BOOT':
             plist.extend(([disk + 'p%s' % pl, cnumb, lb, 'freebsd-boot']))
+        elif fs == 'BIOS':
+            plist.extend(([disk + 'p%s' % pl, cnumb, lb, 'bios-boot']))
+        elif fs == 'UEFI':
+            plist.extend(([disk + 'p%s' % pl, cnumb, lb, 'efi']))
         mplist[lv] = plist
         plist = []
         if lnumb > 0:
