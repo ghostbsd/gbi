@@ -141,14 +141,13 @@ class Partitions():
             rschm = open(disk_schem, 'r')
             schm = rschm.readlines()[0]
             if 'GPT' in schm:
-                fs = part[1].split()[-1]
                 boot = part[0]
-                if 'BOOT' in boot:
-                    pass
-                else:
-                    self.button3.set_sensitive(False)
-                if '/' in fs:
-                    self.button3.set_sensitive(True)
+                if 'BOOT' in boot or 'BIOS' in boot or 'Free' in boot:
+                    fs = part[1].split()[-1] 
+                    if '/' in fs:
+                        self.button3.set_sensitive(True)
+                    else:
+                        self.button3.set_sensitive(False)
                 else:
                     self.button3.set_sensitive(False)
             else:
