@@ -103,7 +103,6 @@ class Partitions():
             if 'GPT' in schm:
                 fs = part[1].split()[-1]
                 boot = part[0]
-                print fs
                 if 'BOOT' in boot:
                     pass
                 else:
@@ -114,7 +113,6 @@ class Partitions():
                     self.button3.set_sensitive(False)
             else:
                 fs = part[0]
-                print fs
                 if '/' in fs:
                     self.button3.set_sensitive(True)
                 else:
@@ -142,7 +140,7 @@ class Partitions():
             schm = rschm.readlines()[0]
             if 'GPT' in schm:
                 boot = part[0]
-                if 'BOOT' in boot or 'BIOS' in boot or 'Free' in boot:
+                if 'BOOT' in boot or 'BIOS' in boot or 'UEFI' in boot:
                     fs = part[1].split()[-1] 
                     if '/' in fs:
                         self.button3.set_sensitive(True)
@@ -152,7 +150,6 @@ class Partitions():
                     self.button3.set_sensitive(False)
             else:
                 fs = part[0]
-                print fs
                 if '/' in fs:
                     self.button3.set_sensitive(True)
                 else:
@@ -431,7 +428,6 @@ class Partitions():
                 if 'GPT' in schm:
                     fs = part[1]
                     boot = part[0]
-                    print fs
                     if 'BOOT' in boot:
                         pass
                     else:
@@ -442,7 +438,6 @@ class Partitions():
                         self.button3.set_sensitive(False)
                 else:
                     fs = part[0].split()[-1]
-                    print fs
                     if '/' in fs:
                         self.button3.set_sensitive(True)
                     else:
@@ -450,8 +445,6 @@ class Partitions():
             else:
                 self.button3.set_sensitive(False)
         elif self.slice == 'freespace':
-            print self.path
-            print self.size
             autoFreeSpace(self.path, self.size)
             self.Tree_Store()
             self.treeview.expand_all()
@@ -466,7 +459,6 @@ class Partitions():
                 if 'GPT' in schm:
                     fs = part[1]
                     boot = part[0]
-                    print fs
                     if 'BOOT' in boot:
                         pass
                     else:
@@ -477,7 +469,6 @@ class Partitions():
                         self.button3.set_sensitive(False)
                 else:
                     fs = part[0]
-                    print fs
                     if '/' in fs:
                         self.button3.set_sensitive(True)
                     else:
@@ -513,18 +504,15 @@ class Partitions():
             if 'GPT' in schm:
                 fs = part[1]
                 boot = part[0]
-                print fs
-                if 'BOOT' in boot:
-                    pass
-                else:
-                    self.button3.set_sensitive(False)
-                if '/' in fs:
-                    self.button3.set_sensitive(True)
+                if 'BOOT' in boot or 'BIOS' in boot or 'UEFI' in boot:
+                    if '/' in fs:
+                        self.button3.set_sensitive(True)
+                    else:
+                        self.button3.set_sensitive(False)
                 else:
                     self.button3.set_sensitive(False)
             else:
                 fs = part[0]
-                print fs
                 if '/' in fs:
                     self.button3.set_sensitive(True)
                 else:
@@ -533,7 +521,6 @@ class Partitions():
             self.button3.set_sensitive(False)
 
     def create_partition(self, widget):
-        print self.path
         if len(self.path) == 3:
             if self.slice == 'freespace':
                 self.labelEditor(self.path, self.slice, self.size, 0, 1)
