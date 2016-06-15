@@ -478,7 +478,7 @@ class Partitions():
         elif len(self.path) == 2:
             pass
         else:
-            print("not work")
+            pass
 
     def revertChange(self, widget):
         if os.path.exists(partitiondb):
@@ -540,15 +540,26 @@ class Partitions():
     def partition_selection(self, tree_selection):
         (model, pathlist) = tree_selection.get_selected_rows()
         for path in pathlist:
+            tree_iter3 = model.get_iter(path[0])
+            self.scheme = model.get_value(tree_iter3, 3)
             tree_iter = model.get_iter(path)
             self.slice = model.get_value(tree_iter, 0)
             self.size = model.get_value(tree_iter, 1)
-            #value2 = model.get_value(tree_iter, 2)
-            self.scheme = model.get_value(tree_iter, 3)
+            if len(path) == 2 and  path[1] > 0:
+                pathbehind = str(path[0]) + ":" + str(int(path[1] - 1))
+                tree_iter2 = model.get_iter(pathbehind)
+            	self.slicebehind = model.get_value(tree_iter2, 0)
+            else:
+                self.slicebehind = None
             self.path = path
-
             if 'freespace' in self.slice:
-                if path[1] >= 4 and "s" in self.slice:
+                if path[1] > 3 and self.scheme == "MBR":
+                    self.create_bt.set_sensitive(False)
+                elif self.slicebehind == None:
+                    self.create_bt.set_sensitive(True)
+                elif int(path[1] + 1) == int(self.slicebehind.partition('s')[2]):
+                    self.create_bt.set_sensitive(False)
+                elif int(self.slicebehind.partition('s')[2]) > 4:
                     self.create_bt.set_sensitive(False)
                 else:
                     self.create_bt.set_sensitive(True)
