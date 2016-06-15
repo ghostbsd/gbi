@@ -184,7 +184,6 @@ class partition_repos():
             info = line.split()
             plist.extend((info[0], info[1].partition('M')[0], '', info[2]))
             mplist.append(plist)
-            #print(plist)
             plist = []
             self.mbr_partition_list(info[0])
         pickle.dump(mplist, dpsf)
@@ -210,7 +209,6 @@ class partition_repos():
                     llist.extend((
                     [pslice + letter, info[0].partition('M')[0], '', info[1]]))
                 mllist.append(llist)
-                #print(llist)
                 llist = []
             pickle.dump(mllist, plf)
             plf.close()
@@ -225,9 +223,7 @@ class partition_repos():
             info = line.split()
             plist.extend((info[0], info[1].partition('M')[0], '', info[2]))
             mplist.append(plist)
-            #print(plist)
             plist = []
-        #print(mplist)
         pickle.dump(mplist, psf)
         psf.close()
 
@@ -327,7 +323,6 @@ class Delete_partition():
         if os.path.exists(dslice):
             sfile = open(dslice, 'r')
             slf = sfile.readlines()[0].rstrip()
-            print slf
             if slf == 'all':
                 ptnum = snum - 1
             else: 
@@ -823,6 +818,10 @@ class createPartition():
             plist.extend(([disk + 'p%s' % pl, cnumb, lb, 'freebsd-swap']))
         elif fs == 'BOOT':
             plist.extend(([disk + 'p%s' % pl, cnumb, lb, 'freebsd-boot']))
+        elif fs == 'BIOS':
+            plist.extend(([disk + 'p%s' % pl, cnumb, lb, 'bios-boot']))
+        elif fs == 'UEFI':
+            plist.extend(([disk + 'p%s' % pl, cnumb, lb, 'efi']))
         mplist[lv] = plist
         plist = []
         if lnumb > 0:
@@ -910,7 +909,6 @@ class rDeleteParttion():
                 part = line[0]
                 num = sliceNum(part)
                 hd = rpartslice(part)
-                print(('gpart delete -i %s %s' % (num, hd)))
                 call('gpart delete -i %s %s' % (num, hd), shell=True)
 
 
@@ -921,10 +919,8 @@ class destroyParttion():
             ds = pickle.load(dsf)
             for line in ds:
                 drive = line[0]
-                print(('gpart destroy -F %s' % drive))
                 call('gpart destroy -F %s' % drive, shell=True)
                 scheme = line[1]
-                print(('gpart create -s %s %s' % (scheme.lower(), drive)))
                 call('gpart create -s %s %s' % (scheme.lower(),
                  drive), shell=True)
 
@@ -950,7 +946,7 @@ class makingParttion():
         if os.path.exists(tmp + 'create'):
             pf = open(tmp + 'create', 'rb')
             pl = pickle.load(pf)
-            read = open(tmp + "boot", 'r')
+            read = open(boot_file, 'r')
             boot = read.readlines()[0].strip()
             size = 0
             for line in pl:
@@ -960,7 +956,7 @@ class makingParttion():
                 if slicePartition(part) == 'p':
                     if bios_or_uefi() == 'UEFI':
                         cmd = 'gpart add -s 100M -t efi -i %s %s' % (sl, drive)
-                        cmd2 = 'newfs_msdos -F 16 ${_intDISK}p1' 
+                        cmd2 = 'newfs_msdos -F 16 %sp%s' % (drive, sl) 
                         call(cmd, shell=True)
                         call(cmd2, shell=True)
                     else:
