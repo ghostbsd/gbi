@@ -551,13 +551,14 @@ class Partitions():
             	self.slicebehind = model.get_value(tree_iter2, 0)
             else:
                 self.slicebehind = None
+            sl = int(path[1]) + 1
             self.path = path
             if 'freespace' in self.slice:
                 if path[1] > 3 and self.scheme == "MBR":
                     self.create_bt.set_sensitive(False)
                 elif self.slicebehind == None:
                     self.create_bt.set_sensitive(True)
-                elif int(path[1] + 1) == int(self.slicebehind.partition('s')[2]):
+                elif sl == int(self.slicebehind.partition('s')[2]):
                     self.create_bt.set_sensitive(False)
                 elif int(self.slicebehind.partition('s')[2]) > 4:
                     self.create_bt.set_sensitive(False)
