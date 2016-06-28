@@ -348,7 +348,7 @@ class ZFS():
         pool_check = Gtk.CheckButton('Pool Name')
         pool_check.connect("toggled", self.on_check_poll)
         self.pool = Gtk.Entry()
-        self.pool.set_text('zroot')
+        self.pool.set_text('tank')
         self.pool.set_sensitive(False)
         # Creating MBR or GPT drive
         label = Gtk.Label('<b>Partition Scheme</b>')
