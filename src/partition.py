@@ -550,14 +550,12 @@ class Partitions():
                 tree_iter2 = model.get_iter(pathbehind)
             	self.slicebehind = model.get_value(tree_iter2, 0)
                 sl = int(path[1]) + 1
-                print self.slicebehind.partition('s')[2]
                 slbehind = int(self.slicebehind.partition('s')[2])
             elif len(path) == 2 and  path[1] > 0 and self.scheme == "GPT":
                 pathbehind = str(path[0]) + ":" + str(int(path[1] - 1))
                 tree_iter2 = model.get_iter(pathbehind)
             	self.slicebehind = model.get_value(tree_iter2, 0)
                 sl = int(path[1]) + 1
-                print self.slicebehind.partition('p')[2]
                 slbehind = int(self.slicebehind.partition('p')[2])
             else:
                 self.slicebehind = None

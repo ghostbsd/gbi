@@ -416,7 +416,7 @@ class ZFS():
         grid.attach(sw, 1, 4, 8, 3)
         grid.attach(pool_check, 5, 8, 2, 1)
         grid.attach(self.pool, 7, 8, 2, 1)
-        grid.attach(check, 1, 8, 3, 1)
+        # grid.attach(check, 1, 8, 3, 1)
         grid.attach(swp_size_label, 5, 9, 2, 1)
         grid.attach(self.swap_entry, 7, 9, 2, 1)
         #grid.attach(self.swap_encrypt_check, 9, 15, 11, 12)
