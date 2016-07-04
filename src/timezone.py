@@ -77,8 +77,8 @@ class TimeZone:
         column.set_sort_column_id(0)
         treeView.append_column(column)
 
-    def Continent_Selection(self, tree_selection):
-        (model, pathlist) = tree_selection.get_selected_rows()
+    def Continent_Selection(self, widget):
+        (model, pathlist) = widget.get_selected_rows()
         self.variant_store.clear()
         for path in pathlist:
             tree_iter = model.get_iter(path)
@@ -131,14 +131,14 @@ class TimeZone:
         read = open(continent, 'r')
         for line in read.readlines():
             store.append(None, [line.rstrip()])
-        treeView = Gtk.TreeView(store)
-        treeView.set_model(store)
-        treeView.set_rules_hint(True)
-        self.continent_columns(treeView)
-        tree_selection = treeView.get_selection()
-        tree_selection.set_mode(Gtk.SelectionMode.SINGLE)
-        tree_selection.connect("changed", self.Continent_Selection)
-        sw.add(treeView)
+        self.continenttreeView = Gtk.TreeView(store)
+        self.continenttreeView.set_model(store)
+        self.continenttreeView.set_rules_hint(True)
+        self.continent_columns(self.continenttreeView)
+        self.continenttree_selection = self.continenttreeView.get_selection()
+        self.continenttree_selection.set_mode(Gtk.SelectionMode.SINGLE)
+        self.continenttree_selection.connect("changed", self.Continent_Selection)
+        sw.add(self.continenttreeView)
         sw.show()
         hbox.pack_start(sw, True, True, 5)
 

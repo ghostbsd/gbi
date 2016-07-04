@@ -94,31 +94,6 @@ class Partitions():
         self.window.hide()
         self.update()
         partlabel = '%spartlabel' % tmp
-        if os.path.exists(partlabel):
-            rd = open(partlabel, 'r')
-            part = rd.readlines()
-            # Find GPT scheme.
-            rschm = open(disk_schem, 'r')
-            schm = rschm.readlines()[0]
-            if 'GPT' in schm:
-                fs = part[1].split()[-1]
-                boot = part[0]
-                if 'BOOT' in boot:
-                    pass
-                else:
-                    self.button3.set_sensitive(False)
-                if '/' in fs:
-                    self.button3.set_sensitive(True)
-                else:
-                    self.button3.set_sensitive(False)
-            else:
-                fs = part[0]
-                if '/' in fs:
-                    self.button3.set_sensitive(True)
-                else:
-                    self.button3.set_sensitive(False)
-        else:
-            self.button3.set_sensitive(False)
 
     def on_add_partition(self, widget, entry, inumb, path, data):
         if self.fs == '' or self.label == '':
@@ -131,31 +106,6 @@ class Partitions():
             createPartition(path, lnumb, inumb, cnumb, lb, fs, data)
         self.window.hide()
         self.update()
-        partlabel = '%spartlabel' % tmp
-        if os.path.exists(partlabel):
-            rd = open(partlabel, 'r')
-            part = rd.readlines()
-            # Find GPT scheme.
-            rschm = open(disk_schem, 'r')
-            schm = rschm.readlines()[0]
-            if 'GPT' in schm:
-                boot = part[0]
-                if 'BOOT' in boot or 'BIOS' in boot or 'UEFI' in boot:
-                    fs = part[1].split()[-1] 
-                    if '/' in fs:
-                        self.button3.set_sensitive(True)
-                    else:
-                        self.button3.set_sensitive(False)
-                else:
-                    self.button3.set_sensitive(False)
-            else:
-                fs = part[0]
-                if '/' in fs:
-                    self.button3.set_sensitive(True)
-                else:
-                    self.button3.set_sensitive(False)
-        else:
-            self.button3.set_sensitive(False)
 
     def cancel(self, widget):
         self.window.hide()
@@ -369,9 +319,11 @@ class Partitions():
         self.window.show_all()
 
     def update(self):
+        oldpath = self.path
         self.Tree_Store()
         self.treeview.expand_all()
-        self.treeview.set_cursor(self.path)
+        self.treeview.row_activated(oldpath, self.treeview.get_columns()[0])
+        self.treeview.set_cursor(oldpath)
 
     def delete_partition(self, widget):
         part = self.slice
@@ -390,7 +342,7 @@ class Partitions():
         bbox.add(self.delete_bt)
         self.modifi_bt = Gtk.Button("Modify")
         self.modifi_bt.connect("clicked", self.modify_partition)
-        bbox.add(self.modifi_bt)
+        # bbox.add(self.modifi_bt)
         self.revert_bt = Gtk.Button("Revert")
         self.revert_bt.connect("clicked", self.revertChange)
         bbox.add(self.revert_bt)
@@ -418,63 +370,11 @@ class Partitions():
             self.Tree_Store()
             self.treeview.expand_all()
             self.treeview.set_cursor(self.path)
-            partlabel = '%spartlabel' % tmp
-            if os.path.exists(partlabel):
-                rd = open(partlabel, 'r')
-                part = rd.readlines()
-                # Find GPT scheme.
-                rschm = open(disk_schem, 'r')
-                schm = rschm.readlines()[0]
-                if 'GPT' in schm:
-                    fs = part[1]
-                    boot = part[0]
-                    if 'BOOT' in boot:
-                        pass
-                    else:
-                        self.button3.set_sensitive(False)
-                    if '/' in fs:
-                        self.button3.set_sensitive(True)
-                    else:
-                        self.button3.set_sensitive(False)
-                else:
-                    fs = part[0].split()[-1]
-                    if '/' in fs:
-                        self.button3.set_sensitive(True)
-                    else:
-                        self.button3.set_sensitive(False)
-            else:
-                self.button3.set_sensitive(False)
         elif self.slice == 'freespace':
             autoFreeSpace(self.path, self.size)
             self.Tree_Store()
             self.treeview.expand_all()
             self.treeview.set_cursor(self.path)
-            partlabel = '%spartlabel' % tmp
-            if os.path.exists(partlabel):
-                rd = open(partlabel, 'r')
-                part = rd.readlines()
-                # Find GPT scheme.
-                rschm = open(disk_schem, 'r')
-                schm = rschm.readlines()[0]
-                if 'GPT' in schm:
-                    fs = part[1]
-                    boot = part[0]
-                    if 'BOOT' in boot:
-                        pass
-                    else:
-                        self.button3.set_sensitive(False)
-                    if '/' in fs:
-                        self.button3.set_sensitive(True)
-                    else:
-                        self.button3.set_sensitive(False)
-                else:
-                    fs = part[0]
-                    if '/' in fs:
-                        self.button3.set_sensitive(True)
-                    else:
-                        self.button3.set_sensitive(False)
-            else:
-                self.button3.set_sensitive(False)
         elif len(self.path) == 2:
             pass
         else:
@@ -494,31 +394,6 @@ class Partitions():
         partition_repos()
         self.Tree_Store()
         self.treeview.expand_all()
-        partlabel = '%spartlabel' % tmp
-        if os.path.exists(partlabel):
-            rd = open(partlabel, 'r')
-            part = rd.readlines()
-            # Find GPT scheme.
-            rschm = open(disk_schem, 'r')
-            schm = rschm.readlines()[0]
-            if 'GPT' in schm:
-                fs = part[1]
-                boot = part[0]
-                if 'BOOT' in boot or 'BIOS' in boot or 'UEFI' in boot:
-                    if '/' in fs:
-                        self.button3.set_sensitive(True)
-                    else:
-                        self.button3.set_sensitive(False)
-                else:
-                    self.button3.set_sensitive(False)
-            else:
-                fs = part[0]
-                if '/' in fs:
-                    self.button3.set_sensitive(True)
-                else:
-                    self.button3.set_sensitive(False)
-        else:
-            self.button3.set_sensitive(False)
 
     def create_partition(self, widget):
         if len(self.path) == 3:
@@ -537,65 +412,89 @@ class Partitions():
             else:
                 pass
 
-    def partition_selection(self, tree_selection):
-        (model, pathlist) = tree_selection.get_selected_rows()
-        for path in pathlist:
-            tree_iter3 = model.get_iter(path[0])
-            self.scheme = model.get_value(tree_iter3, 3)
-            tree_iter = model.get_iter(path)
-            self.slice = model.get_value(tree_iter, 0)
-            self.size = model.get_value(tree_iter, 1)
-            if len(path) == 2 and  path[1] > 0 and self.scheme == "MBR":
-                pathbehind = str(path[0]) + ":" + str(int(path[1] - 1))
-                tree_iter2 = model.get_iter(pathbehind)
-            	self.slicebehind = model.get_value(tree_iter2, 0)
-                sl = int(path[1]) + 1
-                slbehind = int(self.slicebehind.partition('s')[2])
-            elif len(path) == 2 and  path[1] > 0 and self.scheme == "GPT":
-                pathbehind = str(path[0]) + ":" + str(int(path[1] - 1))
-                tree_iter2 = model.get_iter(pathbehind)
-            	self.slicebehind = model.get_value(tree_iter2, 0)
-                sl = int(path[1]) + 1
-                slbehind = int(self.slicebehind.partition('p')[2])
-            else:
-                self.slicebehind = None
-                sl = 1
-                slbehind = 0
-            self.path = path
-            if 'freespace' in self.slice:
-                if path[1] > 3 and self.scheme == "MBR":
-                    self.create_bt.set_sensitive(False)
-                elif self.slicebehind == None:
-                    self.create_bt.set_sensitive(True)
-                elif sl == slbehind:
-                    self.create_bt.set_sensitive(False)
-                elif slbehind > 4:
-                    self.create_bt.set_sensitive(False)
-                else:
-                    self.create_bt.set_sensitive(True)
-                self.delete_bt.set_sensitive(False)
-                self.modifi_bt.set_sensitive(False)
-                self.auto_bt.set_sensitive(True)
-            elif 's' in self.slice:
+    def partition_selection(self, widget):
+        model, self.iter, = widget.get_selected()
+        self.path = model.get_path(self.iter)
+        tree_iter3 = model.get_iter(self.path[0])
+        self.scheme = model.get_value(tree_iter3, 3)
+        tree_iter = model.get_iter(self.path)
+        self.slice = model.get_value(tree_iter, 0)
+        self.size = model.get_value(tree_iter, 1)
+        if len(self.path) == 2 and  self.path[1] > 0 and self.scheme == "MBR":
+            pathbehind = str(self.path[0]) + ":" + str(int(self.path[1] - 1))
+            tree_iter2 = model.get_iter(pathbehind)
+            self.slicebehind = model.get_value(tree_iter2, 0)
+            sl = int(self.path[1]) + 1
+            slbehind = int(self.slicebehind.partition('s')[2])
+        elif len(self.path) == 2 and  self.path[1] > 0 and self.scheme == "GPT":
+            pathbehind = str(self.path[0]) + ":" + str(int(self.path[1] - 1))
+            tree_iter2 = model.get_iter(pathbehind)
+            self.slicebehind = model.get_value(tree_iter2, 0)
+            sl = int(self.path[1]) + 1
+            slbehind = int(self.slicebehind.partition('p')[2])
+        else:
+            self.slicebehind = None
+            sl = 1
+            slbehind = 0
+        if 'freespace' in self.slice:
+            if self.path[1] > 3 and self.scheme == "MBR":
                 self.create_bt.set_sensitive(False)
-                self.delete_bt.set_sensitive(True)
-                #self.modifi_bt.set_sensitive(True)
-                self.auto_bt.set_sensitive(False)
-            elif 'p' in self.slice:
+            elif self.slicebehind == None:
+                self.create_bt.set_sensitive(True)
+            elif sl == slbehind:
                 self.create_bt.set_sensitive(False)
-                self.delete_bt.set_sensitive(True)
-                #self.modifi_bt.set_sensitive(True)
-                self.auto_bt.set_sensitive(False)
+            elif slbehind > 4:
+                self.create_bt.set_sensitive(False)
             else:
-                self.delete_bt.set_sensitive(False)
-                self.modifi_bt.set_sensitive(False)
-                self.auto_bt.set_sensitive(True)
-                if how_partition(self.path) == 1:
-                    self.create_bt.set_sensitive(True)
-                elif how_partition(self.path) == 0:
-                    self.create_bt.set_sensitive(True)
+                self.create_bt.set_sensitive(True)
+            self.delete_bt.set_sensitive(False)
+            self.modifi_bt.set_sensitive(False)
+            self.auto_bt.set_sensitive(True)
+        elif 's' in self.slice:
+            self.create_bt.set_sensitive(False)
+            self.delete_bt.set_sensitive(True)
+            #self.modifi_bt.set_sensitive(True)
+            self.auto_bt.set_sensitive(False)
+        elif 'p' in self.slice:
+            self.create_bt.set_sensitive(False)
+            self.delete_bt.set_sensitive(True)
+            #self.modifi_bt.set_sensitive(True)
+            self.auto_bt.set_sensitive(False)
+        else:
+            self.delete_bt.set_sensitive(False)
+            self.modifi_bt.set_sensitive(False)
+            self.auto_bt.set_sensitive(True)
+            if how_partition(self.path) == 1:
+                self.create_bt.set_sensitive(True)
+            elif how_partition(self.path) == 0:
+                self.create_bt.set_sensitive(True)
+            else:
+                self.create_bt.set_sensitive(False)
+        if os.path.exists(Part_label):
+            rd = open(Part_label, 'r')
+            part = rd.readlines()
+            # Find GPT scheme.
+            rschm = open(disk_schem, 'r')
+            schm = rschm.readlines()[0]
+            if 'GPT' in schm:
+                fs = part[1]
+                boot = part[0]
+                if 'BOOT' in boot or 'BIOS' in boot or 'UEFI' in boot:
+                    pass
                 else:
-                    self.create_bt.set_sensitive(False)
+                    self.button3.set_sensitive(False)
+                if '/' in fs:
+                    self.button3.set_sensitive(True)
+                else:
+                    self.button3.set_sensitive(False)
+            else:
+                fs = part[0].split()[-1]
+                if '/' in fs:
+                    self.button3.set_sensitive(True)
+                else:
+                    self.button3.set_sensitive(False)
+        else:
+            self.button3.set_sensitive(False)
 
     def __init__(self, button3):
         self.button3 = button3
@@ -655,9 +554,9 @@ class Partitions():
         self.treeview.append_column(column4)
         self.treeview.set_reorderable(True)
         self.treeview.expand_all()
-        tree_selection = self.treeview.get_selection()
-        tree_selection.set_mode(Gtk.SelectionMode.SINGLE)
-        tree_selection.connect("changed", self.partition_selection)
+        self.tree_selection = self.treeview.get_selection()
+        self.tree_selection.set_mode(Gtk.SelectionMode.SINGLE)
+        self.tree_selection.connect("changed", self.partition_selection)
         sw.add(self.treeview)
         sw.show()
         box2.pack_start(sw, True, True, 0)
@@ -690,4 +589,6 @@ class Partitions():
         return self.store
 
     def get_model(self):
+        self.tree_selection.select_path(0)   
         return self.box1
+
