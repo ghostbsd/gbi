@@ -677,7 +677,6 @@ class createLabel():
         elif fs == 'SWAP':
             llist.extend((
             [disk + 's%s' % sl + letter, cnumb, lb, 'freebsd-swap']))
-        #elif == 'ZFS':
         mllist[lv] = llist
         llist = []
         if lnumb > 0:
@@ -685,9 +684,21 @@ class createLabel():
             mllist.append(llist)
         pickle.dump(mllist, plf)
         plf.close()
-        pfile = open(Part_label, 'a')
-        pfile.writelines('%s %s %s\n' % (fs, cnumb, lb))
-        pfile.close()
+        if os.path.exists(Part_label):
+            rfile = open(Part_label, 'r')
+            readlinespl = rfile.readlines()
+            if lb == '/' and lv == 0 and " /\n" not in readlinespl[0]:  
+                newpl = ["%s %s %s\n" % (fs, cnumb, lb)] + readlinespl
+            else:
+                newpl = readlinespl + ["%s %s %s\n" % (fs, cnumb, lb)]
+            pfile = open(Part_label, 'w')
+            for line in newpl:
+                pfile.writelines(line)
+            pfile.close()
+        else:
+            pfile = open(Part_label, 'w')
+            pfile.writelines('%s %s %s\n' % (fs, cnumb, lb))
+            pfile.close()
 
 
 class modifyLabel():

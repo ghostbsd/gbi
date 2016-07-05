@@ -414,62 +414,63 @@ class Partitions():
 
     def partition_selection(self, widget):
         model, self.iter, = widget.get_selected()
-        self.path = model.get_path(self.iter)
-        tree_iter3 = model.get_iter(self.path[0])
-        self.scheme = model.get_value(tree_iter3, 3)
-        tree_iter = model.get_iter(self.path)
-        self.slice = model.get_value(tree_iter, 0)
-        self.size = model.get_value(tree_iter, 1)
-        if len(self.path) == 2 and  self.path[1] > 0 and self.scheme == "MBR":
-            pathbehind = str(self.path[0]) + ":" + str(int(self.path[1] - 1))
-            tree_iter2 = model.get_iter(pathbehind)
-            self.slicebehind = model.get_value(tree_iter2, 0)
-            sl = int(self.path[1]) + 1
-            slbehind = int(self.slicebehind.partition('s')[2])
-        elif len(self.path) == 2 and  self.path[1] > 0 and self.scheme == "GPT":
-            pathbehind = str(self.path[0]) + ":" + str(int(self.path[1] - 1))
-            tree_iter2 = model.get_iter(pathbehind)
-            self.slicebehind = model.get_value(tree_iter2, 0)
-            sl = int(self.path[1]) + 1
-            slbehind = int(self.slicebehind.partition('p')[2])
-        else:
-            self.slicebehind = None
-            sl = 1
-            slbehind = 0
-        if 'freespace' in self.slice:
-            if self.path[1] > 3 and self.scheme == "MBR":
-                self.create_bt.set_sensitive(False)
-            elif self.slicebehind == None:
-                self.create_bt.set_sensitive(True)
-            elif sl == slbehind:
-                self.create_bt.set_sensitive(False)
-            elif slbehind > 4:
-                self.create_bt.set_sensitive(False)
+        if self.iter != None:
+            self.path = model.get_path(self.iter)
+            tree_iter3 = model.get_iter(self.path[0])
+            self.scheme = model.get_value(tree_iter3, 3)
+            tree_iter = model.get_iter(self.path)
+            self.slice = model.get_value(tree_iter, 0)
+            self.size = model.get_value(tree_iter, 1)
+            if len(self.path) == 2 and  self.path[1] > 0 and self.scheme == "MBR":
+                pathbehind = str(self.path[0]) + ":" + str(int(self.path[1] - 1))
+                tree_iter2 = model.get_iter(pathbehind)
+                self.slicebehind = model.get_value(tree_iter2, 0)
+                sl = int(self.path[1]) + 1
+                slbehind = int(self.slicebehind.partition('s')[2])
+            elif len(self.path) == 2 and  self.path[1] > 0 and self.scheme == "GPT":
+                pathbehind = str(self.path[0]) + ":" + str(int(self.path[1] - 1))
+                tree_iter2 = model.get_iter(pathbehind)
+                self.slicebehind = model.get_value(tree_iter2, 0)
+                sl = int(self.path[1]) + 1
+                slbehind = int(self.slicebehind.partition('p')[2])
             else:
-                self.create_bt.set_sensitive(True)
-            self.delete_bt.set_sensitive(False)
-            self.modifi_bt.set_sensitive(False)
-            self.auto_bt.set_sensitive(True)
-        elif 's' in self.slice:
-            self.create_bt.set_sensitive(False)
-            self.delete_bt.set_sensitive(True)
-            #self.modifi_bt.set_sensitive(True)
-            self.auto_bt.set_sensitive(False)
-        elif 'p' in self.slice:
-            self.create_bt.set_sensitive(False)
-            self.delete_bt.set_sensitive(True)
-            #self.modifi_bt.set_sensitive(True)
-            self.auto_bt.set_sensitive(False)
-        else:
-            self.delete_bt.set_sensitive(False)
-            self.modifi_bt.set_sensitive(False)
-            self.auto_bt.set_sensitive(True)
-            if how_partition(self.path) == 1:
-                self.create_bt.set_sensitive(True)
-            elif how_partition(self.path) == 0:
-                self.create_bt.set_sensitive(True)
-            else:
+                self.slicebehind = None
+                sl = 1
+                slbehind = 0
+            if 'freespace' in self.slice:
+                if self.path[1] > 3 and self.scheme == "MBR":
+                    self.create_bt.set_sensitive(False)
+                elif self.slicebehind == None:
+                    self.create_bt.set_sensitive(True)
+                elif sl == slbehind:
+                    self.create_bt.set_sensitive(False)
+                elif slbehind > 4:
+                    self.create_bt.set_sensitive(False)
+                else:
+                    self.create_bt.set_sensitive(True)
+                self.delete_bt.set_sensitive(False)
+                self.modifi_bt.set_sensitive(False)
+                self.auto_bt.set_sensitive(True)
+            elif 's' in self.slice:
                 self.create_bt.set_sensitive(False)
+                self.delete_bt.set_sensitive(True)
+                #self.modifi_bt.set_sensitive(True)
+                self.auto_bt.set_sensitive(False)
+            elif 'p' in self.slice:
+                self.create_bt.set_sensitive(False)
+                self.delete_bt.set_sensitive(True)
+                #self.modifi_bt.set_sensitive(True)
+                self.auto_bt.set_sensitive(False)
+            else:
+                self.delete_bt.set_sensitive(False)
+                self.modifi_bt.set_sensitive(False)
+                self.auto_bt.set_sensitive(True)
+                if how_partition(self.path) == 1:
+                    self.create_bt.set_sensitive(True)
+                elif how_partition(self.path) == 0:
+                    self.create_bt.set_sensitive(True)
+                else:
+                    self.create_bt.set_sensitive(False)
         if os.path.exists(Part_label):
             rd = open(Part_label, 'r')
             part = rd.readlines()
