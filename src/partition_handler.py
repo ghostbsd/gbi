@@ -878,7 +878,6 @@ class createPartition():
         if os.path.exists(Part_label):
             rfile = open(Part_label, 'r')
             readlinespl = rfile.readlines()
-            print readlinespl
             if fs == "BOOT" or fs == 'BIOS' or fs == "UEFI":
                 if "BOOT" not in readlinespl[0] or 'BIOS' not in readlinespl[0] or "UEFI" not in readlinespl[0]:
                     newpl = ["%s %s %s\n" % (fs, cnumb, lb)] + readlinespl
@@ -888,7 +887,6 @@ class createPartition():
                 newpl = [readlinespl[0]] + ["%s %s %s\n" % (fs, cnumb, lb)] + readlinespl[1:]
             else:
                 newpl = readlinespl + ["%s %s %s\n" % (fs, cnumb, lb)]
-            print newpl
             pfile = open(Part_label, 'w')
             for line in newpl:
                 pfile.writelines(line)
