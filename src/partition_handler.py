@@ -1,4 +1,32 @@
 #!/usr/local/bin/python
+"""
+Copyright (c) 2010-2013, GhostBSD. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+
+1. Redistribution's of source code must retain the above copyright
+   notice, this list of conditions and the following disclaimer.
+
+2. Redistribution's in binary form must reproduce the above
+   copyright notice,this list of conditions and the following
+   disclaimer in the documentation and/or other materials provided
+   with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES(INCLUDING,
+BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+"""
 
 import os
 import re
@@ -34,14 +62,15 @@ def disk_query():
 
 
 def zfs_disk_query():
-    disk_output = Popen(sysinstall + " disk-list", shell=True, stdin=PIPE, stdout=PIPE,
-    stderr=STDOUT, close_fds=True)
+    disk_output = Popen(sysinstall + " disk-list", shell=True, stdin=PIPE,
+                        stdout=PIPE, stderr=STDOUT, close_fds=True)
     return disk_output.stdout.readlines()
 
 
 def zfs_disk_size_query(disk):
-    disk_info_output = Popen(sysinstall + " disk-info " + disk, shell=True, stdin=PIPE, stdout=PIPE,
-    stderr=STDOUT, close_fds=True)
+    disk_info_output = Popen(sysinstall + " disk-info " + disk, shell=True,
+                             stdin=PIPE, stdout=PIPE, stderr=STDOUT,
+                             close_fds=True)
     return disk_info_output.stdout.readlines()[3].partition('=')[2]
 
 
@@ -175,8 +204,9 @@ class partition_repos():
         return scheme
 
     def mbr_partition_slice_list(self, disk):
-        partition_outpput = Popen('%s %s' % (query_partition, disk), shell=True,
-        stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
+        partition_outpput = Popen('%s %s' % (query_partition, disk),
+                                  shell=True, stdin=PIPE, stdout=PIPE,
+                                  stderr=STDOUT, close_fds=True)
         plist = []
         mplist = []
         dpsf = open(partitiondb + disk, 'wb')
@@ -204,18 +234,21 @@ class partition_repos():
                 letter = chr(alph)
                 alph = alph + 1
                 if info[0] == 'freespace':
-                    llist.extend(([info[0], info[1].partition('M')[0], '', '']))
+                    llist.extend(([info[0], info[1].partition('M')[0], '', ''])
+                                 )
                 else:
                     llist.extend((
-                    [pslice + letter, info[0].partition('M')[0], '', info[1]]))
+                                [pslice + letter, info[0].partition('M')[0],
+                                 '', info[1]]))
                 mllist.append(llist)
                 llist = []
             pickle.dump(mllist, plf)
             plf.close()
 
     def gpt_partition_list(self, disk):
-        partition_outpput = Popen('%s %s' % (query_partition, disk), shell=True,
-        stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
+        partition_outpput = Popen('%s %s' % (query_partition, disk),
+                                  shell=True, stdin=PIPE, stdout=PIPE,
+                                  stderr=STDOUT, close_fds=True)
         plist = []
         mplist = []
         psf = open(partitiondb + disk, 'wb')
@@ -262,7 +295,7 @@ class Delete_partition():
         ll = pickle.load(llist)
         last_num = len(ll) - 1
         lnum = path[2]
-        # See if partlable exist to delete partiton
+        # See if partlable exist to delete partition
         if os.path.exists(Part_label):
             p_file = open(Part_label, 'r')
             pf = p_file.readlines()
@@ -325,7 +358,7 @@ class Delete_partition():
             slf = sfile.readlines()[0].rstrip()
             if slf == 'all':
                 ptnum = snum - 1
-            else: 
+            else:
                 slnum = int(re.sub("[^0-9]", "", slf))
                 ptnum = snum - slnum
         if os.path.exists(Part_label):
@@ -339,57 +372,60 @@ class Delete_partition():
                 os.remove(Part_label)
             else:
                 pfile = open(Part_label, 'w')
-                pf.pop(ptnum)
+                pf.pop(snum)
                 for line in pf:
                     pfile.writelines('%s' % line)
                 pfile.close()
         if last_num == snum:
             free = int_size(sl[last_num][1])
-            if free == 1:
-                sl.remove(sl[snum])
+            # if free == 1:
+            #     sl.remove(sl[snum])
+            # else:
+            if snum != 0 and sl[snum - 1][0] == 'freespace':
+                free = free + int_size(sl[snum - 1][1])
+                sl[snum] = ['freespace', free, '', '']
+                sl.remove(sl[snum - 1])
             else:
-                if snum != 0 and sl[snum - 1][0] == 'freespace':
-                    free = free + int_size(sl[snum - 1][1])
-                    sl[snum] = ['freespace', free, '', '']
-                    sl.remove(sl[snum - 1])
-                else:
-                    sl[snum] = ['freespace', free, '', '']
+                sl[snum] = ['freespace', free, '', '']
         elif snum == 0:
             free = int_size(sl[snum][1])
-            if free == 1:
-                sl.remove(sl[snum])
+            # if free == 1:
+            #     print free
+            #     sl.remove(sl[snum])
+            # else:
+            if sl[snum + 1][0] == 'freespace':
+                free = free + int_size(sl[snum + 1][1])
+                sl.remove(sl[snum + 1])
+                sl[snum] = ['freespace', free, '', '']
             else:
-                if sl[snum + 1][0] == 'freespace':
-                    free = free + int_size(sl[snum + 1][1])
-                    sl.remove(sl[snum + 1])
-                    sl[snum] = ['freespace', free, '', '']
+                sl[snum] = ['freespace', free, '', '']
         else:
             free = int_size(sl[snum][1])
             if sl[snum + 1][0] == 'freespace' and sl[snum - 1][0] == 'freespace':
-                if free == 1:
-                    free = int_size(sl[snum + 1][1]) + int_size(sl[snum - 1][1])
-                    sl[snum] = ['freespace', free, '', '']
-                    sl.remove(sl[snum + 1])
-                    sl.remove(sl[snum - 1])
-                else:
-                    free = free + int_size(sl[snum + 1][1]) + int_size(sl[snum - 1][1])
-                    sl[snum] = ['freespace', free, '', '']
-                    sl.remove(sl[snum + 1])
-                    sl.remove(sl[snum - 1])
+                # if free == 1:
+                #     free = int_size(sl[snum + 1][1]) + int_size(sl[snum - 1][1])
+                #     sl[snum] = ['freespace', free, '', '']
+                #     sl.remove(sl[snum + 1])
+                #     sl.remove(sl[snum - 1])
+                # else:
+                free = free + int_size(sl[snum + 1][1]) + int_size(sl[snum - 1][1])
+                sl[snum] = ['freespace', free, '', '']
+                sl.remove(sl[snum + 1])
+                sl.remove(sl[snum - 1])
             elif sl[snum + 1][0] == 'freespace':
-                if free == 1:
-                    sl.remove(sl[snum])
-                else:
-                    free = free + int_size(sl[snum + 1][1])
-                    sl[snum] = ['freespace', free, '', '']
-                    sl.remove(sl[snum + 1])
+                # if free == 1:
+                #     sl.remove(sl[snum])
+                # else:
+                free = free + int_size(sl[snum + 1][1])
+                sl[snum] = ['freespace', free, '', '']
+                sl.remove(sl[snum + 1])
             elif snum != 0 and sl[snum - 1][0] == 'freespace':
-                if free == 1:
-                    sl.remove(sl[snum])
-                else:
-                    free = free + int_size(sl[snum - 1][1])
-                    sl[snum] = ['freespace', free, '', '']
-                    sl.remove(sl[snum - 1])
+                # if free == 1:
+                #     sl.remove(sl[snum])
+                # else:
+                free = free + int_size(sl[snum - 1][1])
+                sl[snum] = ['freespace', free, '', '']
+                sl.remove(sl[snum - 1])
             else:
                 sl[snum] = ['freespace', free, '', '']
         # Making delete file
@@ -687,7 +723,7 @@ class createLabel():
         if os.path.exists(Part_label):
             rfile = open(Part_label, 'r')
             readlinespl = rfile.readlines()
-            if lb == '/' and lv == 0 and " /\n" not in readlinespl[0]:  
+            if lb == '/' and lv == 0 and " /\n" not in readlinespl[0]:
                 newpl = ["%s %s %s\n" % (fs, cnumb, lb)] + readlinespl
             else:
                 newpl = readlinespl + ["%s %s %s\n" % (fs, cnumb, lb)]
@@ -702,7 +738,6 @@ class createLabel():
 
 
 class modifyLabel():
-
 
     def __init__(self, path, lnumb, cnumb, lb, fs, data):
         disk = disk_query()[path[0]][0]
@@ -820,8 +855,8 @@ class createPartition():
         plist = []
         pslice = '%sp%s' % (disk, pl)
         mplist = partition_query(disk)
-        if lnumb == 0:
-            cnumb -= 1
+        if lnumb == 0 and cnumb > 1:
+                cnumb -= 1
         pf = open(partitiondb + disk, 'wb')
         if fs == 'UFS' or fs == 'UFS+S' or fs == 'UFS+J' or fs == 'UFS+SUJ':
             plist.extend(([disk + 'p%s' % pl, cnumb, lb, 'freebsd-ufs']))
@@ -840,9 +875,28 @@ class createPartition():
             mplist.append(plist)
         pickle.dump(mplist, pf)
         pf.close()
-        pfile = open(Part_label, 'a')
-        pfile.writelines('%s %s %s\n' % (fs, cnumb, lb))
-        pfile.close()
+        if os.path.exists(Part_label):
+            rfile = open(Part_label, 'r')
+            readlinespl = rfile.readlines()
+            print readlinespl
+            if fs == "BOOT" or fs == 'BIOS' or fs == "UEFI":
+                if "BOOT" not in readlinespl[0] or 'BIOS' not in readlinespl[0] or "UEFI" not in readlinespl[0]:
+                    newpl = ["%s %s %s\n" % (fs, cnumb, lb)] + readlinespl
+                else:
+                    newpl = readlinespl + ["%s %s %s\n" % (fs, cnumb, lb)]
+            elif lb == '/' and len(readlinespl) == 2 and " /\n" not in readlinespl[1]:
+                newpl = [readlinespl[0]] + ["%s %s %s\n" % (fs, cnumb, lb)] + readlinespl[1:]
+            else:
+                newpl = readlinespl + ["%s %s %s\n" % (fs, cnumb, lb)]
+            print newpl
+            pfile = open(Part_label, 'w')
+            for line in newpl:
+                pfile.writelines(line)
+            pfile.close()
+        else:
+            pfile = open(Part_label, 'w')
+            pfile.writelines('%s %s %s\n' % (fs, cnumb, lb))
+            pfile.close()
         if data is True:
             plst = []
             mplst = []
@@ -852,6 +906,7 @@ class createPartition():
                 cf = open(tmp + 'create', 'wb')
                 pickle.dump(mplst, cf)
                 cf.close()
+
 
 
 class modifyPartition():
@@ -875,7 +930,7 @@ class modifyPartition():
         if not os.path.exists(dslice):
             slice_file = open(dslice, 'w')
             slice_file.writelines('p%s\n' % pl)
-            #slice_file.writelines('%s\n' % number)
+            # slice_file.writelines('%s\n' % number)
             slice_file.close()
         plist = []
         pslice = '%sp%s' % (disk, pl)
@@ -967,7 +1022,7 @@ class makingParttion():
                 if slicePartition(part) == 'p':
                     if bios_or_uefi() == 'UEFI':
                         cmd = 'gpart add -s 100M -t efi -i %s %s' % (sl, drive)
-                        cmd2 = 'newfs_msdos -F 16 %sp%s' % (drive, sl) 
+                        cmd2 = 'newfs_msdos -F 16 %sp%s' % (drive, sl)
                         call(cmd, shell=True)
                         call(cmd2, shell=True)
                     else:

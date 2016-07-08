@@ -1,11 +1,45 @@
-#!/usr/bin/env python
+#!/usr/local/bin/python
+"""
+Copyright (c) 2010-2013, GhostBSD. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+
+1. Redistribution's of source code must retain the above copyright
+   notice, this list of conditions and the following disclaimer.
+
+2. Redistribution's in binary form must reproduce the above
+   copyright notice,this list of conditions and the following
+   disclaimer in the documentation and/or other materials provided
+   with the distribution.
+
+3. Neither then name of GhostBSD Project nor the names of its
+   contributors maybe used to endorse or promote products derived
+   from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES(INCLUDING,
+BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+"""
+
 import gi
-gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, GObject
 import sys
+import os
+import shutil
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
 installer = "/usr/local/lib/gbi/"
 sys.path.append(installer)
-# sys.path.append("/home/ericbsd/gbi/src/")
 from language import Language
 from installType import Types
 from keyboard import Keyboard
@@ -15,12 +49,8 @@ from partition import Partitions
 from use_zfs import ZFS
 from root import RootUser
 from addUser import AddUser
-from install import installSlide, read_output, installProgress
-import threading
 from partition_handler import partition_repos
-import os
-import shutil
-
+from install import installProgress, installSlide
 logo = "/usr/local/lib/gbi/logo.png"
 tmp = "/tmp/.gbi/"
 if not os.path.exists(tmp):
@@ -31,43 +61,47 @@ disk_schem = '%sscheme' % tmp
 zfs_config = '%szfs_config' % tmp
 partitiondb = "%spartitiondb/" % tmp
 
-class MainWindow:
+
+class MainWindow():
+    """Main window class."""
 
     def delete(self, widget, event=None):
+        """Close the main window."""
         if os.path.exists('/tmp/.gbi'):
             shutil.rmtree('/tmp/.gbi')
         Gtk.main_quit()
         return False
 
     def next_page(self, widget, notebook):
+        """Go to the next window."""
         page = self.notebook.get_current_page()
         if page == 0:
             self.lang.save_selection()
-            Kbbox = Gtk.VBox(False, 0)
-            Kbbox.show()
+            kbbox = Gtk.VBox(False, 0)
+            kbbox.show()
             self.kb = Keyboard(self.button3)
             get_kb = self.kb.get_model()
-            Kbbox.pack_start(get_kb, True, True, 0)
+            kbbox.pack_start(get_kb, True, True, 0)
             label = Gtk.Label("Keyboard")
-            self.notebook.insert_page(Kbbox, label, 1)
+            self.notebook.insert_page(kbbox, label, 1)
             self.window.show_all()
             self.notebook.next_page()
             self.button1.set_sensitive(True)
             self.button3.set_sensitive(False)
         elif page == 1:
             self.kb.save_selection()
-            Tbbox = Gtk.VBox(False, 0)
-            Tbbox.show()
+            tbbox = Gtk.VBox(False, 0)
+            tbbox.show()
             self.tz = TimeZone(self.button3)
             get_tz = self.tz.get_model()
-            Tbbox.pack_start(get_tz, True, True, 0)
+            tbbox.pack_start(get_tz, True, True, 0)
             label = Gtk.Label("TimeZone")
-            self.notebook.insert_page(Tbbox, label, 2)
+            self.notebook.insert_page(tbbox, label, 2)
             self.window.show_all()
             self.notebook.next_page()
             self.button3.set_sensitive(False)
         elif page == 2:
-            self.tz.save_selection() 
+            self.tz.save_selection()
             typebox = Gtk.VBox(False, 0)
             typebox.show()
             self.types = Types()
@@ -78,19 +112,19 @@ class MainWindow:
             self.window.show_all()
             self.notebook.next_page()
         elif page == 3:
-            partition_repos()
             if self.types.get_type() == "disk":
-                Udbox = Gtk.VBox(False, 0)
-                Udbox.show()
+                udbox = Gtk.VBox(False, 0)
+                udbox.show()
                 self.partition = UFSDisk(self.button3)
-                get_UD = self.partition.get_model()
-                Udbox.pack_start(get_UD, True, True, 0)
+                get_ud = self.partition.get_model()
+                udbox.pack_start(get_ud, True, True, 0)
                 label = Gtk.Label("UFS Disk Configuration")
-                self.notebook.insert_page(Udbox, label, 4)
+                self.notebook.insert_page(udbox, label, 4)
                 self.window.show_all()
                 self.notebook.next_page()
                 self.button3.set_sensitive(False)
             elif self.types.get_type() == "custom":
+                partition_repos()
                 Pbox = Gtk.VBox(False, 0)
                 Pbox.show()
                 self.partition = Partitions(self.button3)
@@ -158,6 +192,7 @@ class MainWindow:
             self.window.show_all()
 
     def back_page(self, widget):
+        """Go back to the previous window."""
         current_page = self.notebook.get_current_page()
         if current_page == 1:
             self.button1.set_sensitive(False)
@@ -187,6 +222,7 @@ class MainWindow:
         self.button3.set_sensitive(True)
 
     def __init__(self):
+        """Were the Main window start."""
         self.window = Gtk.Window()
         self.window.connect("delete_event", self.delete)
         self.window.set_border_width(0)

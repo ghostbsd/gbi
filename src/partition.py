@@ -1,35 +1,32 @@
 #!/usr/local/bin/python
-#
-# Copyright (c) 2009-2012, GhostBSD. All rights reserved.
-#
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions
-# are met:
-#
-# 1. Redistribution's of source code must retain the above copyright
-#    notice, this list of conditions and the following disclaimer.
-#
-# 2. Redistribution's in binary form must reproduce the above
-#    copyright notice,this list of conditions and the following
-#    disclaimer in the documentation and/or other materials provided
-#    with the distribution.
-#
-# 3. Neither then name of GhostBSD Project nor the names of its
-#    contributors maybe used to endorse or promote products derived
-#    from this software without specific prior written permission.
-#
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-# FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-# COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES(INCLUDING,
-# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-# POSSIBILITY OF SUCH DAMAGE.
+"""
+Copyright (c) 2010-2013, GhostBSD. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+
+1. Redistribution's of source code must retain the above copyright
+   notice, this list of conditions and the following disclaimer.
+
+2. Redistribution's in binary form must reproduce the above
+   copyright notice,this list of conditions and the following
+   disclaimer in the documentation and/or other materials provided
+   with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES(INCLUDING,
+BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+"""
 #
 # partition.py v 1.3 Friday, January 17 2014 Eric Turgeon
 #
@@ -421,18 +418,24 @@ class Partitions():
             tree_iter = model.get_iter(self.path)
             self.slice = model.get_value(tree_iter, 0)
             self.size = model.get_value(tree_iter, 1)
-            if len(self.path) == 2 and  self.path[1] > 0 and self.scheme == "MBR":
+            if len(self.path) == 2 and self.path[1] > 0 and self.scheme == "MBR":
                 pathbehind = str(self.path[0]) + ":" + str(int(self.path[1] - 1))
                 tree_iter2 = model.get_iter(pathbehind)
                 self.slicebehind = model.get_value(tree_iter2, 0)
                 sl = int(self.path[1]) + 1
-                slbehind = int(self.slicebehind.partition('s')[2])
+                if 'freespace' in self.slicebehind:
+                    slbehind = self.path[1]
+                else:
+                    slbehind = int(self.slicebehind.partition('s')[2])
             elif len(self.path) == 2 and  self.path[1] > 0 and self.scheme == "GPT":
                 pathbehind = str(self.path[0]) + ":" + str(int(self.path[1] - 1))
                 tree_iter2 = model.get_iter(pathbehind)
                 self.slicebehind = model.get_value(tree_iter2, 0)
                 sl = int(self.path[1]) + 1
-                slbehind = int(self.slicebehind.partition('p')[2])
+                if 'freespace' in self.slicebehind:
+                    slbehind = self.path[1]
+                else:
+                    slbehind = int(self.slicebehind.partition('p')[2])
             else:
                 self.slicebehind = None
                 sl = 1
@@ -478,14 +481,17 @@ class Partitions():
             rschm = open(disk_schem, 'r')
             schm = rschm.readlines()[0]
             if 'GPT' in schm:
-                fs = part[1]
-                boot = part[0]
-                if 'BOOT' in boot or 'BIOS' in boot or 'UEFI' in boot:
-                    pass
-                else:
-                    self.button3.set_sensitive(False)
-                if '/' in fs:
-                    self.button3.set_sensitive(True)
+                if len(part) >= 2:
+                    fs = part[1]
+                    boot = part[0]
+                    if 'BOOT' in boot or 'BIOS' in boot or 'UEFI' in boot:
+                        pass
+                    else:
+                        self.button3.set_sensitive(False)
+                    if '/' in fs:
+                        self.button3.set_sensitive(True)
+                    else:
+                        self.button3.set_sensitive(False)
                 else:
                     self.button3.set_sensitive(False)
             else:
@@ -590,6 +596,6 @@ class Partitions():
         return self.store
 
     def get_model(self):
-        self.tree_selection.select_path(0)   
+        self.tree_selection.select_path(0)
         return self.box1
 
