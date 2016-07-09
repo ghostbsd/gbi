@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Copyright (c) 2010-2013, GhostBSD. All rights reserved.
+Copyright (c) 2010-2016, GhostBSD. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions

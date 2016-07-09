@@ -488,7 +488,7 @@ class Partitions():
                         pass
                     else:
                         self.button3.set_sensitive(False)
-                    if '/' in fs:
+                    if '/\n' in fs:
                         self.button3.set_sensitive(True)
                     else:
                         self.button3.set_sensitive(False)
@@ -496,7 +496,7 @@ class Partitions():
                     self.button3.set_sensitive(False)
             else:
                 fs = part[0].split()[-1]
-                if '/' in fs:
+                if '/\n' in fs:
                     self.button3.set_sensitive(True)
                 else:
                     self.button3.set_sensitive(False)
