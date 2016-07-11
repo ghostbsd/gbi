@@ -291,24 +291,10 @@ class Delete_partition():
             return True
 
     def delete_label(self, part, spart, path):
-        llist = open(partitiondb + spart, 'r')
+        llist = open(partitiondb + spart, 'rb')
         ll = pickle.load(llist)
         last_num = len(ll) - 1
         lnum = path[2]
-        # See if partlable exist to delete partition
-        if os.path.exists(Part_label):
-            p_file = open(Part_label, 'r')
-            pf = p_file.readlines()
-            pnum = len(pf)
-            # Look if or more item.
-            if pnum == 1:
-                os.remove(Part_label)
-            else:
-                pfile = open(Part_label, 'w')
-                pf.pop(lnum)
-                for line in pf:
-                    pfile.writelines('%s' % line)
-                pfile.close()
         if last_num == lnum:
             free = int_size(ll[last_num][1])
             if lnum != 0 and ll[lnum - 1][0] == 'freespace':
@@ -338,6 +324,14 @@ class Delete_partition():
         pickle.dump(ll, savepl)
         savepl.close()
 
+        llist = open(partitiondb + spart, 'rb')
+        lablelist = pickle.load(llist)
+        pfile = open(Part_label, 'w')
+        for partlist in lablelist:
+            if partlist[2] != '':
+                pfile.writelines('%s %s %s\n' % (partlist[3], partlist[1], partlist [2]))
+        pfile.close()
+
     def __init__(self, part, path):
         if part == "freespace":
             pass
@@ -361,26 +355,8 @@ class Delete_partition():
             else:
                 slnum = int(re.sub("[^0-9]", "", slf))
                 ptnum = snum - slnum
-        if os.path.exists(Part_label):
-            p_file = open(Part_label, 'r')
-            pf = p_file.readlines()
-            pnum = len(pf)
-            # Look if one or more item.
-            if 's' in part:
-                os.remove(Part_label)
-            elif pnum == 1:
-                os.remove(Part_label)
-            else:
-                pfile = open(Part_label, 'w')
-                pf.pop(snum)
-                for line in pf:
-                    pfile.writelines('%s' % line)
-                pfile.close()
         if last_num == snum:
             free = int_size(sl[last_num][1])
-            # if free == 1:
-            #     sl.remove(sl[snum])
-            # else:
             if snum != 0 and sl[snum - 1][0] == 'freespace':
                 free = free + int_size(sl[snum - 1][1])
                 sl[snum] = ['freespace', free, '', '']
@@ -389,10 +365,6 @@ class Delete_partition():
                 sl[snum] = ['freespace', free, '', '']
         elif snum == 0:
             free = int_size(sl[snum][1])
-            # if free == 1:
-            #     print free
-            #     sl.remove(sl[snum])
-            # else:
             if sl[snum + 1][0] == 'freespace':
                 free = free + int_size(sl[snum + 1][1])
                 sl.remove(sl[snum + 1])
@@ -402,27 +374,15 @@ class Delete_partition():
         else:
             free = int_size(sl[snum][1])
             if sl[snum + 1][0] == 'freespace' and sl[snum - 1][0] == 'freespace':
-                # if free == 1:
-                #     free = int_size(sl[snum + 1][1]) + int_size(sl[snum - 1][1])
-                #     sl[snum] = ['freespace', free, '', '']
-                #     sl.remove(sl[snum + 1])
-                #     sl.remove(sl[snum - 1])
-                # else:
                 free = free + int_size(sl[snum + 1][1]) + int_size(sl[snum - 1][1])
                 sl[snum] = ['freespace', free, '', '']
                 sl.remove(sl[snum + 1])
                 sl.remove(sl[snum - 1])
             elif sl[snum + 1][0] == 'freespace':
-                # if free == 1:
-                #     sl.remove(sl[snum])
-                # else:
                 free = free + int_size(sl[snum + 1][1])
                 sl[snum] = ['freespace', free, '', '']
                 sl.remove(sl[snum + 1])
             elif snum != 0 and sl[snum - 1][0] == 'freespace':
-                # if free == 1:
-                #     sl.remove(sl[snum])
-                # else:
                 free = free + int_size(sl[snum - 1][1])
                 sl[snum] = ['freespace', free, '', '']
                 sl.remove(sl[snum - 1])
@@ -451,6 +411,12 @@ class Delete_partition():
         saveps = open(partitiondb + drive, 'w')
         pickle.dump(sl, saveps)
         saveps.close()
+        if "p" in part:
+            pfile = open(Part_label, 'w')
+            for partlist in partition_query(drive):
+                if partlist[2] != '':
+                    pfile.writelines('%s %s %s\n' % (partlist[3], partlist[1], partlist[2]))
+            pfile.close()
 
 
 class autoDiskPartition():
@@ -483,17 +449,17 @@ class autoDiskPartition():
         slice_file.writelines('%s\n' % number)
         slice_file.close()
         ram = Popen(memory, shell=True, stdin=PIPE, stdout=PIPE,
-        stderr=STDOUT, close_fds=True)
+                    stderr=STDOUT, close_fds=True)
         mem = ram.stdout.read()
         swap = int(mem.partition(':')[2].strip()) / (1024 * 1024)
         rootNum = number - swap
         llist = []
         mllist = []
         plf = open(partitiondb + disk + 's1', 'wb')
-        llist.extend(([disk + 's1a', rootNum, '/', 'freebsd-ufs']))
+        llist.extend(([disk + 's1a', rootNum, '/', 'UFS+SUJ']))
         mllist.append(llist)
         llist = []
-        llist.extend(([disk + 's1b', swap, 'none', 'freebsd-swap']))
+        llist.extend(([disk + 's1b', swap, 'none', 'SWAP']))
         mllist.append(llist)
         pickle.dump(mllist, plf)
         plf.close()
@@ -539,17 +505,17 @@ class autoDiskPartition():
         line = read.readlines()
         boot = line[0].strip()
         if bios_or_uefi() == "UEFI":
-            plist.extend(([disk + 'p1', bnum, 'none', 'efi']))
+            plist.extend(([disk + 'p1', bnum, 'none', 'UEFI']))
         elif boot == "GRUB":
-            plist.extend(([disk + 'p1', bnum, 'none', 'bios-boot']))
+            plist.extend(([disk + 'p1', bnum, 'none', 'BIOS']))
         else:
-            plist.extend(([disk + 'p1', bnum, 'none', 'freebsd-boot']))
+            plist.extend(([disk + 'p1', bnum, 'none', 'BOOT']))
         mplist.append(plist)
         plist = []
-        plist.extend(([disk + 'p2', rnum, '/', 'freebsd-ufs']))
+        plist.extend(([disk + 'p2', rnum, '/', 'UFS+SUJ']))
         mplist.append(plist)
         plist = []
-        plist.extend(([disk + 'p3', swap, 'none', 'freebsd-swap']))
+        plist.extend(([disk + 'p3', swap, 'none', 'SWAP']))
         mplist.append(plist)
         pickle.dump(mplist, plf)
         plf.close()
@@ -594,10 +560,10 @@ class autoFreeSpace():
         llist = []
         mllist = []
         plf = open(partitiondb + disk + 's%s' % sl, 'wb')
-        llist.extend(([disk + 's%sa' % sl, rootNum, '/', 'freebsd-ufs']))
+        llist.extend(([disk + 's%sa' % sl, rootNum, '/', 'UFS+SUJ']))
         mllist.append(llist)
         llist = []
-        llist.extend(([disk + 's%sb' % sl, swap, 'none', 'freebsd-swap']))
+        llist.extend(([disk + 's%sb' % sl, swap, 'none', 'SWAP']))
         mllist.append(llist)
         pickle.dump(mllist, plf)
         plf.close()
@@ -651,25 +617,33 @@ class autoFreeSpace():
         plist = []
         mplist = partition_query(disk)
         plf = open(partitiondb + disk, 'wb')
+        read = open(boot_file, 'r')
+        line = read.readlines()
+        boot = line[0].strip()
         if bios_or_uefi() == "UEFI":
-            plist.extend(([disk + 'p%s' % sl, bs, 'none', 'efi']))
+            plist.extend(([disk + 'p%s' % sl, bs, 'none', 'UEFI']))
         elif boot == "GRUB":
-            plist.extend(([disk + 'p%s' % sl, bs, 'none', 'bios-boot']))
+            plist.extend(([disk + 'p%s' % sl, bs, 'none', 'BIOS']))
         else:
-            plist.extend(([disk + 'p%s' % sl, bs, 'none', 'freebsd-boot']))
+            plist.extend(([disk + 'p%s' % sl, bs, 'none', 'BOOT']))
         mplist[path] = plist
         plist = []
         plist.extend((
-        [disk + 'p%s' % int(sl + 1), rootNum, '/', 'freebsd-ufs']))
+        [disk + 'p%s' % int(sl + 1), rootNum, '/', 'UFS+SUJ']))
         mplist.append(plist)
         plist = []
         plist.extend((
-        [disk + 'p%s' % int(sl + 2), swap, 'none', 'freebsd-swap']))
+        [disk + 'p%s' % int(sl + 2), swap, 'none', 'SWAP']))
         mplist.append(plist)
         pickle.dump(mplist, plf)
         plf.close()
         pfile = open(Part_label, 'w')
-        pfile.writelines('BOOT %s /\n' % bs)
+        if bios_or_uefi() == "UEFI":
+            pfile.writelines('UEFI %s none\n' % bs)
+        elif boot == "GRUB":
+            pfile.writelines('BIOS %s none\n' % bs)
+        else:
+            pfile.writelines('BOOT %s none\n' % bs)
         pfile.writelines('UFS+SUJ %s /\n' % rootNum)
         pfile.writelines('SWAP %s none\n' % int(swap - 1))
         pfile.close()
@@ -707,12 +681,7 @@ class createLabel():
         plf = open(partitiondb + disk + 's%s' % sl, 'wb')
         if lnumb == 0:
             cnumb -= 1
-        if fs == 'UFS' or fs == 'UFS+S' or fs == 'UFS+J' or fs == 'UFS+SUJ':
-            llist.extend((
-            [disk + 's%s' % sl + letter, cnumb, lb, 'freebsd-ufs']))
-        elif fs == 'SWAP':
-            llist.extend((
-            [disk + 's%s' % sl + letter, cnumb, lb, 'freebsd-swap']))
+        llist.extend(([disk + 's%s' % sl + letter, cnumb, lb, fs]))
         mllist[lv] = llist
         llist = []
         if lnumb > 0:
@@ -720,21 +689,13 @@ class createLabel():
             mllist.append(llist)
         pickle.dump(mllist, plf)
         plf.close()
-        if os.path.exists(Part_label):
-            rfile = open(Part_label, 'r')
-            readlinespl = rfile.readlines()
-            if lb == '/' and lv == 0 and " /\n" not in readlinespl[0]:
-                newpl = ["%s %s %s\n" % (fs, cnumb, lb)] + readlinespl
-            else:
-                newpl = readlinespl + ["%s %s %s\n" % (fs, cnumb, lb)]
-            pfile = open(Part_label, 'w')
-            for line in newpl:
-                pfile.writelines(line)
-            pfile.close()
-        else:
-            pfile = open(Part_label, 'w')
-            pfile.writelines('%s %s %s\n' % (fs, cnumb, lb))
-            pfile.close()
+        llist = open(partitiondb + disk + 's%s' % sl, 'rb')
+        labellist = pickle.load(llist)
+        pfile = open(Part_label, 'w')
+        for partlist in labellist:
+            if partlist[2] != '':
+                pfile.writelines('%s %s %s\n' % (partlist[3], partlist[1], partlist[2]))
+        pfile.close()
 
 
 class modifyLabel():
@@ -761,13 +722,7 @@ class modifyLabel():
         plf = open(partitiondb + disk + 's%s' % sl, 'wb')
         if lnumb == 0:
             cnumb -= 1
-        if fs == 'UFS' or fs == 'UFS+S' or fs == 'UFS+J' or fs == 'UFS+SUJ':
-            llist.extend((
-            [disk + 's%s' % sl + letter, cnumb, lb, 'freebsd-ufs']))
-        elif fs == 'SWAP':
-            llist.extend((
-            [disk + 's%s' % sl + letter, cnumb, lb, 'freebsd-swap']))
-        #elif == 'ZFS':
+        llist.extend(([disk + 's%s' % sl + letter, cnumb, lb, fs]))
         mllist[lv] = llist
         llist = []
         if lnumb > 0:
@@ -775,8 +730,12 @@ class modifyLabel():
             mllist.append(llist)
         pickle.dump(mllist, plf)
         plf.close()
-        pfile = open(Part_label, 'a')
-        pfile.writelines('%s %s %s\n' % (fs, cnumb, lb))
+        llist = open(partitiondb + disk + 's%s' % sl, 'rb')
+        labellist = pickle.load(llist)
+        pfile = open(Part_label, 'w')
+        for partlist in labellist:
+            if partlist[2] != '':
+                pfile.writelines('%s %s %s\n' % (partlist[3], partlist[1], partlist[2]))
         pfile.close()
 
 
@@ -858,16 +817,7 @@ class createPartition():
         if lnumb == 0 and cnumb > 1:
                 cnumb -= 1
         pf = open(partitiondb + disk, 'wb')
-        if fs == 'UFS' or fs == 'UFS+S' or fs == 'UFS+J' or fs == 'UFS+SUJ':
-            plist.extend(([disk + 'p%s' % pl, cnumb, lb, 'freebsd-ufs']))
-        elif fs == 'SWAP':
-            plist.extend(([disk + 'p%s' % pl, cnumb, lb, 'freebsd-swap']))
-        elif fs == 'BOOT':
-            plist.extend(([disk + 'p%s' % pl, cnumb, lb, 'freebsd-boot']))
-        elif fs == 'BIOS':
-            plist.extend(([disk + 'p%s' % pl, cnumb, lb, 'bios-boot']))
-        elif fs == 'UEFI':
-            plist.extend(([disk + 'p%s' % pl, cnumb, lb, 'efi']))
+        plist.extend(([disk + 'p%s' % pl, cnumb, lb, fs]))
         mplist[lv] = plist
         plist = []
         if lnumb > 0:
@@ -875,26 +825,11 @@ class createPartition():
             mplist.append(plist)
         pickle.dump(mplist, pf)
         pf.close()
-        if os.path.exists(Part_label):
-            rfile = open(Part_label, 'r')
-            readlinespl = rfile.readlines()
-            if fs == "BOOT" or fs == 'BIOS' or fs == "UEFI":
-                if "BOOT" not in readlinespl[0] or 'BIOS' not in readlinespl[0] or "UEFI" not in readlinespl[0]:
-                    newpl = ["%s %s %s\n" % (fs, cnumb, lb)] + readlinespl
-                else:
-                    newpl = readlinespl + ["%s %s %s\n" % (fs, cnumb, lb)]
-            elif lb == '/' and len(readlinespl) == 2 and " /\n" not in readlinespl[1]:
-                newpl = [readlinespl[0]] + ["%s %s %s\n" % (fs, cnumb, lb)] + readlinespl[1:]
-            else:
-                newpl = readlinespl + ["%s %s %s\n" % (fs, cnumb, lb)]
-            pfile = open(Part_label, 'w')
-            for line in newpl:
-                pfile.writelines(line)
-            pfile.close()
-        else:
-            pfile = open(Part_label, 'w')
-            pfile.writelines('%s %s %s\n' % (fs, cnumb, lb))
-            pfile.close()
+        pfile = open(Part_label, 'w')
+        for partlist in partition_query(disk):
+            if partlist[2] != '':
+                pfile.writelines('%s %s %s\n' % (partlist[3], partlist[1], partlist[2]))
+        pfile.close()
         if data is True:
             plst = []
             mplst = []
@@ -904,7 +839,6 @@ class createPartition():
                 cf = open(tmp + 'create', 'wb')
                 pickle.dump(mplst, cf)
                 cf.close()
-
 
 
 class modifyPartition():
@@ -936,12 +870,7 @@ class modifyPartition():
         if lnumb == 0:
             cnumb -= 1
         pf = open(partitiondb + disk, 'wb')
-        if fs == 'UFS' or fs == 'UFS+S' or fs == 'UFS+J' or fs == 'UFS+SUJ':
-            plist.extend(([disk + 'p%s' % pl, cnumb, lb, 'freebsd-ufs']))
-        elif fs == 'SWAP':
-            plist.extend(([disk + 'p%s' % pl, cnumb, lb, 'freebsd-swap']))
-        elif fs == 'BOOT':
-            plist.extend(([disk + 'p%s' % pl, cnumb, lb, 'freebsd-boot']))
+        plist.extend(([disk + 'p%s' % pl, cnumb, lb, fs]))
         mplist[lv] = plist
         plist = []
         if lnumb > 0:
@@ -949,8 +878,10 @@ class modifyPartition():
             mplist.append(plist)
         pickle.dump(mplist, pf)
         pf.close()
-        pfile = open(Part_label, 'a')
-        pfile.writelines('%s %s %s\n' % (fs, cnumb, lb))
+        pfile = open(Part_label, 'w')
+        for partlist in partition_query(disk):
+            if partlist[2] != '':
+                pfile.writelines('%s %s %s\n' % (partlist[3], partlist[1], partlist[2]))
         pfile.close()
         if data is True:
             plst = []
@@ -964,7 +895,6 @@ class modifyPartition():
 
 
 class rDeleteParttion():
-
     def __init__(self):
         if os.path.exists(tmp + 'delete'):
             df = open(tmp + 'delete', 'rb')

@@ -376,6 +376,7 @@ class Partitions():
             pass
         else:
             pass
+        self.update()
 
     def revertChange(self, widget):
         if os.path.exists(partitiondb):
@@ -477,31 +478,50 @@ class Partitions():
         if os.path.exists(Part_label):
             rd = open(Part_label, 'r')
             part = rd.readlines()
-            # Find GPT scheme.
-            rschm = open(disk_schem, 'r')
-            schm = rschm.readlines()[0]
-            if 'GPT' in schm:
-                if len(part) >= 2:
-                    fs = part[1]
-                    boot = part[0]
-                    if 'BOOT' in boot or 'BIOS' in boot or 'UEFI' in boot:
-                        pass
-                    else:
-                        self.button3.set_sensitive(False)
-                    if '/\n' in fs:
-                        self.button3.set_sensitive(True)
+            #print part
+            # If Find GPT scheme.
+            if os.path.exists(disk_schem):
+                rschm = open(disk_schem, 'r')
+                schm = rschm.readlines()[0]
+                if 'GPT' in schm:
+                    if len(part) >= 2:
+                        if 'BOOT' in part[0] or 'BIOS' in part[0] or 'UEFI' in part[0]:
+                            if "/boot\n" in part[1]:
+                                if len(part) >= 3:
+                                    if '/\n' in part[1]:
+                                        self.button3.set_sensitive(True)
+                                    else:
+                                        self.button3.set_sensitive(False)
+                                else:
+                                    self.button3.set_sensitive(False)
+                            elif '/\n' in part[1]:
+                                self.button3.set_sensitive(True)
+                            else:
+                                self.button3.set_sensitive(False)
+                        else:
+                            self.button3.set_sensitive(False)
                     else:
                         self.button3.set_sensitive(False)
                 else:
-                    self.button3.set_sensitive(False)
+                    if len(part) >= 1:
+                        if "/boot\n" in part[0] or '/\n' in part[0]:
+                            if len(part) >= 2:
+                                if '/\n' in part[1]:
+                                    self.button3.set_sensitive(True)
+                                else:
+                                    self.button3.set_sensitive(False)
+                            else:
+                                self.button3.set_sensitive(False)
+                        elif '/\n' in part[0]:
+                            self.button3.set_sensitive(True)
+                        else:
+                            self.button3.set_sensitive(False)
+                    else:
+                        self.button3.set_sensitive(False)
             else:
-                fs = part[0].split()[-1]
-                if '/\n' in fs:
-                    self.button3.set_sensitive(True)
-                else:
-                    self.button3.set_sensitive(False)
+                self.button3.set_sensitive(False)
         else:
-            self.button3.set_sensitive(False)
+                self.button3.set_sensitive(False)
 
     def __init__(self, button3):
         self.button3 = button3
