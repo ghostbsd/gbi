@@ -504,7 +504,7 @@ class Partitions():
                         self.button3.set_sensitive(False)
                 else:
                     if len(part) >= 1:
-                        if "/boot\n" in part[0] or '/\n' in part[0]:
+                        if "/boot\n" in part[0]:
                             if len(part) >= 2:
                                 if '/\n' in part[1]:
                                     self.button3.set_sensitive(True)
