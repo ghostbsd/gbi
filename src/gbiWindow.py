@@ -113,6 +113,7 @@ class MainWindow():
             self.notebook.next_page()
         elif page == 3:
             if self.types.get_type() == "disk":
+                partition_repos()
                 udbox = Gtk.VBox(False, 0)
                 udbox.show()
                 self.partition = UFSDisk(self.button3)
