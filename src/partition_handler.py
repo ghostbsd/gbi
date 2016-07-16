@@ -32,6 +32,7 @@ import os
 import re
 from subprocess import Popen, PIPE, STDOUT, call
 import pickle
+from time import sleep
 
 tmp = "/tmp/.gbi/"
 if not os.path.exists(tmp):
@@ -904,6 +905,7 @@ class rDeleteParttion():
                 num = sliceNum(part)
                 hd = rpartslice(part)
                 call('gpart delete -i %s %s' % (num, hd), shell=True)
+                sleep(2)
 
 
 class destroyParttion():
@@ -915,8 +917,10 @@ class destroyParttion():
                 drive = line[0]
                 call('gpart destroy -F %s' % drive, shell=True)
                 scheme = line[1]
-                call('gpart create -s %s %s' % (scheme.lower(),
+                sleep(2)
+                call('gpart create -s %s %s' % (scheme,
                  drive), shell=True)
+                sleep(2)
 
 
 def bios_or_uefi():
@@ -950,6 +954,7 @@ class makingParttion():
                 if slicePartition(part) == 'p':
                     if bios_or_uefi() == 'UEFI':
                         cmd = 'gpart add -s 100M -t efi -i %s %s' % (sl, drive)
+                        sleep(2)
                         cmd2 = 'newfs_msdos -F 16 %sp%s' % (drive, sl)
                         call(cmd, shell=True)
                         call(cmd2, shell=True)
@@ -964,3 +969,4 @@ class makingParttion():
                     block = int(size * 2048)
                     cmd = 'gpart add -a 4k -s %s -t freebsd -i %s %s' % (block, sl, drive)
                     call(cmd, shell=True)
+                sleep(2)

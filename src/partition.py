@@ -478,7 +478,7 @@ class Partitions():
         if os.path.exists(Part_label):
             rd = open(Part_label, 'r')
             part = rd.readlines()
-            #print part
+            readpart = open(Part_label, 'r').read()
             # If Find GPT scheme.
             if os.path.exists(disk_schem):
                 rschm = open(disk_schem, 'r')
@@ -486,18 +486,18 @@ class Partitions():
                 if 'GPT' in schm:
                     if len(part) >= 2:
                         if 'BOOT' in part[0] or 'BIOS' in part[0] or 'UEFI' in part[0]:
-                            if "/boot\n" in part[1]:
-                                if len(part) >= 3:
-                                    if '/\n' in part[1]:
-                                        self.button3.set_sensitive(True)
+                                if "/boot\n" in part[1]:
+                                    if len(part) >= 3:
+                                        if '/\n' in part[1]:
+                                            self.button3.set_sensitive(True)
+                                        else:
+                                            self.button3.set_sensitive(False)
                                     else:
                                         self.button3.set_sensitive(False)
+                                elif '/\n' in part[1]:
+                                    self.button3.set_sensitive(True)
                                 else:
                                     self.button3.set_sensitive(False)
-                            elif '/\n' in part[1]:
-                                self.button3.set_sensitive(True)
-                            else:
-                                self.button3.set_sensitive(False)
                         else:
                             self.button3.set_sensitive(False)
                     else:

@@ -16,7 +16,7 @@ import os
 from subprocess import Popen, PIPE, STDOUT, call
 from time import sleep
 from partition_handler import rDeleteParttion, destroyParttion, makingParttion
-from create_cfg import gbsd_cfg 
+from create_cfg import gbsd_cfg
 from create_cfg import dbsd_cfg
 from slides import gbsdSlides
 from slides import dbsdSlides
@@ -35,22 +35,22 @@ logo = "/usr/local/lib/gbi/logo.png"
 def update_progess(probar, bartext):
     new_val = probar.get_fraction() + 0.000003
     probar.set_fraction(new_val)
-    probar.set_text("Copying system to drive")
+    probar.set_text(bartext)
 
 
 def read_output(command, probar):
     call('service hald stop', shell=True)
     GLib.idle_add(update_progess, probar, "Creating pcinstall.cfg")
+
     # If rc.conf.ghostbsd exists run gbsd_cfg
     if os.path.exists(rcconfgbsd):
         gbsd_cfg()
         call('umount /media/GhostBSD', shell=True)
-        sleep (1)
     # If rc.conf.desktopbsd exists run dbsd_cfg
     elif os.path.exists(rcconfdbsd):
         dbsd_cfg()
         call('umount /media/DESKTOPBSD', shell=True)
-        sleep (1)
+    sleep (2)
     if os.path.exists(tmp + 'delete'):
         GLib.idle_add(update_progess, probar, "Deleting partition")
         rDeleteParttion()
@@ -77,7 +77,7 @@ def read_output(command, probar):
         # filer = open("/tmp/.gbi/tmp", "a")
         # filer.writelines(bartext)
         # filer.close
-        # print(bartext)
+        print(bartext)
     call('service hald start', shell=True)
     if bartext.rstrip() == "Installation finished!":
         Popen('python %send.py' % gbi_path, shell=True, close_fds=True)
