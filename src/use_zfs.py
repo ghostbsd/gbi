@@ -96,13 +96,13 @@ class ZFS():
         SWAP = int(self.swap_entry.get_text())
         ZFS_NUM = SIZE - SWAP
         if self.disk_encript is True:
-            dgeli = '.eli '
+            dgeli = '.eli'
         else:
-            dgeli = ' '
+            dgeli = ''
         if self.swap_encrypt is True:
-            sgeli = '.eli '
+            sgeli = '.eli'
         else:
-            sgeli = ' '
+            sgeli = ''
         pfile = open(Part_label, 'w')
         if self.zpool is True:
             pfile.writelines("zpoolName=%s\n" % self.pool.get_text())
@@ -122,8 +122,10 @@ class ZFS():
             ZFS_disk = zfs_dsk_list
             disk_len = len(ZFS_disk) - 1
             num = 1
+            mirror_dsk = ''
             while disk_len != 0:
-                mirror_dsk = ' ' + ZFS_disk[num].partition('-')[0].rstrip()
+                mirror_dsk += ' ' + ZFS_disk[num].partition('-')[0].rstrip()
+                print mirror_dsk
                 num += 1
                 disk_len -= 1
             pool_type = ' (%s:%s)\n' % (self.mirror, mirror_dsk)
@@ -136,7 +138,9 @@ class ZFS():
             ZFS_NUM = ZFS_NUM - 1
         else:
             ZFS_NUM = ZFS_NUM - 1
-        pfile.writelines('disk0-part=ZFS%s%s /, /usr, /var%s' % (dgeli, ZFS_NUM, pool_type))
+        zfsPart = 'disk0-part=ZFS%s %s /(compress=lz4|atime=off),/usr(canmount=off|mountpoint=none),/var(canmount=off|atime=on|mountpoint=none)%s' % (dgeli, ZFS_NUM, pool_type)
+        pfile.writelines(zfsPart)
+        print zfsPart
         if SWAP != 0:
             pfile.writelines('disk0-part=SWAP%s%s none\n' % (sgeli, SWAP))
         if self.disk_encript is True:
@@ -501,6 +505,7 @@ class ZFS():
                     self.button3.set_sensitive(True)
                 else:
                     self.button3.set_sensitive(False)
+        print zfs_dsk_list
         return
 
     def passwdstrength(self, widget):
