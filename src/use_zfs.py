@@ -142,7 +142,7 @@ class ZFS():
         pfile.writelines(zfsPart)
         print zfsPart
         if SWAP != 0:
-            pfile.writelines('disk0-part=SWAP%s%s none\n' % (sgeli, SWAP))
+            pfile.writelines('disk0-part=SWAP%s %s none\n' % (sgeli, SWAP))
         if self.disk_encript is True:
             pfile.writelines('encpass=%s\n' % self.password.get_text())
         else:
