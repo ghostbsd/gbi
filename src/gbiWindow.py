@@ -32,10 +32,10 @@ ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 """
 
-import gi
 import sys
 import os
 import shutil
+import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 installer = "/usr/local/lib/gbi/"

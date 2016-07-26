@@ -31,7 +31,8 @@ POSSIBILITY OF SUCH DAMAGE.
 # partition.py v 1.3 Friday, January 17 2014 Eric Turgeon
 #
 # auto_partition.py create and delete partition slice for GhostBSD installer
-
+import gi
+gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GObject
 import os
 import shutil
@@ -127,7 +128,6 @@ class Partitions():
         label1 = Gtk.Label("Type:")
         label2 = Gtk.Label("Size(MB):")
         label3 = Gtk.Label("Mount point:")
-        self.fs = 'UFS+SUJ'
         self.fstype = Gtk.ComboBoxText()
         self.fstype.append_text('UFS')
         self.fstype.append_text('UFS+S')
@@ -140,11 +140,23 @@ class Partitions():
             boot = line[0].strip()
             if bios_or_uefi() == "UEFI":
                 self.fstype.append_text("UEFI")
-            elif boot == "GRUB":
+                self.fs = "UEFI"
+            elif boot == "grub":
                 self.fstype.append_text("BIOS")
+                self.fs = "BIOS"
             else:
-                self.fstype.append_text('BOOT')
-        self.fstype.set_active(3)
+                self.fstype.append_text("BOOT")
+                self.fs = "BOOT"
+        if data1 == 1 and not os.path.exists(Part_label):
+            self.fstype.set_active(5)
+        elif data1 == 1 and len(self.partfile) == 0:
+            self.fstype.set_active(5)
+        elif self.lablebehind == "/":
+            self.fstype.set_active(4)
+            self.fs = "SWAP"
+        else:
+            self.fstype.set_active(3)
+            self.fs = "UFS+SUJ"
         self.fstype.connect("changed", self.on_fs)
         adj = Gtk.Adjustment(numb, 0, numb, 1, 100, 0)
         self.entry = Gtk.SpinButton(adjustment=adj)
@@ -158,7 +170,13 @@ class Partitions():
         self.mountpoint.append_text('none')
         # The space for root '/ ' is to recognise / from the file.
         self.mountpoint.append_text('/')
-        self.mountpoint.append_text('/boot')
+        if os.path.exists(Part_label):
+            if data1 == 1 and len(self.partfile) == 1:
+                self.mountpoint.append_text('/boot')
+            elif data1 == 0 and len(self.partfile) == 0:
+                self.mountpoint.append_text('/boot')
+        elif data1 == 0 and not os.path.exists(Part_label):
+            self.mountpoint.append_text('/boot')
         self.mountpoint.append_text('/etc')
         self.mountpoint.append_text('/root')
         self.mountpoint.append_text('/tmp')
@@ -432,15 +450,35 @@ class Partitions():
                 pathbehind = str(self.path[0]) + ":" + str(int(self.path[1] - 1))
                 tree_iter2 = model.get_iter(pathbehind)
                 self.slicebehind = model.get_value(tree_iter2, 0)
+                self.lablebehind = model.get_value(tree_iter2, 2)
                 sl = int(self.path[1]) + 1
                 if 'freespace' in self.slicebehind:
                     slbehind = self.path[1]
                 else:
                     slbehind = int(self.slicebehind.partition('p')[2])
+            elif len(self.path) == 3 and  self.path[2] > 0 and self.scheme == "MBR":
+                if self.path[1] > 0:
+                    pathbehind1 = str(self.path[0]) + ":" + str(int(self.path[1] - 1))
+                    tree_iter2 = model.get_iter(pathbehind1)
+                    self.slicebehind = model.get_value(tree_iter2, 0)
+                else:
+                    self.slicebehind = None
+                pathbehind2 = str(self.path[0]) + ":" + str(self.path[1]) + ":" + str(int(self.path[2] - 1))
+                tree_iter3 = model.get_iter(pathbehind2)
+                self.lablebehind = model.get_value(tree_iter3, 2)
+                sl = int(self.path[1]) + 1
+                if self.slicebehind is None:
+                    slbehind = self.path[1]
+                elif 'freespace' in self.slicebehind:
+                    slbehind = self.path[1]
+                else:
+                    slbehind = int(self.slicebehind.partition('s')[2])
             else:
                 self.slicebehind = None
+                self.lablebehind = None
                 sl = 1
                 slbehind = 0
+
             if 'freespace' in self.slice:
                 if self.path[1] > 3 and self.scheme == "MBR":
                     self.create_bt.set_sensitive(False)
@@ -477,24 +515,23 @@ class Partitions():
                     self.create_bt.set_sensitive(False)
         if os.path.exists(Part_label):
             rd = open(Part_label, 'r')
-            part = rd.readlines()
-            readpart = open(Part_label, 'r').read()
+            self.partfile = rd.readlines()
             # If Find GPT scheme.
             if os.path.exists(disk_schem):
                 rschm = open(disk_schem, 'r')
                 schm = rschm.readlines()[0]
                 if 'GPT' in schm:
-                    if len(part) >= 2:
-                        if 'BOOT' in part[0] or 'BIOS' in part[0] or 'UEFI' in part[0]:
-                                if "/boot\n" in part[1]:
-                                    if len(part) >= 3:
-                                        if '/\n' in part[1]:
+                    if len(self.partfile) >= 2:
+                        if 'BOOT' in self.partfile[0] or 'BIOS' in self.partfile[0] or 'UEFI' in self.partfile[0]:
+                                if "/boot\n" in self.partfile[1]:
+                                    if len(self.partfile) >= 3:
+                                        if '/\n' in self.partfile[1]:
                                             self.button3.set_sensitive(True)
                                         else:
                                             self.button3.set_sensitive(False)
                                     else:
                                         self.button3.set_sensitive(False)
-                                elif '/\n' in part[1]:
+                                elif '/\n' in self.partfile[1]:
                                     self.button3.set_sensitive(True)
                                 else:
                                     self.button3.set_sensitive(False)
@@ -503,16 +540,16 @@ class Partitions():
                     else:
                         self.button3.set_sensitive(False)
                 else:
-                    if len(part) >= 1:
-                        if "/boot\n" in part[0]:
-                            if len(part) >= 2:
-                                if '/\n' in part[1]:
+                    if len(self.partfile) >= 1:
+                        if "/boot\n" in self.partfile[0]:
+                            if len(self.partfile) >= 2:
+                                if '/\n' in self.partfile[1]:
                                     self.button3.set_sensitive(True)
                                 else:
                                     self.button3.set_sensitive(False)
                             else:
                                 self.button3.set_sensitive(False)
-                        elif '/\n' in part[0]:
+                        elif '/\n' in self.partfile[0]:
                             self.button3.set_sensitive(True)
                         else:
                             self.button3.set_sensitive(False)

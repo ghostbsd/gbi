@@ -239,7 +239,7 @@ class partition_repos():
                                  )
                 else:
                     llist.extend((
-                                [pslice + letter, info[0].partition('M')[0],
+                                 [pslice + letter, info[0].partition('M')[0],
                                  '', info[1]]))
                 mllist.append(llist)
                 llist = []

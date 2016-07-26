@@ -99,10 +99,6 @@ class ZFS():
             dgeli = '.eli'
         else:
             dgeli = ''
-        if self.swap_encrypt is True:
-            sgeli = '.eli'
-        else:
-            sgeli = ''
         pfile = open(Part_label, 'w')
         if self.zpool is True:
             pfile.writelines("zpoolName=%s\n" % self.pool.get_text())

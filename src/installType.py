@@ -7,7 +7,8 @@
 # type.py v 0.5 Thursday, Mar 28 2013 19:31:53 Eric Turgeon
 #
 # type.py create and delete partition slice for GhostBSD system.
-
+import gi
+gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 import os
 import os.path
@@ -55,7 +56,6 @@ class Types():
         box2 = Gtk.VBox(False, 10)
         # box2.set_border_width(10)
         self.box1.pack_start(box2, False, False, 0)
-
         box2.show()
         # auto partition or Customize Disk Partition.
         bbox = Gtk.VBox()
@@ -98,20 +98,20 @@ class Types():
         box3.pack_start(hbox, True, True, 0)
         bbox1 = Gtk.VBox()
         bbox1.show()
-        none = Gtk.RadioButton.new_with_label_from_widget(None, "Install only FreeBSD loader")
-        bbox1.pack_start(none, False, True, 10)
-        none.connect("toggled", self.boot_manager, "none")
-        none.show()
-        bsd = Gtk.RadioButton.new_with_label_from_widget(none, "Install FreeBSD boot manager + loader(MBR only)")
-        bbox1.pack_start(bsd, False, True, 10)
-        bsd.connect("toggled", self.boot_manager, "bsd")
-        bsd.show()
-        grub = Gtk.RadioButton.new_with_label_from_widget(bsd, "Install Grub2")
+        grub = Gtk.RadioButton.new_with_label_from_widget(None, "Install Grub2(ZFS needed)")
         bbox1.pack_start(grub, False, True, 10)
         grub.connect("toggled", self.boot_manager, "grub")
         grub.show()
+        bsd = Gtk.RadioButton.new_with_label_from_widget(grub, "Install FreeBSD boot manager + loader(MBR only)")
+        bbox1.pack_start(bsd, False, True, 10)
+        bsd.connect("toggled", self.boot_manager, "bsd")
+        bsd.show()
+        none = Gtk.RadioButton.new_with_label_from_widget(bsd, "Install only FreeBSD loader")
+        bbox1.pack_start(none, False, True, 10)
+        none.connect("toggled", self.boot_manager, "none")
+        none.show()
         hbox.pack_start(bbox1, False, False, 50)
-        self.boot = "none"
+        self.boot = "grub"
         boot = open(boot_file, 'w')
         boot.writelines(self.boot)
         boot.close()
