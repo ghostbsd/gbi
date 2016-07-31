@@ -136,9 +136,8 @@ class ZFS():
             ZFS_NUM = ZFS_NUM - 1
         zfsPart = 'disk0-part=ZFS%s %s /(compress=lz4|atime=off),/usr(canmount=off|mountpoint=none),/var(canmount=off|atime=on|mountpoint=none)%s' % (dgeli, ZFS_NUM, pool_type)
         pfile.writelines(zfsPart)
-        print zfsPart
         if SWAP != 0:
-            pfile.writelines('disk0-part=SWAP%s %s none\n' % (sgeli, SWAP))
+            pfile.writelines('disk0-part=SWAP%s %s none\n' % (dgeli, SWAP))
         if self.disk_encript is True:
             pfile.writelines('encpass=%s\n' % self.password.get_text())
         else:
