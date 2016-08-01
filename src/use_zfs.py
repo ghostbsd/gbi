@@ -382,6 +382,7 @@ class ZFS():
         self.disk_encript = False
         encrypt_check = Gtk.CheckButton("Encrypt Disk")
         encrypt_check.connect("toggled", self.on_check_encrypt)
+        encrypt_check.set_sensitive(False)
         # password
         self.passwd_label = Gtk.Label("Password")
         self.password = Gtk.Entry()
