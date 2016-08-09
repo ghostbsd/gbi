@@ -47,11 +47,10 @@ installer = "/usr/local/lib/gbi/"
 query = "sh /usr/local/lib/gbi/backend-query/"
 if not os.path.exists(tmp):
     os.makedirs(tmp)
-sysinstall = "sh /usr/local/lib/gbi/pc-sysinstall"
 logo = "/usr/local/lib/gbi/logo.png"
 language = "%slanguage/avail-langs" % installer
 langfile = '%slanguage' % tmp
-langcmd = 'pc-sysinstall query-langs'
+langcmd = '/usr/local/sbin/pc-sysinstall query-langs'
 langlist = Popen(langcmd, shell=True, stdin=PIPE, stdout=PIPE,
                  stderr=STDOUT, close_fds=True).stdout.readlines()
 # Text to be replace be multiple language file.
