@@ -9,7 +9,7 @@
 
 import os
 import pickle
-from subprocess import Popen
+from subprocess import Popen, PIPE
 
 # Directory use from the installer.
 tmp = "/tmp/.gbi/"
