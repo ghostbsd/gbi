@@ -14,7 +14,6 @@ from subprocess import Popen
 # Directory use from the installer.
 tmp = "/tmp/.gbi/"
 installer = "/usr/local/lib/gbi/"
-start_Install = 'python %sinstall.py' % installer
 # Installer data file.
 disk = '%sdisk' % tmp
 layout = '%slayout' % tmp
@@ -152,6 +151,14 @@ class gbsd_cfg():
         f.writelines('defaultGroup=wheel\n')
         f.writelines('userGroups=operator\n')
         f.writelines('commitUser\n')
+        ifvbox = open('/tmp/.ifvbox', 'w')
+        vbguest = Popen('pciconf -lv | grep ', shell=True,
+                        stdout=PIPE, close_fds=True)
+        if "VirtualBox Graphics" in vbguest.stdout.readlines():
+            ifvbox.writelines('True\n')
+        else:
+            ifvbox.writelines('False\n')
+        ifvbox.close()
         f.writelines('runScript=/usr/local/bin/iso_to_hd\n')
         if "af" == lang_output:
             f.writelines('runCommand=pkg install -y af-libreoffice\n')
@@ -271,7 +278,6 @@ class gbsd_cfg():
             f.writelines('runCommand=pkg install -y zu-libreoffice\n')
         f.close()
         os.remove(user_passwd)
-        Popen(start_Install, shell=True)
 
 class dbsd_cfg():
     def __init__(self):
@@ -512,4 +518,3 @@ class dbsd_cfg():
             f.writelines('runCommand=pkg install -y zu-libreoffice\n')
         f.close()
         os.remove(user_passwd)
-        Popen(start_Install, shell=True)
