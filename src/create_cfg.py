@@ -152,7 +152,7 @@ class gbsd_cfg():
         f.writelines('userGroups=operator\n')
         f.writelines('commitUser\n')
         ifvbox = open('/tmp/.ifvbox', 'w')
-        vbguest = Popen('pciconf -lv | grep ', shell=True,
+        vbguest = Popen('pciconf -lv | grep "VirtualBox Graphics"', shell=True,
                         stdout=PIPE, close_fds=True)
         if "VirtualBox Graphics" in vbguest.stdout.readlines():
             ifvbox.writelines('True\n')
