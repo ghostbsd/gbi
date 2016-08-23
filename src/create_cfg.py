@@ -154,7 +154,7 @@ class gbsd_cfg():
         ifvbox = open('/tmp/.ifvbox', 'w')
         vbguest = Popen('pciconf -lv | grep "VirtualBox Graphics"', shell=True,
                         stdout=PIPE, close_fds=True)
-        if "VirtualBox Graphics" in vbguest.stdout.readlines():
+        if "VirtualBox Graphics" in vbguest.stdout.read():
             ifvbox.writelines('True\n')
         else:
             ifvbox.writelines('False\n')
