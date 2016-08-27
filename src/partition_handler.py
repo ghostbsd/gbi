@@ -79,10 +79,18 @@ def how_partition(path):
     disk = disk_query()[path[0]][0]
     if os.path.exists(partitiondb + disk):
         part = partition_query(disk)
+        print part
         return len(part)
     else:
         return 0
 
+def first_is_free(path):
+    disk = disk_query()[path[0]][0]
+    if os.path.exists(partitiondb + disk):
+        part = partition_query(disk)
+        return part[0][0]
+    else:
+        return None
 
 def partition_query(disk):
     plist = open(partitiondb + disk, 'rb')

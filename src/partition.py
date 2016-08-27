@@ -38,7 +38,7 @@ import os
 import shutil
 from partition_handler import partition_repos, disk_query, Delete_partition
 from partition_handler import partition_query, label_query, bios_or_uefi
-from partition_handler import autoDiskPartition, autoFreeSpace
+from partition_handler import autoDiskPartition, autoFreeSpace, first_is_free
 from partition_handler import createLabel, scheme_query, how_partition
 from partition_handler import diskSchemeChanger, createSlice, createPartition
 
@@ -478,7 +478,6 @@ class Partitions():
                 self.lablebehind = None
                 sl = 1
                 slbehind = 0
-
             if 'freespace' in self.slice:
                 if self.path[1] > 3 and self.scheme == "MBR":
                     self.create_bt.set_sensitive(False)
@@ -507,7 +506,7 @@ class Partitions():
                 self.delete_bt.set_sensitive(False)
                 self.modifi_bt.set_sensitive(False)
                 self.auto_bt.set_sensitive(True)
-                if how_partition(self.path) == 1:
+                if how_partition(self.path) == 1 and first_is_free(self.path) == 'freespace':
                     self.create_bt.set_sensitive(True)
                 elif how_partition(self.path) == 0:
                     self.create_bt.set_sensitive(True)
