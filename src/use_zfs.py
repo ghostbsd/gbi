@@ -358,8 +358,8 @@ class ZFS():
         shemebox.set_active(0)
         # Force 4k Sectors
         self.zfs_four_k = "False"
-        check = Gtk.CheckButton("Force ZFS 4k block size")
-        check.connect("toggled", self.on_check)
+        zfs4kcheck = Gtk.CheckButton("Force ZFS 4k block size")
+        zfs4kcheck.connect("toggled", self.on_check)
         # Swap Size
         ram = Popen(memory, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT,
         close_fds=True)
@@ -413,7 +413,7 @@ class ZFS():
         grid.attach(sw, 1, 4, 8, 4)
         grid.attach(pool_check, 5, 9, 2, 1)
         grid.attach(self.pool, 7, 9, 2, 1)
-        # grid.attach(check, 1, 8, 3, 1)
+        grid.attach(zfs4kcheck, 1, 8, 3, 1)
         grid.attach(swp_size_label, 5, 11, 2, 1)
         grid.attach(self.swap_entry, 7, 11, 2, 1)
         #grid.attach(self.swap_encrypt_check, 9, 15, 11, 12)
