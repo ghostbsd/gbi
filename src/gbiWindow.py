@@ -44,7 +44,7 @@ from language import Language
 from installType import Types
 from keyboard import Keyboard
 from timezone import TimeZone
-from use_disk import UFSDisk
+from use_ufs import use_ufs
 from partition import Partitions
 from use_zfs import ZFS
 from root import RootUser
@@ -112,11 +112,11 @@ class MainWindow():
             self.window.show_all()
             self.notebook.next_page()
         elif page == 3:
-            if self.types.get_type() == "disk":
+            if self.types.get_type() == "ufs":
                 partition_repos()
                 udbox = Gtk.VBox(False, 0)
                 udbox.show()
-                self.partition = UFSDisk(self.button3)
+                self.partition = use_ufs(self.button3)
                 get_ud = self.partition.get_model()
                 udbox.pack_start(get_ud, True, True, 0)
                 label = Gtk.Label("UFS Disk Configuration")

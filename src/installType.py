@@ -7,6 +7,7 @@
 # type.py v 0.5 Thursday, Mar 28 2013 19:31:53 Eric Turgeon
 #
 # type.py create and delete partition slice for GhostBSD system.
+
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
@@ -65,21 +66,21 @@ class Types():
         # create a Hbox to center the radio button.
         hbox = Gtk.HBox()
         box2.pack_start(hbox, False, False, 10)
-        radio = Gtk.RadioButton.new_with_label_from_widget(None, "UFS full disk Configuration")
+        radio = Gtk.RadioButton.new_with_label_from_widget(None, "UFS Full Disk Configuration")
         bbox.pack_start(radio, False, True, 10)
-        radio.connect("toggled", self.partition, "disk")
-        self.ne = 'disk'
+        radio.connect("toggled", self.partition, "ufs")
+        self.ne = 'ufs'
         pass_file = open(signal, 'w')
         pass_file.writelines(self.ne)
         pass_file.close
         radio.show()
         # box2.pack_start(radio, True, True, 10)
-        radio = Gtk.RadioButton.new_with_label_from_widget(radio, "UFS Custom Configuration")
+        radio = Gtk.RadioButton.new_with_label_from_widget(radio, "UFS Custom Disk Configuration")
         bbox.pack_start(radio, False, True, 10)
         radio.connect("toggled", self.partition, "custom")
         radio.show()
         # box2.pack_start(radio, True, True, 10)
-        radio = Gtk.RadioButton.new_with_label_from_widget(radio, "ZFS Configuration")
+        radio = Gtk.RadioButton.new_with_label_from_widget(radio, "ZFS Full Disk Configuration")
         bbox.pack_start(radio, False, True, 10)
         radio.connect("toggled", self.partition, "zfs")
         radio.show()
@@ -98,7 +99,7 @@ class Types():
         box3.pack_start(hbox, True, True, 0)
         bbox1 = Gtk.VBox()
         bbox1.show()
-        grub = Gtk.RadioButton.new_with_label_from_widget(None, "Install Grub2(ZFS needed)")
+        grub = Gtk.RadioButton.new_with_label_from_widget(None, "Install Grub2(need by ZFS)")
         bbox1.pack_start(grub, False, True, 10)
         grub.connect("toggled", self.boot_manager, "grub")
         grub.show()
