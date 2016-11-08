@@ -92,9 +92,9 @@ def allCharacter(strg, search=re.compile(r'[^a-zA-Z0-9~\!@#\$%\^&\*_\+":;\'\-]')
 
 class use_ufs():
     def save_selection(self):
-        disk size = int(zfs_dsk_list[0].partition('-')[2].rstrip()) - 2
+        disk_size = int(zfs_dsk_list[0].partition('-')[2].rstrip()) - 2
         swap_size = int(self.swap_entry.get_text())
-        root_size = disk size - swap_size
+        root_size = disk_size - swap_size
         if self.disk_encript is True:
             dgeli = '.eli'
         else:
@@ -102,35 +102,23 @@ class use_ufs():
         pfile = open(Part_label, 'w')
         pfile.writelines('disk0=%s\n' % zfs_dsk_list[0].partition('-')[0].rstrip())
         if self.mirror is True:
-            mirror=ad1
-            mirrorbal=split
             ufs_disk = zfs_dsk_list
             disk_len = len(ufs_disk) - 1
             num = 1
             mirror_dsk = ''
             while disk_len != 0:
-                mirror_dsk += ' ' + ufs_disk[num].partition('-')[0].rstrip()
+                mirror_dsk += ufs_disk[num].partition('-')[0].rstrip() + " "
                 print mirror_dsk
                 num += 1
                 disk_len -= 1
-            pool_type = ' (%s:%s)\n' % (self.mirror, mirror_dsk)
-            pfile.writelines("mirror=%s\n" % self.pool.get_text())
-            pfile.writelines("mirrorlab=%s\n" % 
+            pfile.writelines("mirror=%s\n" % mirror_dsk)
+            pfile.writelines("mirrorlab=%s\n" % self.mirrorbl)
         else:
             pfile.writelines("#mirror=\n")
             pfile.writelines("#mirrorlab=\n")
         pfile.writelines('partition=ALL\n')
         pfile.writelines('partscheme=%s\n' % self.scheme)
         pfile.writelines('commitDiskPart\n\n')
-        ufs_disk = zfs_dsk_list
-        disk_len = len(ufs_disk) - 1
-        num = 1
-        mirror_dsk = ''
-        while disk_len != 0:
-            mirror_dsk += ' ' + ufs_disk[num].partition('-')[0].rstrip()
-            print mirror_dsk
-            num += 1
-            disk_len -= 1
         read = open(boot_file, 'r')
         line = read.readlines()
         boot = line[0].strip()
@@ -177,7 +165,7 @@ class use_ufs():
             else:
                 self.button3.set_sensitive(True)
         elif self.mirror is True:
-            self.mirrorTips.set_text("Please select at less 2 drive for mirroring")
+            self.mirrorTips.set_text("Please select 2 drive for mirroring")
             if len(zfs_dsk_list) > 1:
                 self.button3.set_sensitive(True)
             else:
@@ -224,7 +212,7 @@ class use_ufs():
         else:
             self.swap_mirror = False
 
-    def chosefs(self, widget):
+    def chosefs(self, combobox):
         model = combobox.get_model()
         index = combobox.get_active()
         data = model[index][0]

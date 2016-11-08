@@ -29,6 +29,7 @@ KBFile = '%skeyboard' % tmp
 boot_file = '%sboot' % tmp
 disk_schem = '%sscheme' % tmp
 zfs_config = '%szfs_config' % tmp
+ufs_config = tmp + 'ufs_config'
 
 
 class gbsd_cfg():
@@ -85,6 +86,19 @@ class gbsd_cfg():
                 else:
                     f.writelines(line)
             # os.remove(zfs_config)
+        if os.path.exists(ufs_config):
+            # Disk Setup
+            r = open(ufs_config, 'r')
+            ufsconf = r.readlines()
+            for line in ufsconf:
+                if 'partscheme' in line:
+                    f.writelines(line)
+                    read = open(boot_file, 'r')
+                    boot = read.readlines()[0].strip()
+                    f.writelines('bootManager=%s\n' % boot)
+                    os.remove(boot_file)
+                else:
+                    f.writelines(line)
         else:
             # Disk Setup
             r = open(disk, 'r')
