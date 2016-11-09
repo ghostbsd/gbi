@@ -35,7 +35,7 @@ logo = "/usr/local/lib/gbi/logo.png"
 def update_progess(probar, bartext):
     new_val = probar.get_fraction() + 0.000003
     probar.set_fraction(new_val)
-    probar.set_text(bartext[0:100])
+    probar.set_text(bartext[0:80])
 
 
 def read_output(command, probar):
@@ -71,7 +71,7 @@ def read_output(command, probar):
         line = p.stdout.readline()
         if not line:
             break
-        bartext = line
+        bartext = line.rstrip()
         GLib.idle_add(update_progess, probar, bartext)
         # Those for next 4 line is for debugin only.
         # filer = open("/tmp/.gbi/tmp", "a")
