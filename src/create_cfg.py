@@ -173,7 +173,8 @@ class gbsd_cfg():
         else:
             ifvbox.writelines('False\n')
         ifvbox.close()
-        f.writelines('runScript=/usr/local/bin/iso_to_hd\n')
+        f.writelines('runScript=/root/iso_to_hd.sh\n')
+        f.writelines('runCommand=rm -f /root/iso_to_hd.sh\n')
         if "af" == lang_output:
             f.writelines('runCommand=pkg install -y af-libreoffice\n')
         elif "ar" == lang_output:
