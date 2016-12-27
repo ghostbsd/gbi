@@ -1,0 +1,109 @@
+<div class="bs-callout bs-callout-primary">
+<p>GhostBSD is a project that is always seeking for support in an area as a monetary donation, project promotion and development of projects, we are grateful for all past contributions and seeing more active contributor. It is very easy to contribute! Contributing to the project depend only on your skills, your availability or/and your wealth. You can contribute where you would like to.</p>
+</div>
+<ul class="nav nav-tabs">
+  <li class="active"><a aria-expanded="true" href="#Financial" data-toggle="tab">Financial Contribution</a></li>
+  <li class=""><a aria-expanded="false" href="#Support" data-toggle="tab">Support Contribution</a></li>
+  <li class=""><a aria-expanded="false" href="#Promotion" data-toggle="tab">Promotion Contribution</a></li>
+  <li class=""><a aria-expanded="false" href="#Writing" data-toggle="tab">Writing Contribution</a></li>
+  <li class=""><a aria-expanded="false" href="#Development" data-toggle="tab">Development Contribution</a></li>
+</ul>
+<div id="myTabContent" class="tab-content">
+
+  <div class="tab-pane fade active in" id="Financial">
+    <div class="bs-callout bs-callout-primary">
+    <p>Incomes from AdSense and donations are use to help pay for web servers, project promotion, new hardware and equipment, and we hope one day donation will provide incomes for the developers and upstream project Development. GhostBSD is developed on free time, most of us have family, jobs and other projects, due to lack of time and money restrictions we are limited to what we can offer which it is why we need financial contribution.</p>
+    </div>
+    <div class="row">
+    <div class="col-lg-6">
+    <div class="well">
+    <h3>Donations</h3>
+    <p><strong><span lang="en-US"><span style="font-weight: normal;">You can help by making a financial contribution to the project. Donation will give the opportunity to help the future development of GhostBSD. GhostBSD is developed on free time. Most of us have family, jobs and other projects. Due to time and money restrictions we are limited to what we can offer which it is why we need financial Contribution. Donation are use to help pay for web servers, project promotion, new hardware and equipment, and we hope one day donation will provide incomes for the developers.</span></span></strong></p>
+    <p><a href="http://ghostbsd.org/donate"><span lang="en-US">Make a donation</span></a></p>
+    </div>
+    </div>
+    <div class="col-lg-6">
+    <div class="well">
+    <h3>Sponsorship</h3>
+    <p>Sponsorship is created when an individual, provides a monthly donation or one-time donation of $100 or more .&nbsp; The individual name, project or company will automatically be associated with the success of GhostBSD. We engage to display the Sponsor project company banner or logo placed in the sponsor page with a link to the website and randomly display sponsors on every page of the GhostBSD website. Our benefits from sponsors is a predictable source of constant income and it is the best form of financial support.</p>
+     <p><a class="western" href="http://ghostbsd.org/sponsor"><span lang="en-US">Become a sponsor</span></a></p>
+    </div>
+    </div>
+    </div>
+    <div class="well">
+    <a name="Partnership"></a><h3>Partnership</h3>
+    <p style="text-align: left;">We are always interested in new partnerships. Partners provide service or support to the project or his community. Partners can also be vendors that sales GhostBSD or associated products around the world&nbsp; and share the income generate from selling GhostBSD and associated products.<br />Interested in building a partnership with us,<strong><a href="http://www.ghostbsd.org/contact/ghostbsd%20partnership"> contact us.</a></strong></p>
+    </div>
+  </div>
+
+  <div class="tab-pane fade" id="Support">
+    <h3>Supports</h3>
+    <p>If you have some basic Linux/BSD experience, time and you're willing to help other users with technical problems, you should consider join the forums and the IRC channel and helping other users to solve their problems.</p>
+    <div class="row">
+    <div class="col-lg-6">
+    <div class="bs-callout bs-callout-primary">
+    <h3>Forums</h3>
+    <p>GhostBSD Forums is an interactive Q&A website to help finding answers to common questions. Anyone can create an account to start asking and answering Question.</p>
+    <div class="row"><a class="btn btn-primary" href="http://forums.ghostbsd.org/search.php?search_id=unanswered">Unanswered Questions</a> <a class="btn btn-primary" href="http://forums.ghostbsd.org/">New Question</a></div>
+    </div>
+    </div>
+
+    <div class="col-lg-6">
+    <div class="bs-callout bs-callout-primary">
+    <h3>Documentation</h3>
+    <p>GhostBSD provides Wiki documentation for both users and developers. All of our documentation is hosted on GhostBSD Wiki, so anyone can submit changes and new sections. </p>
+    <div class="row">
+        <a class="btn btn-primary" href="http://wiki.ghostbsd.org/wiki/index.php/Main_Page">Wiki</a>
+    </div>
+    </div>
+    </div>
+    </div>
+
+  </div>
+
+  <div class="tab-pane fade" id="Promotion">
+    <h3>Promoting the project</h3>
+    <p>If you like GhostBSD, let people know, talk about it with your friends coworker and the people around you. Setup boot at open source event and share with others. Write a review and publish it on distrowatch.com.</p>
+  </div>
+
+  <div class="tab-pane fade" id="Writing">
+    <h3>Translations</h3>
+    <p>Currently, GhostBSD is by default only available in English. We want this to change and hope to roll out some international features in the future versions. For that however, we need help from our community. If you want to contribute a translation of any GhostBSD content, let us know onhttp://forums.ghostbsd.org/viewforum.php?f=71.</p>
+  </div>
+
+  <div class="tab-pane fade" id="Development">
+    <h3>Testers</h3>
+    <p>If you like playing around with operating systems and have a bit of spare time and you have a spare system or virtual machine, one of the most effective ways you can assist the GhostBSD community is by reporting problems you encounter while using GhostBSD. Subscribe to the <a title="GhostBSD Forums" href="http://forums.ghostbsd.org">GhostBSD Forums </a>and GhostBSD IRC channel is at irc.freenode.net <a href="http://www.ghostbsd.org/irc">#ghostbsd. </a>You will also be able to see what problems other are finding and can check to see if the problem exists on your hardware as well.</p>
+    <h3>Bug reports</h3>
+    <p>If you've noticed something that doesn't work properly while using GhostBSD, let us know. The problem you have discovered is likely to affect others as well. The sooner we know about it, the sooner we're able to fix it.</p>
+    <p>Follow these tips so that you can accurately describe your findings so they can be fixed as soon as possible:</p>
+    <ul>
+    <li>before reporting a bug, search the http://issues.ghostbsd.org to see if anyone else has reported a similar problem.</li>
+    </ul>
+    <ul>
+    <li>when reporting a new issue, use a descriptive subject that includes the error and the version of GhostBSD. Ideally, the subject should be short, and contains key words about the error.</li>
+    </ul>
+    <ul>
+    <li>ensure that the body of the bug report includes the GHostBSD version.</li>
+    </ul>
+    <ul>
+    <li>give a good description of how to recreate the error. If there is an error message, include its text.</li>
+    </ul>
+    <ul>
+    <li>include any other info that may be useful.</li>
+    </ul>
+    <ul>
+    <li>if the problem appears to be hardware related, include a copy of /var/run/dmesg.boot as this file shows the hardware that was probed the last time the GhostBSD system booted.</li>
+    </ul>
+    <h3>Porting software</h3>
+    <p>If you have a suggestion for a Port that doesn't exist yet or want to help ensure that new Ports work flawlessly check out <a href="http://lists.freebsd.org/mailman/listinfo/freebsd-ports">FreeBSD Port mailing list</a> for any other information you might require, check out <a href="http://www.freebsd.org/doc/en_US.ISO8859-1/books/porters-handbook/">FreeBSD Porter's Handbook</a>&nbsp;</p>
+    <h3>Translations</h3>
+    <p>Currently, GhostBSD is by default only available in English. We want this to change and hope to roll out some international features in the future versions. For that however, we need help from our community. If you want to contribute a translation of any GhostBSD content, let us know onhttp://forums.ghostbsd.org/viewforum.php?f=71.</p>
+    <h3>Artwork</h3>
+    <p>If you have an idea on how to improve the look and feel of GhostBSD, want to design a wallpaper, MATE theme, icon set or anything of this sort for GhostBSD, let us know on http://forums.ghostbsd.org/viewforum.php?f=74.</p>
+    <h3>Become a Committer</h3>
+    <p>Are you looking to become a GhostBSD committer? People who want to help improve the <a href="http://github.com/GhostBSD">GhostBSD code</a> are always welcome! If you would like to take part in the development, a good place to get started is by signing up for the developers mailing list. Once you've signed up then feel free to browse our active <a href="http://wiki.ghostbsd.org/index.php?title=Category:TODO_Lists">TO DO</a> list. If you see something you want to work on or have a proposal for the project then feel free to let us know via the developers list and we'll be happy to help you get started.</p>
+    <h3>GTK, XML,Python, C, SH</h3>
+    <p>Most of the GhostBSD specific GUI tools are developed in Python using the GTK Libraries, and other non-GUI development is done using standard shell (/bin/sh) scripts and Python. There may be cases where other languages / libraries are needed, but those will be evaluated on a case-by-case basis, so feel free to let us know your proposals on the <a href="https://groups.google.com/forum/#%21forum/ghostbsd-dev">developers mailing list</a>.</p>
+  </div>
+</div>
