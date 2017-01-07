@@ -36,7 +36,7 @@ class gbsdSlides:
         vBox2.show()
         label2 = Gtk.Label(name="slideText")
         label2.set_markup("Thank you for choosing GhostBSD. We hope you enjoy the BSD experience.\n\n"
-                          "We believe every computer Operating System should be Secure, respect your privacy and true freedom, be elegant and light, GhostBSD makes FreeBSD desktop computing more easier.\n\n"
+                          "We believe every computer Operating System should be elegant, lightweight, and secure. It should respect your privacy and give the user true freedom. GhostBSD makes FreeBSD desktop computing much easier.\n\n"
                           "We want GhostBSD to work for you. So while your software is installing, this slideshow will introduce you to GhostBSD.")
         label2.set_justify(Gtk.Justification.LEFT)
         label2.set_line_wrap(True)
@@ -60,8 +60,8 @@ class gbsdSlides:
         hBox.show()
         vBox.pack_end(hBox, True, True, 0)
         label2 = Gtk.Label(name="slideText")
-        label2.set_markup("Search, install, upgrade and uninstall software with OctoPkg software manager.\n\n"
-                          "OctoPkg is a powerful tool to manage GhostBSD/FreeBSD software. It has a simple interface which consists of just 2 panels, a list of all available software including results of searches and a tab widget showing 6 useful tabs information, files, transaction, output, news and a quick help guide\n\n"
+        label2.set_markup("Search, install, upgrade, and uninstall software with OctoPkg software manager.\n\n"
+                          "OctoPkg is a powerful tool to manage GhostBSD/FreeBSD software. It has a simple interface which consists of just 2 panels, a list of all available software including results of searches and a tab widget showing 6 useful tabs information, files, transaction, output, news, and a quick help guide.\n\n"
                           "There are over 25000 softwares available to install.")
         label2.set_justify(Gtk.Justification.LEFT)
         label2.set_line_wrap(True)
@@ -85,7 +85,7 @@ class gbsdSlides:
         vBox.pack_end(hBox, True, True, 0)
         label2 = Gtk.Label(name="slideText")
         label2.set_markup("GhostBSD includes Mozilla Firefox, the web browser used by millions of people around the world.\n\n"
-                          "Browse the web safely and with private, share your files, software, and multimedia, send and receive e-mail, and communicate with friends and family.\n\n"
+                          "Browse the web safely and privately, share your files, software, and multimedia, send and receive e-mail, and communicate with friends and family.\n\n"
                           "Web browsers such as Chromium and Epiphany are easily installable.")
         label2.set_justify(Gtk.Justification.LEFT)
         label2.set_line_wrap(True)
@@ -109,7 +109,7 @@ class gbsdSlides:
         vBox.pack_end(hBox, True, True, 0)
         label2 = Gtk.Label(name="slideText")
         label2.set_markup("GhostBSD includes Mozilla Firefox, the web browser used by millions of people around the world.\n\n"
-                          "Browse the web safely and with private, share your files, software, and multimedia, send and receive e-mail, and communicate with friends and family.\n\n"
+                          "Browse the web safely and privately, share your files, software, and multimedia, send and receive e-mail, and communicate with friends and family.\n\n"
                           "Web browsers such as Chromium and Epiphany are easily installable.")
         label2.set_justify(Gtk.Justification.LEFT)
         label2.set_line_wrap(True)
@@ -280,7 +280,7 @@ class dbsdSlides:
         vBox2.show()
         label2 = Gtk.Label(name="slideText")
         label2.set_markup("Thank you for choosing DesktopBSD. We hope you enjoy the BSD experience.\n\n"
-                          "We believe every computer Operating System should be Secure, respect your privacy and true freedom, be elegant and light, DesktopBSD makes FreeBSD desktop computing more easier.\n\n"
+                          "We believe every computer Operating System should be elegant, lightweight, and secure. It should respect your privacy and give the user true freedom. DesktopBSD makes FreeBSD desktop computing much easier.\n\n"
                           "We want DesktopBSD to work for you. So while your software is installing, this slideshow will introduce you to DesktopBSD.")
         label2.set_justify(Gtk.Justification.LEFT)
         label2.set_line_wrap(True)
@@ -304,8 +304,8 @@ class dbsdSlides:
         hBox.show()
         vBox.pack_end(hBox, True, True, 0)
         label2 = Gtk.Label(name="slideText")
-        label2.set_markup("Search, install, upgrade and uninstall software with OctoPkg software manager.\n\n"
-                          "OctoPkg is a powerful tool to manage DesktopBSD/FreeBSD software. It has a simple interface which consists of just 2 panels, a list of all available software including results of searches and a tab widget showing 6 useful tabs information, files, transaction, output, news and a quick help guide\n\n"
+        label2.set_markup("Search, install, upgrade, and uninstall software with OctoPkg software manager.\n\n"
+                          "OctoPkg is a powerful tool to manage DesktopBSD/FreeBSD software. It has a simple interface which consists of just 2 panels, a list of all available software including results of searches and a tab widget showing 6 useful tabs information, files, transaction, output, news, and a quick help guide.\n\n"
                           "There are over 25000 softwares available to install.")
         label2.set_justify(Gtk.Justification.LEFT)
         label2.set_line_wrap(True)
