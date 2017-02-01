@@ -86,7 +86,7 @@ class gbsd_cfg():
                 else:
                     f.writelines(line)
             # os.remove(zfs_config)
-        if os.path.exists(ufs_config):
+        elif os.path.exists(ufs_config):
             # Disk Setup
             r = open(ufs_config, 'r')
             ufsconf = r.readlines()
