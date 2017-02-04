@@ -9,9 +9,9 @@
 # install.py give the job to pc-sysinstall to install GhostBSD.
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, GObject, GLib
+from gi.repository import Gtk, GLib
 import threading
-import locale
+# import locale
 import os
 from subprocess import Popen, PIPE, STDOUT, call
 from time import sleep
@@ -50,7 +50,7 @@ def read_output(command, probar):
     elif os.path.exists(rcconfdbsd):
         dbsd_cfg()
         call('umount /media/DESKTOPBSD', shell=True)
-    sleep (2)
+    sleep(2)
     if os.path.exists(tmp + 'delete'):
         GLib.idle_add(update_progess, probar, "Deleting partition")
         rDeleteParttion()
@@ -80,11 +80,11 @@ def read_output(command, probar):
         print(bartext)
     call('service hald start', shell=True)
     if bartext.rstrip() == "Installation finished!":
-        Popen('python %send.py' % gbi_path, shell=True, close_fds=True)
+        Popen('python2 %send.py' % gbi_path, shell=True, close_fds=True)
         call("rm -rf /tmp/.gbi/", shell=True, close_fds=True)
         Gtk.main_quit()
     else:
-        Popen('python %serror.py' % gbi_path, shell=True, close_fds=True)
+        Popen('python2 %serror.py' % gbi_path, shell=True, close_fds=True)
         Gtk.main_quit()
 
 
