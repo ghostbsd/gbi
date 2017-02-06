@@ -26,7 +26,7 @@ class gbsdSlides:
     def Welcome(self):
         vBox = Gtk.VBox(False, 0)
         vBox.show()
-        label = Gtk.Label("Welcome to GhostBSD 10.3!", name="Header")
+        label = Gtk.Label("Welcome to GhostBSD!", name="Header")
         label.set_property("height-request", 40)
         vBox.pack_start(label, False, False, 0)
         hBox = Gtk.HBox(False, 0, name="welcome")
@@ -265,7 +265,7 @@ class gbsdSlides:
             sleep(60)
             GLib.idle_add(self.SlideRight)
 
-                                     
+
 class dbsdSlides:
     def Welcome(self):
         vBox = Gtk.VBox(False, 0)
@@ -500,7 +500,7 @@ class dbsdSlides:
         thr = threading.Thread(target=self.slidesThreading)
         thr.setDaemon(True)
         thr.start()
-        
+
     def get_slide(self):
         return self.hBox
 
