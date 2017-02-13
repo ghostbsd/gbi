@@ -61,8 +61,8 @@ class gbsdSlides:
         vBox.pack_end(hBox, True, True, 0)
         label2 = Gtk.Label(name="slideText")
         label2.set_markup("Search, install, upgrade, and uninstall software with OctoPkg software manager.\n\n"
-                          "OctoPkg is a powerful tool to manage GhostBSD/FreeBSD software. It has a simple interface which consists of just 2 panels, a list of all available software including results of searches and a tab widget showing 6 useful tabs information, files, transaction, output, news, and a quick help guide.\n\n"
-                          "There are over 25000 softwares available to install.")
+                          "OctoPkg is a powerful tool to manage GhostBSD/FreeBSD software. It has a simple interface which consists of just 2 panels, a list of all available software including results of searches and a tab widget showing 6 useful tabs for information, files, transaction, output, news, and a quick help guide.\n\n"
+                          "There are over 25000 software packages available to install.")
         label2.set_justify(Gtk.Justification.LEFT)
         label2.set_line_wrap(True)
         label2.set_alignment(0.1, 0.2)
@@ -150,7 +150,7 @@ class gbsdSlides:
     def MultiMedia(self):
         vBox = Gtk.VBox(False, 0)
         vBox.show()
-        label = Gtk.Label("Play your movies and musics", name="Header")
+        label = Gtk.Label("Play your movies and music", name="Header")
         label.set_property("height-request", 40)
         vBox.pack_start(label, False, False, 0)
         hBox = Gtk.HBox(False, 0, name="mutimedia")
@@ -158,7 +158,7 @@ class gbsdSlides:
         vBox.pack_end(hBox, True, True, 0)
         label2 = Gtk.Label(name="slideText")
         label2.set_markup("GhostBSD is ready to play videos and music from the web, CDs and DVDs.\n\n"
-                          "Exail audio player lets you organize your music and listen to Internet radio, podcasts, and more, as well as synchronizes your audio collection to a portable audio player.\n\n"
+                          "Exaile audio player lets you organize your music and listen to Internet radio, podcasts, and more, as well as synchronizes your audio collection to a portable audio player.\n\n"
                           "\nGnome MPlayer allows you to easily watch videos from your computer, DVD.")
         label2.set_justify(Gtk.Justification.LEFT)
         label2.set_line_wrap(True)
@@ -174,7 +174,7 @@ class gbsdSlides:
     def communicate(self):
         vBox = Gtk.VBox(False, 0)
         vBox.show()
-        label = Gtk.Label("Play your movies and musics", name="Header")
+        label = Gtk.Label("Play your movies and music", name="Header")
         label.set_property("height-request", 40)
         vBox.pack_start(label, False, False, 0)
         hBox = Gtk.HBox(False, 0, name="communicate")
@@ -182,7 +182,7 @@ class gbsdSlides:
         vBox.pack_end(hBox, True, True, 0)
         label2 = Gtk.Label(name="slideText")
         label2.set_markup("GhostBSD is ready to play videos and music from the web, CDs and DVDs.\n\n"
-                          "Exail audio player lets you organize your music and listen to Internet radio, podcasts, and more, as well as synchronizes your audio collection to a portable audio player.\n\n"
+                          "Exaile audio player lets you organize your music and listen to Internet radio, podcasts, and more, as well as synchronizes your audio collection to a portable audio player.\n\n"
                           "Gnome MPlayer allows you to easily watch videos from your computer, DVD.")
         label2.set_justify(Gtk.Justification.LEFT)
         label2.set_line_wrap(True)
