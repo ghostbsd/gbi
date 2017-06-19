@@ -1,65 +1,65 @@
-GtkHBox#welcome {
+#welcome {
     background-image: url("/usr/local/lib/gbi/slide-images/ghostbsd/welcome.png");
-    background-size: 100%;
+    background-size: cover;
 }
 
-GtkHBox#software {
+#software {
     background-image: url("/usr/local/lib/gbi/slide-images/ghostbsd/software.png");
-    background-size: 100%;
+    background-size: cover;
 }
 
-GtkHBox#web {
+#web {
     background-image: url("/usr/local/lib/gbi/slide-images/ghostbsd/browser.png");
-    background-size: 100%;
+    background-size: cover;
 }
 
-GtkHBox#email {
+#email {
     background-image: url("/usr/local/lib/gbi/slide-images/ghostbsd/email.png");
-    background-size: 100%;
+    background-size: cover;
 }
 
-GtkHBox#communicate {
+#communicate {
     background-image: url("/usr/local/lib/gbi/slide-images/ghostbsd/social.png");
-    background-size: 100%;
+    background-size: cover;
 }
 
-GtkHBox#office {
+#office {
     background-image: url("/usr/local/lib/gbi/slide-images/ghostbsd/office.png");
-    background-size: 100%;
+    background-size: cover;
 }
 
-GtkHBox#mutimedia {
+#mutimedia {
     background-image: url("/usr/local/lib/gbi/slide-images/ghostbsd/music.png");
-    background-size: 100%;
+    background-size: cover;
 }
 
-GtkHBox#photo {
+#photo {
     background-image: url("/usr/local/lib/gbi/slide-images/ghostbsd/photo.png");
-    background-size: 100%;
+    background-size: cover;
 }
 
-GtkHBox#customize {
+#customize {
     background-image: url("/usr/local/lib/gbi/slide-images/ghostbsd/customize.png");
-    background-size: 100%;
+    background-size: cover;
 }
 
-GtkHBox#help {
+#help {
     background-image: url("/usr/local/lib/gbi/slide-images/ghostbsd/help.png");
-    background-size: 100%;
+    background-size: cover;
 }
 
-GtkLabel#slideText {
+#slideText {
     color: #F9F9F9;
     font-weight:bold;
-    font-size: 10px;
+    font-size: 14px;
 }
 
-GtkHBox#TransBox {
-    background-color: rgba(0, 0, 0, 0.5)
+#TransBox {
+    background-color: rgba(0, 0, 0, 0.6)
 }
 
-GtkLabel#Header {
+#Header {
     color: #F9F9F9;
     background-color: #3C3B37;
-    font-size: 15px;
+    font-size: 22px;
 }

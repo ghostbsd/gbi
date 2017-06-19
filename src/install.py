@@ -19,7 +19,7 @@ from partition_handler import rDeleteParttion, destroyParttion, makingParttion
 from create_cfg import gbsd_cfg
 from create_cfg import dbsd_cfg
 from slides import gbsdSlides
-from slides import dbsdSlides
+# from slides import dbsdSlides
 import sys
 installer = "/usr/local/lib/gbi/"
 sys.path.append(installer)
@@ -100,10 +100,10 @@ class installSlide():
         self.mainVbox = Gtk.VBox(False, 0)
         self.mainVbox.show()
         self.mainHbox.pack_start(self.mainVbox, True, True, 0)
-        if os.path.exists(rcconfgbsd):
-            slide = gbsdSlides()
-        elif os.path.exists(rcconfdbsd):
-            slide = dbsdSlides()
+        #if os.path.exists(rcconfgbsd):
+        slide = gbsdSlides()
+        #elif os.path.exists(rcconfdbsd):
+        #    slide = dbsdSlides()
         getSlides = slide.get_slide()
         self.mainVbox.pack_start(getSlides, True, True, 0)
 
