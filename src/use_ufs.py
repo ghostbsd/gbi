@@ -1,6 +1,6 @@
 #!/usr/local/bin/python
 """
-Copyright (c) 2014-2017, GhostBSD. All rights reserved.
+Copyright (c) 2014-2016, GhostBSD. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -292,7 +292,7 @@ class use_ufs():
         self.mirrorbl_box.set_sensitive(False)
         self.mirrorbl = 'load'
         # Creating MBR or GPT drive
-        label = Gtk.Label('Partition Scheme')
+        label = Gtk.Label('<b>Partition Scheme</b>')
         label.set_use_markup(True)
         # Adding a combo box to selecting MBR or GPT sheme.
         self.scheme = 'GPT'
@@ -306,7 +306,7 @@ class use_ufs():
         close_fds=True)
         mem = ram.stdout.read()
         swap = int(mem.partition(':')[2].strip()) / (1024 * 1024)
-        swp_size_label = Gtk.Label('Swap Size(MB)')
+        swp_size_label = Gtk.Label('<b>Swap Size(MB)</b>')
         swp_size_label.set_use_markup(True)
         self.swap_entry = Gtk.Entry()
         self.swap_entry.set_text(str(swap))
@@ -321,7 +321,7 @@ class use_ufs():
         swap_mirror_check.connect("toggled", self.on_check_swap_mirror)
         # GELI Disk encription
         self.disk_encript = False
-        encrypt_check = Gtk.CheckButton("Encrypt disk with Geli")
+        encrypt_check = Gtk.CheckButton("Encrypt Disk")
         encrypt_check.connect("toggled", self.on_check_encrypt)
         encrypt_check.set_sensitive(True)
         # password
@@ -338,8 +338,6 @@ class use_ufs():
         self.repassword.set_visibility(False)
         self.repassword.connect("changed", self.passwdVerification)
         # set image for password matching
-        self.img = Gtk.Image()
-        self.img.set_alignment(0.2, 0.5)
         fslabel = Gtk.Label("Mount point:")
         self.fstype = Gtk.ComboBoxText()
         self.fstype.append_text('UFS')
@@ -356,23 +354,23 @@ class use_ufs():
         grid.attach(Title, 0, 0, 9, 2)
         grid.attach(mirror_check, 0, 2, 1, 1)
         grid.attach(self.mirrorbl_box, 1, 2, 1, 1)
-        grid.attach(label, 5, 7, 2, 1)
-        grid.attach(shemebox, 7, 7, 1, 1)
+        grid.attach(label, 0, 9, 2, 1)
+        grid.attach(shemebox, 2, 9, 1, 1)
         grid.attach(self.mirrorTips, 1, 3, 8, 1)
-        grid.attach(sw, 0, 4, 9, 3)
+        grid.attach(sw, 0, 4, 9, 4)
         grid.attach(fslabel, 5, 9, 2, 1)
         grid.attach(self.fstype, 7, 9, 1, 1)
         grid.attach(swp_size_label, 5, 2, 2, 1)
         grid.attach(self.swap_entry, 7, 2, 1, 1)
         #grid.attach(self.swap_encrypt_check, 9, 15, 11, 12)
         #grid.attach(swap_mirror_check, 9, 15, 11, 12)
-        grid.attach(encrypt_check, 0, 7, 2, 1)
-        grid.attach(self.passwd_label, 0, 8, 1, 1)
-        grid.attach(self.password, 1, 8, 2, 1)
-        grid.attach(self.strenght_label, 3, 8, 2, 1)
-        grid.attach(self.vpasswd_label, 0, 9, 1, 1)
-        grid.attach(self.repassword, 1, 9, 2, 1)
-        grid.attach(self.img, 3, 9, 2, 1)
+        #grid.attach(encrypt_check, 1, 9, 2, 1)
+        #grid.attach(self.passwd_label, 1, 10, 1, 1)
+        #grid.attach(self.password, 2, 10, 2, 1)
+        #grid.attach(self.strenght_label, 4, 10, 2, 1)
+        #grid.attach(self.vpasswd_label, 1, 11, 1, 1)
+        #grid.attach(self.repassword, 2, 11, 2, 1)
+        #grid.attach(self.img, 4, 11, 2, 1)
         box2.pack_start(grid, True, True, 10)
         return
 
