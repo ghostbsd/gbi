@@ -32,8 +32,23 @@ part_query = '%sdisk-part.sh' % query
 
 class Types():
 
-    def partition(self, radiobutton, val):
+    def fstype(self, radiobutton, val):
         self.ne = val
+        if self.ne == "ufs":
+            self.none.set_active(True)
+            self.grub.set_sensitive(False)
+            self.bsd.set_sensitive(False)
+            self.none.set_sensitive(True)
+        elif self.ne == "custom":
+            self.grub.set_active(True)
+            self.grub.set_sensitive(True)
+            self.bsd.set_sensitive(True)
+            self.none.set_sensitive(True)
+        elif self.ne == "zfs":
+            self.grub.set_active(True)
+            self.grub.set_sensitive(True)
+            self.bsd.set_sensitive(False)
+            self.none.set_sensitive(False)
         pass_file = open(signal, 'w')
         pass_file.writelines(self.ne)
         pass_file.close
@@ -68,24 +83,21 @@ class Types():
         box2.pack_start(hbox, False, False, 10)
         radio = Gtk.RadioButton.new_with_label_from_widget(None, "UFS Full Disk Configuration")
         bbox.pack_start(radio, False, True, 10)
-        radio.connect("toggled", self.partition, "ufs")
+        radio.connect("toggled", self.fstype, "ufs")
         self.ne = 'ufs'
         pass_file = open(signal, 'w')
         pass_file.writelines(self.ne)
         pass_file.close
         radio.show()
-        # box2.pack_start(radio, True, True, 10)
         radio = Gtk.RadioButton.new_with_label_from_widget(radio, "UFS Custom Disk Configuration")
         bbox.pack_start(radio, False, True, 10)
-        radio.connect("toggled", self.partition, "custom")
+        radio.connect("toggled", self.fstype, "custom")
         radio.show()
-        # box2.pack_start(radio, True, True, 10)
         radio = Gtk.RadioButton.new_with_label_from_widget(radio, "ZFS Full Disk Configuration")
         bbox.pack_start(radio, False, True, 10)
-        radio.connect("toggled", self.partition, "zfs")
+        radio.connect("toggled", self.fstype, "zfs")
         radio.show()
         hbox.pack_start(bbox, False, False, 50)
-        # hbox.pack_start(bbox, True, True, 50)
         # Boot option.
         box3 = Gtk.VBox(False, 0)
         box3.set_border_width(10)
@@ -99,20 +111,23 @@ class Types():
         box3.pack_start(hbox, True, True, 0)
         bbox1 = Gtk.VBox()
         bbox1.show()
-        grub = Gtk.RadioButton.new_with_label_from_widget(None, "Install Grub2(need by ZFS)")
-        bbox1.pack_start(grub, False, True, 10)
-        grub.connect("toggled", self.boot_manager, "grub")
-        grub.show()
-        bsd = Gtk.RadioButton.new_with_label_from_widget(grub, "Install FreeBSD boot manager + loader(MBR only)")
-        bbox1.pack_start(bsd, False, True, 10)
-        bsd.connect("toggled", self.boot_manager, "bsd")
-        bsd.show()
-        none = Gtk.RadioButton.new_with_label_from_widget(bsd, "Install only FreeBSD loader")
-        bbox1.pack_start(none, False, True, 10)
-        none.connect("toggled", self.boot_manager, "none")
-        none.show()
+        self.grub = Gtk.RadioButton.new_with_label_from_widget(None, "Install Grub2")
+        bbox1.pack_start(self.grub, False, True, 10)
+        self.grub.connect("toggled", self.boot_manager, "grub")
+        self.grub.show()
+        self.grub.set_sensitive(False)
+        self.bsd = Gtk.RadioButton.new_with_label_from_widget(self.grub, "Install FreeBSD boot manager + loader(MBR only)")
+        bbox1.pack_start(self.bsd, False, True, 10)
+        self.bsd.connect("toggled", self.boot_manager, "bsd")
+        self.bsd.show()
+        self.bsd.set_sensitive(False)
+        self.none = Gtk.RadioButton.new_with_label_from_widget(self.bsd, "Install only FreeBSD loader")
+        bbox1.pack_start(self.none, False, True, 10)
+        self.none.connect("toggled", self.boot_manager, "none")
+        self.none.show()
         hbox.pack_start(bbox1, False, False, 50)
-        self.boot = "grub"
+        self.none.set_active(True)
+        self.boot = "none"
         boot = open(boot_file, 'w')
         boot.writelines(self.boot)
         boot.close()
