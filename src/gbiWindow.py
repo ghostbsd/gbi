@@ -59,6 +59,7 @@ disk = '%sdisk' % tmp
 dslice = '%sslice' % tmp
 disk_schem = '%sscheme' % tmp
 zfs_config = '%szfs_config' % tmp
+ufs_config = '%sufs_config' % tmp
 partitiondb = "%spartitiondb/" % tmp
 
 
@@ -214,6 +215,8 @@ class MainWindow():
                 os.remove(tmp + 'partlabel')
             if os.path.exists(zfs_config):
                 os.remove(zfs_config)
+            if os.path.exists(ufs_config):
+                os.remove(ufs_config)
             if os.path.exists(disk):
                 os.remove(disk)
             if os.path.exists(dslice):

@@ -52,7 +52,7 @@ Part_label = '%sufs_config' % tmp
 part_schem = '%sscheme' % tmp
 boot_file = '%sboot' % tmp
 
-zfs_dsk_list = []
+ufs_dsk_list = []
 
 
 # Find if pasword contain only lower case and number
@@ -92,7 +92,7 @@ def allCharacter(strg, search=re.compile(r'[^a-zA-Z0-9~\!@#\$%\^&\*_\+":;\'\-]')
 
 class use_ufs():
     def save_selection(self):
-        disk_size = int(zfs_dsk_list[0].partition('-')[2].rstrip()) - 2
+        disk_size = int(ufs_dsk_list[0].partition('-')[2].rstrip()) - 2
         swap_size = int(self.swap_entry.get_text())
         root_size = disk_size - swap_size
         if self.disk_encript is True:
@@ -100,9 +100,9 @@ class use_ufs():
         else:
             dgeli = ''
         pfile = open(Part_label, 'w')
-        pfile.writelines('disk0=%s\n' % zfs_dsk_list[0].partition('-')[0].rstrip())
+        pfile.writelines('disk0=%s\n' % ufs_dsk_list[0].partition('-')[0].rstrip())
         if self.mirror is True:
-            ufs_disk = zfs_dsk_list
+            ufs_disk = ufs_dsk_list
             disk_len = len(ufs_disk) - 1
             num = 1
             mirror_dsk = ''
@@ -160,13 +160,13 @@ class use_ufs():
             self.mirror = False
         if self.mirror is False:
             self.mirrorTips.set_text("Please select one drive")
-            if len(zfs_dsk_list) != 1:
+            if len(ufs_dsk_list) != 1:
                 self.button3.set_sensitive(False)
             else:
                 self.button3.set_sensitive(True)
         elif self.mirror is True:
             self.mirrorTips.set_text("Please select 2 drive for mirroring")
-            if len(zfs_dsk_list) > 1:
+            if len(ufs_dsk_list) > 1:
                 self.button3.set_sensitive(True)
             else:
                 self.button3.set_sensitive(False)
@@ -190,12 +190,12 @@ class use_ufs():
             self.disk_encript = False
             #self.swap_encrypt_check.set_active(False)
             if self.mirror is False:
-                if len(zfs_dsk_list) != 1:
+                if len(ufs_dsk_list) != 1:
                     self.button3.set_sensitive(False)
                 else:
                     self.button3.set_sensitive(True)
             elif self.mirror is True:
-                if len(zfs_dsk_list) > 1:
+                if len(ufs_dsk_list) > 1:
                     self.button3.set_sensitive(True)
                 else:
                     self.button3.set_sensitive(False)
@@ -375,6 +375,7 @@ class use_ufs():
         return
 
     def get_model(self):
+        del ufs_dsk_list[:]
         return self.box1
 
     def digit_only(self, *args):
@@ -384,30 +385,30 @@ class use_ufs():
     def col1_toggled_cb(self, cell, path, model):
         model[path][3] = not model[path][3]
         if model[path][3] is False:
-            zfs_dsk_list.remove(model[path][0] + "-" + model[path][1])
+            ufs_dsk_list.remove(model[path][0] + "-" + model[path][1])
             if self.mirror is False:
-                if len(zfs_dsk_list) != 1:
+                if len(ufs_dsk_list) != 1:
                     self.button3.set_sensitive(False)
                 else:
                     self.button3.set_sensitive(True)
             elif self.mirror is True:
-                if len(zfs_dsk_list) > 1:
+                if len(ufs_dsk_list) > 1:
                     self.button3.set_sensitive(True)
                 else:
                     self.button3.set_sensitive(False)
         else:
-            zfs_dsk_list.extend([model[path][0] + "-" + model[path][1]])
+            ufs_dsk_list.extend([model[path][0] + "-" + model[path][1]])
             if self.mirror is False:
-                if len(zfs_dsk_list) != 1:
+                if len(ufs_dsk_list) != 1:
                     self.button3.set_sensitive(False)
                 else:
                     self.button3.set_sensitive(True)
             elif self.mirror is True:
-                if len(zfs_dsk_list) > 1:
+                if len(ufs_dsk_list) > 1:
                     self.button3.set_sensitive(True)
                 else:
                     self.button3.set_sensitive(False)
-        print zfs_dsk_list
+        print ufs_dsk_list
         return
 
     def passwdstrength(self, widget):
@@ -489,32 +490,32 @@ class use_ufs():
         if self.password.get_text() == self.repassword.get_text():
             self.img.set_from_stock(Gtk.STOCK_YES, 10)
             if self.mirror == "none":
-                if len(zfs_dsk_list) != 1:
+                if len(ufs_dsk_list) != 1:
                     self.button3.set_sensitive(False)
                 else:
                     self.button3.set_sensitive(True)
             elif self.mirror == "mirror":
-                if len(zfs_dsk_list) > 1:
+                if len(ufs_dsk_list) > 1:
                     self.button3.set_sensitive(True)
                 else:
                     self.button3.set_sensitive(False)
             elif self.mirror == "raidz1":
-                if len(zfs_dsk_list) == 3 or len(zfs_dsk_list) == 5:
+                if len(ufs_dsk_list) == 3 or len(ufs_dsk_list) == 5:
                     self.button3.set_sensitive(True)
                 else:
                     self.button3.set_sensitive(False)
             elif self.mirror == "raidz2":
-                if len(zfs_dsk_list) == 4 or len(zfs_dsk_list) == 6 or len(zfs_dsk_list) == 10:
+                if len(ufs_dsk_list) == 4 or len(ufs_dsk_list) == 6 or len(ufs_dsk_list) == 10:
                     self.button3.set_sensitive(True)
                 else:
                     self.button3.set_sensitive(False)
             elif self.mirror == "raidz3":
-                if len(zfs_dsk_list) == 5 or len(zfs_dsk_list) == 7 or len(zfs_dsk_list) == 11:
+                if len(ufs_dsk_list) == 5 or len(ufs_dsk_list) == 7 or len(ufs_dsk_list) == 11:
                     self.button3.set_sensitive(True)
                 else:
                     self.button3.set_sensitive(False)
             elif self.mirror == "strip":
-                if len(zfs_dsk_list) > 2:
+                if len(ufs_dsk_list) > 2:
                     self.button3.set_sensitive(True)
                 else:
                     self.button3.set_sensitive(False)
