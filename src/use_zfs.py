@@ -186,8 +186,8 @@ class ZFS():
                 self.button3.set_sensitive(True)
             else:
                 self.button3.set_sensitive(False)
-        elif self.mirror == "strip":
-            self.mirrorTips.set_text("Please select 3 drive to strip")
+        elif self.mirror == "stripe":
+            self.mirrorTips.set_text("Please select 3 drive to stripe")
             if len(zfs_dsk_list) > 2:
                 self.button3.set_sensitive(True)
             else:
@@ -246,7 +246,7 @@ class ZFS():
                     self.button3.set_sensitive(True)
                 else:
                     self.button3.set_sensitive(False)
-            elif self.mirror == "strip":
+            elif self.mirror == "stripe":
                 if len(zfs_dsk_list) > 2:
                     self.button3.set_sensitive(True)
                 else:
@@ -325,7 +325,7 @@ class ZFS():
         self.mirrorTips = Gtk.Label('Please select one drive')
         self.mirrorTips.set_justify(Gtk.Justification.LEFT)
         self.mirrorTips.set_alignment(0.01, 0.5)
-        # Mirro, raidz and strip
+        # Mirro, raidz and stripe
         self.mirror = 'none'
         mirror_label = Gtk.Label('<b>Pool Type</b>')
         mirror_label.set_use_markup(True)
@@ -335,7 +335,7 @@ class ZFS():
         mirror_box.append_text("raidz1")
         mirror_box.append_text("raidz2")
         mirror_box.append_text("raidz3")
-        mirror_box.append_text("strip")
+        mirror_box.append_text("stripe")
         mirror_box.connect('changed', self.mirror_selection)
         mirror_box.set_active(0)
 
@@ -464,7 +464,7 @@ class ZFS():
                     self.button3.set_sensitive(True)
                 else:
                     self.button3.set_sensitive(False)
-            elif self.mirror == "strip":
+            elif self.mirror == "stripe":
                 if len(zfs_dsk_list) > 2:
                     self.button3.set_sensitive(True)
                 else:
@@ -496,7 +496,7 @@ class ZFS():
                     self.button3.set_sensitive(True)
                 else:
                     self.button3.set_sensitive(False)
-            elif self.mirror == "strip":
+            elif self.mirror == "stripe":
                 if len(zfs_dsk_list) > 2:
                     self.button3.set_sensitive(True)
                 else:
@@ -607,7 +607,7 @@ class ZFS():
                     self.button3.set_sensitive(True)
                 else:
                     self.button3.set_sensitive(False)
-            elif self.mirror == "strip":
+            elif self.mirror == "stripe":
                 if len(zfs_dsk_list) > 2:
                     self.button3.set_sensitive(True)
                 else:

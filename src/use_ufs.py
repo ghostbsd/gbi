@@ -499,26 +499,6 @@ class use_ufs():
                     self.button3.set_sensitive(True)
                 else:
                     self.button3.set_sensitive(False)
-            elif self.mirror == "raidz1":
-                if len(ufs_dsk_list) == 3 or len(ufs_dsk_list) == 5:
-                    self.button3.set_sensitive(True)
-                else:
-                    self.button3.set_sensitive(False)
-            elif self.mirror == "raidz2":
-                if len(ufs_dsk_list) == 4 or len(ufs_dsk_list) == 6 or len(ufs_dsk_list) == 10:
-                    self.button3.set_sensitive(True)
-                else:
-                    self.button3.set_sensitive(False)
-            elif self.mirror == "raidz3":
-                if len(ufs_dsk_list) == 5 or len(ufs_dsk_list) == 7 or len(ufs_dsk_list) == 11:
-                    self.button3.set_sensitive(True)
-                else:
-                    self.button3.set_sensitive(False)
-            elif self.mirror == "strip":
-                if len(ufs_dsk_list) > 2:
-                    self.button3.set_sensitive(True)
-                else:
-                    self.button3.set_sensitive(False)
         else:
             self.img.set_from_stock(Gtk.STOCK_NO, 10)
             self.button3.set_sensitive(False)
