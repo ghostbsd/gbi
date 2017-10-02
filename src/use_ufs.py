@@ -338,7 +338,7 @@ class use_ufs():
         self.repassword.set_visibility(False)
         self.repassword.connect("changed", self.passwdVerification)
         # set image for password matching
-        fslabel = Gtk.Label("Mount point:")
+        fslabel = Gtk.Label("File System:")
         self.fstype = Gtk.ComboBoxText()
         self.fstype.append_text('UFS')
         self.fstype.append_text('UFS+S')

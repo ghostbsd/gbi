@@ -515,7 +515,7 @@ class autoDiskPartition():
         boot = line[0].strip()
         if bios_or_uefi() == "UEFI":
             plist.extend(([disk + 'p1', bnum, 'none', 'UEFI']))
-        elif boot == "GRUB":
+        elif boot == "grub":
             plist.extend(([disk + 'p1', bnum, 'none', 'BIOS']))
         else:
             plist.extend(([disk + 'p1', bnum, 'none', 'BOOT']))
@@ -531,7 +531,7 @@ class autoDiskPartition():
         pfile = open(Part_label, 'w')
         if bios_or_uefi() == "UEFI":
             pfile.writelines('UEFI %s none\n' % bnum)
-        elif boot == "GRUB":
+        elif boot == "grub":
             pfile.writelines('BIOS %s none\n' % bnum)
         else:
             pfile.writelines('BOOT %s none\n' % bnum)
@@ -631,7 +631,7 @@ class autoFreeSpace():
         boot = line[0].strip()
         if bios_or_uefi() == "UEFI":
             plist.extend(([disk + 'p%s' % sl, bs, 'none', 'UEFI']))
-        elif boot == "GRUB":
+        elif boot == "grub":
             plist.extend(([disk + 'p%s' % sl, bs, 'none', 'BIOS']))
         else:
             plist.extend(([disk + 'p%s' % sl, bs, 'none', 'BOOT']))
@@ -649,7 +649,7 @@ class autoFreeSpace():
         pfile = open(Part_label, 'w')
         if bios_or_uefi() == "UEFI":
             pfile.writelines('UEFI %s none\n' % bs)
-        elif boot == "GRUB":
+        elif boot == "grub":
             pfile.writelines('BIOS %s none\n' % bs)
         else:
             pfile.writelines('BOOT %s none\n' % bs)
