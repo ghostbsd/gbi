@@ -377,14 +377,14 @@ class Partitions():
     def autoPartition(self, widget):
         if len(self.path) == 3:
             pass
-        elif len(self.path) == 1 and self.scheme is None:
-            self.schemeEditor(None)
-            self.update()
-        elif len(self.path) == 1:
-            autoDiskPartition(self.slice, self.size, self.scheme)
-            self.Tree_Store()
-            self.treeview.expand_all()
-            self.treeview.set_cursor(self.path)
+        #elif len(self.path) == 1 and self.scheme is None:
+        #    self.schemeEditor(None)
+        #    self.update()
+        #elif len(self.path) == 1:
+        #    autoDiskPartition(self.slice, self.size, self.scheme)
+        #    self.Tree_Store()
+        #    self.treeview.expand_all()
+        #    self.treeview.set_cursor(self.path)
         elif self.slice == 'freespace':
             autoFreeSpace(self.path, self.size)
             self.Tree_Store()
