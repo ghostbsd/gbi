@@ -1,6 +1,6 @@
 #!/usr/local/bin/python
 """
-Copyright (c) 2010-2013, GhostBSD. All rights reserved.
+Copyright (c) 2010-2017, GhostBSD. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -505,7 +505,7 @@ class Partitions():
             else:
                 self.delete_bt.set_sensitive(False)
                 self.modifi_bt.set_sensitive(False)
-                self.auto_bt.set_sensitive(True)
+                self.auto_bt.set_sensitive(False)
                 if how_partition(self.path) == 1 and first_is_free(self.path) == 'freespace':
                     self.create_bt.set_sensitive(True)
                 elif how_partition(self.path) == 0:

@@ -1,6 +1,6 @@
 #!/usr/local/bin/python
 """
-Copyright (c) 2010-2013, GhostBSD. All rights reserved.
+Copyright (c) 2010-2017, GhostBSD. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -609,6 +609,7 @@ class autoFreeSpace():
         sfile.writelines('partscheme=GPT')
         sfile.close()
         number = int(size.partition('M')[0])
+        number = number - 512
         slice_file = open(dslice, 'w')
         slice_file.writelines('p%s\n' % sl)
         slice_file.writelines('%s\n' % number)
@@ -967,10 +968,10 @@ class makingParttion():
                         call(cmd, shell=True)
                         call(cmd2, shell=True)
                     else:
-                        if boot == "GRUB":
+                        if boot == "grub":
                             cmd = 'gpart add -a 4k -s 1M -t bios-boot -i %s %s' % (sl, drive)
                         else:
-                            cmd = 'gpart add -a 4k -s 512M -t freebsd-boot -i %s %s' % (sl, drive)
+                            cmd = 'gpart add -a 4k -s 512 -t freebsd-boot -i %s %s' % (sl, drive)
                         call(cmd, shell=True)
                 elif slicePartition(part) == 's':
                     size = int(line[1])
