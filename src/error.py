@@ -41,7 +41,7 @@ class PyApp:
         label = gtk.Label(lyrics)
         label.set_use_markup(True)
 
-        label.set_markup("Please report the issue to <a href='http://issues.ghostbsd.org/my_view_page.php'>GhostBSD issue system</a>,\nand be sure to provide tmp/.pc-sysinstall/pc-sysinstall.log.")
+        label.set_markup("Please report the issue to <a href='http://issues.ghostbsd.org/my_view_page.php'>GhostBSD issue system</a>,\nand be sure to provide /tmp/.pc-sysinstall/pc-sysinstall.log.")
         box2.pack_start(title)
         box2.pack_start(label)
         box2 = gtk.HBox(False, 10)
