@@ -34,21 +34,21 @@ class Types():
 
     def fstype(self, radiobutton, val):
         self.ne = val
-        if self.ne == "ufs":
-            self.none.set_active(True)
-            self.grub.set_sensitive(False)
-            self.bsd.set_sensitive(False)
-            self.none.set_sensitive(True)
-        elif self.ne == "custom":
-            self.grub.set_active(True)
-            self.grub.set_sensitive(True)
-            self.bsd.set_sensitive(True)
-            self.none.set_sensitive(True)
-        elif self.ne == "zfs":
-            self.grub.set_active(True)
-            self.grub.set_sensitive(True)
-            self.bsd.set_sensitive(False)
-            self.none.set_sensitive(False)
+        #if self.ne == "ufs":
+        #    self.none.set_active(True)
+        #    self.grub.set_sensitive(False)
+        #    self.bsd.set_sensitive(False)
+        #    self.none.set_sensitive(True)
+        #elif self.ne == "custom":
+        #    self.grub.set_active(True)
+        #    self.grub.set_sensitive(True)
+        #    self.bsd.set_sensitive(True)
+        #    self.none.set_sensitive(True)
+        #elif self.ne == "zfs":
+        #    self.grub.set_active(True)
+        #    self.grub.set_sensitive(True)
+        #    self.bsd.set_sensitive(False)
+        #    self.none.set_sensitive(False)
         pass_file = open(signal, 'w')
         pass_file.writelines(self.ne)
         pass_file.close
@@ -115,12 +115,12 @@ class Types():
         bbox1.pack_start(self.grub, False, True, 10)
         self.grub.connect("toggled", self.boot_manager, "grub")
         self.grub.show()
-        self.grub.set_sensitive(False)
+        #self.grub.set_sensitive(False)
         self.bsd = Gtk.RadioButton.new_with_label_from_widget(self.grub, "Install FreeBSD boot manager + loader(MBR only)")
         bbox1.pack_start(self.bsd, False, True, 10)
         self.bsd.connect("toggled", self.boot_manager, "bsd")
         self.bsd.show()
-        self.bsd.set_sensitive(False)
+        #self.bsd.set_sensitive(False)
         self.none = Gtk.RadioButton.new_with_label_from_widget(self.bsd, "Install only FreeBSD loader")
         bbox1.pack_start(self.none, False, True, 10)
         self.none.connect("toggled", self.boot_manager, "none")
