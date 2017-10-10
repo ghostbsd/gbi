@@ -187,8 +187,8 @@ class ZFS():
             else:
                 self.button3.set_sensitive(False)
         elif self.mirror == "stripe":
-            self.mirrorTips.set_text("Please select 3 drive to stripe")
-            if len(zfs_dsk_list) > 2:
+            self.mirrorTips.set_text("Please select 2 drive to stripe")
+            if len(zfs_dsk_list) > 1:
                 self.button3.set_sensitive(True)
             else:
                 self.button3.set_sensitive(False)
@@ -247,7 +247,7 @@ class ZFS():
                 else:
                     self.button3.set_sensitive(False)
             elif self.mirror == "stripe":
-                if len(zfs_dsk_list) > 2:
+                if len(zfs_dsk_list) > 1:
                     self.button3.set_sensitive(True)
                 else:
                     self.button3.set_sensitive(False)
@@ -465,7 +465,7 @@ class ZFS():
                 else:
                     self.button3.set_sensitive(False)
             elif self.mirror == "stripe":
-                if len(zfs_dsk_list) > 2:
+                if len(zfs_dsk_list) > 1:
                     self.button3.set_sensitive(True)
                 else:
                     self.button3.set_sensitive(False)
@@ -497,7 +497,7 @@ class ZFS():
                 else:
                     self.button3.set_sensitive(False)
             elif self.mirror == "stripe":
-                if len(zfs_dsk_list) > 2:
+                if len(zfs_dsk_list) > 1:
                     self.button3.set_sensitive(True)
                 else:
                     self.button3.set_sensitive(False)
@@ -608,7 +608,7 @@ class ZFS():
                 else:
                     self.button3.set_sensitive(False)
             elif self.mirror == "stripe":
-                if len(zfs_dsk_list) > 2:
+                if len(zfs_dsk_list) > 1:
                     self.button3.set_sensitive(True)
                 else:
                     self.button3.set_sensitive(False)
