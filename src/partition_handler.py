@@ -84,6 +84,7 @@ def how_partition(path):
     else:
         return 0
 
+
 def first_is_free(path):
     disk = disk_query()[path[0]][0]
     if os.path.exists(partitiondb + disk):

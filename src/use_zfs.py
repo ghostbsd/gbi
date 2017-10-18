@@ -52,6 +52,7 @@ Part_label = '%szfs_config' % tmp
 part_schem = '%sscheme' % tmp
 boot_file = '%sboot' % tmp
 
+global zfs_dsk_list
 zfs_dsk_list = []
 
 
@@ -154,6 +155,7 @@ class ZFS():
     def mirror_selection(self, combobox):
         model = combobox.get_model()
         index = combobox.get_active()
+        mirror_mesage = " (select the smallest disk first)"
         data = model[index][0]
         self.mirror = data
         if self.mirror == "none":
@@ -163,31 +165,31 @@ class ZFS():
             else:
                 self.button3.set_sensitive(True)
         elif self.mirror == "mirror":
-            self.mirrorTips.set_text("Please select at less 2 drive for mirroring")
+            self.mirrorTips.set_text("Please select at less 2 drive for mirroring"+ mirror_mesage)
             if len(zfs_dsk_list) > 1:
                 self.button3.set_sensitive(True)
             else:
                 self.button3.set_sensitive(False)
         elif self.mirror == "raidz1":
-            self.mirrorTips.set_text("Please select 3 or 5 drive for raidz1")
+            self.mirrorTips.set_text("Please select 3 or 5 drive for raidz1" + mirror_mesage)
             if len(zfs_dsk_list) == 3 or len(zfs_dsk_list) == 5:
                 self.button3.set_sensitive(True)
             else:
                 self.button3.set_sensitive(False)
         elif self.mirror == "raidz2":
-            self.mirrorTips.set_text("Please select 4, 6, or 10 drive for raidz2")
+            self.mirrorTips.set_text("Please select 4, 6, or 10 drive for raidz" + mirror_mesage)
             if len(zfs_dsk_list) == 4 or len(zfs_dsk_list) == 6 or len(zfs_dsk_list) == 10:
                 self.button3.set_sensitive(True)
             else:
                 self.button3.set_sensitive(False)
         elif self.mirror == "raidz3":
-            self.mirrorTips.set_text("Please select 5, 7, or 11 drive for raidz3")
+            self.mirrorTips.set_text("Please select 5, 7, or 11 drive for raidz" + mirror_mesage)
             if len(zfs_dsk_list) == 5 or len(zfs_dsk_list) == 7 or len(zfs_dsk_list) == 11:
                 self.button3.set_sensitive(True)
             else:
                 self.button3.set_sensitive(False)
         elif self.mirror == "stripe":
-            self.mirrorTips.set_text("Please select 2 drive to stripe")
+            self.mirrorTips.set_text("Please select 2 drive to stripe" + mirror_mesage)
             if len(zfs_dsk_list) > 1:
                 self.button3.set_sensitive(True)
             else:
@@ -435,6 +437,15 @@ class ZFS():
         text = self.swap_entry.get_text().strip()
         self.swap_entry.set_text(''.join([i for i in text if i in '0123456789']))
 
+    def check_if_small_disk(size):
+        for line in zfs_dsk_list:
+            if int(line.partition('-')[2]) > int(size):
+                returns = True
+                break
+            else:
+                returns = False
+        return returns
+
     def col1_toggled_cb(self, cell, path, model):
         model[path][3] = not model[path][3]
         if model[path][3] is False:
@@ -470,39 +481,46 @@ class ZFS():
                 else:
                     self.button3.set_sensitive(False)
         else:
-            zfs_dsk_list.extend([model[path][0] + "-" + model[path][1]])
-            if self.mirror == "none":
-                if len(zfs_dsk_list) != 1:
-                    self.button3.set_sensitive(False)
-                else:
-                    self.button3.set_sensitive(True)
-            elif self.mirror == "mirror":
-                if len(zfs_dsk_list) > 1:
-                    self.button3.set_sensitive(True)
-                else:
-                    self.button3.set_sensitive(False)
-            elif self.mirror == "raidz1":
-                if len(zfs_dsk_list) == 3 or len(zfs_dsk_list) == 5:
-                    self.button3.set_sensitive(True)
-                else:
-                    self.button3.set_sensitive(False)
-            elif self.mirror == "raidz2":
-                if len(zfs_dsk_list) == 4 or len(zfs_dsk_list) == 6 or len(zfs_dsk_list) == 10:
-                    self.button3.set_sensitive(True)
-                else:
-                    self.button3.set_sensitive(False)
-            elif self.mirror == "raidz3":
-                if len(zfs_dsk_list) == 5 or len(zfs_dsk_list) == 7 or len(zfs_dsk_list) == 11:
-                    self.button3.set_sensitive(True)
-                else:
-                    self.button3.set_sensitive(False)
-            elif self.mirror == "stripe":
-                if len(zfs_dsk_list) > 1:
-                    self.button3.set_sensitive(True)
-                else:
-                    self.button3.set_sensitive(False)
+            if check_if_small_disk is False:
+                zfs_dsk_list.extend([model[path][0] + "-" + model[path][1]])
+                if self.mirror == "none":
+                    if len(zfs_dsk_list) != 1:
+                        self.button3.set_sensitive(False)
+                    else:
+                        self.button3.set_sensitive(True)
+                elif self.mirror == "mirror":
+                    if len(zfs_dsk_list) > 1:
+                        self.button3.set_sensitive(True)
+                    else:
+                        self.button3.set_sensitive(False)
+                elif self.mirror == "raidz1":
+                    if len(zfs_dsk_list) == 3 or len(zfs_dsk_list) == 5:
+                        self.button3.set_sensitive(True)
+                    else:
+                        self.button3.set_sensitive(False)
+                elif self.mirror == "raidz2":
+                    if len(zfs_dsk_list) == 4 or len(zfs_dsk_list) == 6 or len(zfs_dsk_list) == 10:
+                        self.button3.set_sensitive(True)
+                    else:
+                        self.button3.set_sensitive(False)
+                elif self.mirror == "raidz3":
+                    if len(zfs_dsk_list) == 5 or len(zfs_dsk_list) == 7 or len(zfs_dsk_list) == 11:
+                        self.button3.set_sensitive(True)
+                    else:
+                        self.button3.set_sensitive(False)
+                elif self.mirror == "stripe":
+                    if len(zfs_dsk_list) > 1:
+                        self.button3.set_sensitive(True)
+                    else:
+                        self.button3.set_sensitive(False)
+            else:
+                #zfs_dsk_list = []
+                #grey the all the check
+                #comment box that say select a small disk
+                #when press ok it delete disk selection
+                # and uncheck all disk selected
         print zfs_dsk_list
-        return
+        return True
 
     def passwdstrength(self, widget):
         passwd = self.password.get_text()
