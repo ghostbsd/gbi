@@ -280,18 +280,18 @@ class ZFS():
         sw = Gtk.ScrolledWindow(hexpand=True, vexpand=True)
         sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
         sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
-        store = Gtk.TreeStore(str, str, str,'gboolean')
+        self.store = Gtk.TreeStore(str, str, str,'gboolean')
         for disk in zfs_disk_query():
             dsk = disk.partition(':')[0].rstrip()
             dsk_name = disk.partition(':')[2].rstrip()
             dsk_size = zfs_disk_size_query(dsk).rstrip()
-            store.append(None, [dsk, dsk_size, dsk_name, False])
-        treeView = Gtk.TreeView(store)
-        treeView.set_model(store)
+            self.store.append(None, [dsk, dsk_size, dsk_name, False])
+        treeView = Gtk.TreeView(self.store)
+        treeView.set_model(self.store)
         treeView.set_rules_hint(True)
         self.check_cell = Gtk.CellRendererToggle()
         self.check_cell.set_property('activatable', True)
-        self.check_cell.connect('toggled', self.col1_toggled_cb, store)
+        self.check_cell.connect('toggled', self.col1_toggled_cb, self.store)
         cell = Gtk.CellRendererText()
         column = Gtk.TreeViewColumn(None, cell, text=0)
         column_header = Gtk.Label('Disk')
@@ -437,13 +437,16 @@ class ZFS():
         text = self.swap_entry.get_text().strip()
         self.swap_entry.set_text(''.join([i for i in text if i in '0123456789']))
 
-    def check_if_small_disk(size):
-        for line in zfs_dsk_list:
-            if int(line.partition('-')[2]) > int(size):
-                returns = True
-                break
-            else:
-                returns = False
+    def check_if_small_disk(self, size):
+        if len(zfs_dsk_list) != 0:
+            for line in zfs_dsk_list:
+                if int(line.partition('-')[2]) > int(size):
+                    returns = True
+                    break
+                else:
+                    returns = False
+        else:
+            returns = False
         return returns
 
     def col1_toggled_cb(self, cell, path, model):
@@ -481,7 +484,7 @@ class ZFS():
                 else:
                     self.button3.set_sensitive(False)
         else:
-            if check_if_small_disk is False:
+            if self.check_if_small_disk(model[path][1]) is False:
                 zfs_dsk_list.extend([model[path][0] + "-" + model[path][1]])
                 if self.mirror == "none":
                     if len(zfs_dsk_list) != 1:
@@ -514,6 +517,9 @@ class ZFS():
                     else:
                         self.button3.set_sensitive(False)
             else:
+                self.check_cell.set_sensitive(False)
+                self.small_disk_warning()
+
                 #zfs_dsk_list = []
                 #grey the all the check
                 #comment box that say select a small disk
@@ -521,6 +527,42 @@ class ZFS():
                 # and uncheck all disk selected
         print zfs_dsk_list
         return True
+
+    def small_disk_warning(self):
+        window = Gtk.Window()
+        window.set_title("Warning")
+        window.set_border_width(0)
+        #window.set_size_request(480, 200)
+        window.set_icon_from_file(logo)
+        box1 = Gtk.VBox(False, 0)
+        window.add(box1)
+        box1.show()
+        box2 = Gtk.VBox(False, 10)
+        box2.set_border_width(10)
+        box1.pack_start(box2, True, True, 0)
+        box2.show()
+        warning_text = "Smallest disk need to be SELECTED first!\n"
+        warning_text += "All the disk selected will reset."
+        label = Gtk.Label(warning_text)
+        # Add button
+        box2.pack_start(label, True, True, 0)
+        bbox = Gtk.HButtonBox()
+        bbox.set_border_width(5)
+        bbox.set_spacing(10)
+        button = Gtk.Button(stock=Gtk.STOCK_OK)
+        button.connect("clicked", self.resset_selection, window)
+        bbox.add(button)
+        box2.pack_end(bbox, True, True, 5)
+        window.show_all()
+
+    def resset_selection(self, widget, window):
+        zfs_dsk_list = []
+        rows = len(self.store) - 1
+        for row in range(0, rows):
+            self.store[row][3] = False
+            row += 1
+        self.check_cell.set_sensitive(True)
+        window.hide()
 
     def passwdstrength(self, widget):
         passwd = self.password.get_text()
