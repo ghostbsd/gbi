@@ -520,11 +520,6 @@ class ZFS():
                 self.check_cell.set_sensitive(False)
                 self.small_disk_warning()
 
-                #zfs_dsk_list = []
-                #grey the all the check
-                #comment box that say select a small disk
-                #when press ok it delete disk selection
-                # and uncheck all disk selected
         print zfs_dsk_list
         return True
 
@@ -556,8 +551,9 @@ class ZFS():
         window.show_all()
 
     def resset_selection(self, widget, window):
+        global zfs_dsk_list
         zfs_dsk_list = []
-        rows = len(self.store) - 1
+        rows = len(self.store)
         for row in range(0, rows):
             self.store[row][3] = False
             row += 1
