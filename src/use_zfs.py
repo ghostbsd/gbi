@@ -642,33 +642,33 @@ class ZFS():
     def passwdVerification(self, widget):
         if self.password.get_text() == self.repassword.get_text():
             self.img.set_from_stock(Gtk.STOCK_YES, 10)
-            if self.mirror == "none":
+            if self.mirror == "single disk":
                 if len(zfs_dsk_list) != 1:
                     self.button3.set_sensitive(False)
                 else:
                     self.button3.set_sensitive(True)
-            elif self.mirror == "mirror":
-                if len(zfs_dsk_list) > 1:
+            elif self.mirror == "2 disk mirror":
+                if len(zfs_dsk_list) == 2:
                     self.button3.set_sensitive(True)
                 else:
                     self.button3.set_sensitive(False)
-            elif self.mirror == "raidz1":
-                if len(zfs_dsk_list) == 3 or len(zfs_dsk_list) == 5:
+            elif self.mirror == "3 disk raidz1":
+                if len(zfs_dsk_list) == 3:
                     self.button3.set_sensitive(True)
                 else:
                     self.button3.set_sensitive(False)
-            elif self.mirror == "raidz2":
-                if len(zfs_dsk_list) == 4 or len(zfs_dsk_list) == 6 or len(zfs_dsk_list) == 10:
+            elif self.mirror == "4 disk raidz2":
+                if len(zfs_dsk_list) == 4:
                     self.button3.set_sensitive(True)
                 else:
                     self.button3.set_sensitive(False)
-            elif self.mirror == "raidz3":
-                if len(zfs_dsk_list) == 5 or len(zfs_dsk_list) == 7 or len(zfs_dsk_list) == 11:
+            elif self.mirror == "5 disk raidz3":
+                if len(zfs_dsk_list) == 5:
                     self.button3.set_sensitive(True)
                 else:
                     self.button3.set_sensitive(False)
-            elif self.mirror == "stripe":
-                if len(zfs_dsk_list) > 1:
+            elif self.mirror == "2+ disk stripe":
+                if len(zfs_dsk_list) >= 2:
                     self.button3.set_sensitive(True)
                 else:
                     self.button3.set_sensitive(False)
