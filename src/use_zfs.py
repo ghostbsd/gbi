@@ -113,8 +113,8 @@ class ZFS():
         pfile.writelines('partition=ALL\n')
         pfile.writelines('partscheme=%s\n' % self.scheme)
         pfile.writelines('commitDiskPart\n\n')
-        if self.mirror == 'none':
-            pool_type = '\n'
+        if self.poolType == 'none':
+            pool_disk = '\n'
         else:
             ZFS_disk = zfs_dsk_list
             disk_len = len(ZFS_disk) - 1
@@ -125,7 +125,7 @@ class ZFS():
                 print mirror_dsk
                 num += 1
                 disk_len -= 1
-            pool_type = ' (%s:%s)\n' % (self.mirror, mirror_dsk)
+            pool_disk = ' (%s:%s)\n' % (self.poolType, mirror_dsk)
         read = open(boot_file, 'r')
         line = read.readlines()
         boot = line[0].strip()
@@ -135,7 +135,7 @@ class ZFS():
             ZFS_NUM = ZFS_NUM - 1
         else:
             ZFS_NUM = ZFS_NUM - 1
-        zfsPart = 'disk0-part=ZFS%s %s /(compress=off),/usr(compress=off),/usr/home(compress=lz4),/var(compress=lz4)%s' % (dgeli, ZFS_NUM, pool_type)
+        zfsPart = 'disk0-part=ZFS%s %s /(compress=off),/usr(compress=off),/usr/home(compress=lz4),/var(compress=lz4)%s' % (dgeli, ZFS_NUM, pool_disk)
         pfile.writelines(zfsPart)
         if SWAP != 0:
             pfile.writelines('disk0-part=SWAP%s %s none\n' % ('', SWAP))
@@ -158,44 +158,48 @@ class ZFS():
         mirror_mesage = " (select the smallest disk first)"
         data = model[index][0]
         self.mirror = data
-        if self.mirror == "none":
+        if self.mirror == "single disk":
+            self.poolType = 'none'
             self.mirrorTips.set_text("Please select one drive")
             if len(zfs_dsk_list) != 1:
                 self.button3.set_sensitive(False)
             else:
                 self.button3.set_sensitive(True)
-        elif self.mirror == "mirror":
-            self.mirrorTips.set_text("Please select at less 2 drive for mirroring"+ mirror_mesage)
-            if len(zfs_dsk_list) > 1:
+        elif self.mirror == "2 disk mirror":
+            self.poolType= 'mirror'
+            self.mirrorTips.set_text("Please select 2 drive for mirroring" + mirror_mesage)
+            if len(zfs_dsk_list) == 2:
                 self.button3.set_sensitive(True)
             else:
                 self.button3.set_sensitive(False)
-        elif self.mirror == "raidz1":
-            self.mirrorTips.set_text("Please select 3 or 5 drive for raidz1" + mirror_mesage)
-            if len(zfs_dsk_list) == 3 or len(zfs_dsk_list) == 5:
+        elif self.mirror == "3 disk raidz1":
+            self.poolType = 'raidz1'
+            self.mirrorTips.set_text("Please select 3 drive for raidz1" + mirror_mesage)
+            if len(zfs_dsk_list) == 3:
                 self.button3.set_sensitive(True)
             else:
                 self.button3.set_sensitive(False)
-        elif self.mirror == "raidz2":
-            self.mirrorTips.set_text("Please select 4, 6, or 10 drive for raidz" + mirror_mesage)
-            if len(zfs_dsk_list) == 4 or len(zfs_dsk_list) == 6 or len(zfs_dsk_list) == 10:
+        elif self.mirror == "4 disk raidz2":
+             self.poolType = 'raidz2'
+            self.mirrorTips.set_text("Please select 4 drive for raidz2" + mirror_mesage)
+            if len(zfs_dsk_list) == 4:
                 self.button3.set_sensitive(True)
             else:
                 self.button3.set_sensitive(False)
-        elif self.mirror == "raidz3":
-            self.mirrorTips.set_text("Please select 5, 7, or 11 drive for raidz" + mirror_mesage)
-            if len(zfs_dsk_list) == 5 or len(zfs_dsk_list) == 7 or len(zfs_dsk_list) == 11:
+        elif self.mirror == "5 disk raidz3":
+            self.poolType = 'raidz3'
+            self.mirrorTips.set_text("Please select 5 drive for raidz3" + mirror_mesage)
+            if len(zfs_dsk_list) == 5:
                 self.button3.set_sensitive(True)
             else:
                 self.button3.set_sensitive(False)
-        elif self.mirror == "stripe":
-            self.mirrorTips.set_text("Please select 2 drive to stripe" + mirror_mesage)
-            if len(zfs_dsk_list) > 1:
+        elif self.mirror == "2+ disk stripe":
+            self.poolType = 'stripe'
+            self.mirrorTips.set_text("Please select 2 or more drive for stripe" + mirror_mesage)
+            if len(zfs_dsk_list) >= 2:
                 self.button3.set_sensitive(True)
             else:
                 self.button3.set_sensitive(False)
-
-
 
     def on_check_poll(self, widget):
         if widget.get_active():
@@ -223,33 +227,33 @@ class ZFS():
             self.repassword.set_sensitive(False)
             self.disk_encript = False
             #self.swap_encrypt_check.set_active(False)
-            if self.mirror == "none":
+            if self.mirror == "single disk":
                 if len(zfs_dsk_list) != 1:
                     self.button3.set_sensitive(False)
                 else:
                     self.button3.set_sensitive(True)
-            elif self.mirror == "mirror":
-                if len(zfs_dsk_list) > 1:
+            elif self.mirror == "2 disk mirror":
+                if len(zfs_dsk_list) == 2:
                     self.button3.set_sensitive(True)
                 else:
                     self.button3.set_sensitive(False)
-            elif self.mirror == "raidz1":
-                if len(zfs_dsk_list) == 3 or len(zfs_dsk_list) == 5:
+            elif self.mirror == "3 disk raidz1":
+                if len(zfs_dsk_list) == 3:
                     self.button3.set_sensitive(True)
                 else:
                     self.button3.set_sensitive(False)
-            elif self.mirror == "raidz2":
-                if len(zfs_dsk_list) == 4 or len(zfs_dsk_list) == 6 or len(zfs_dsk_list) == 10:
+            elif self.mirror == "4 disk raidz2":
+                if len(zfs_dsk_list) == 4:
                     self.button3.set_sensitive(True)
                 else:
                     self.button3.set_sensitive(False)
-            elif self.mirror == "raidz3":
-                if len(zfs_dsk_list) == 5 or len(zfs_dsk_list) == 7 or len(zfs_dsk_list) == 11:
+            elif self.mirror == "5 disk raidz3":
+                if len(zfs_dsk_list) == 5:
                     self.button3.set_sensitive(True)
                 else:
                     self.button3.set_sensitive(False)
-            elif self.mirror == "stripe":
-                if len(zfs_dsk_list) > 1:
+            elif self.mirror == "2+ disk  stripe":
+                if len(zfs_dsk_list) >= 2:
                     self.button3.set_sensitive(True)
                 else:
                     self.button3.set_sensitive(False)
@@ -332,12 +336,12 @@ class ZFS():
         mirror_label = Gtk.Label('<b>Pool Type</b>')
         mirror_label.set_use_markup(True)
         mirror_box = Gtk.ComboBoxText()
-        mirror_box.append_text("none")
-        mirror_box.append_text("mirror")
-        mirror_box.append_text("raidz1")
-        mirror_box.append_text("raidz2")
-        mirror_box.append_text("raidz3")
-        mirror_box.append_text("stripe")
+        mirror_box.append_text("single disk")
+        mirror_box.append_text("2 disk mirror")
+        mirror_box.append_text("3 disk raidz1")
+        mirror_box.append_text("4 disk raidz2")
+        mirror_box.append_text("5 disk raidz3")
+        mirror_box.append_text("2+ disk stripe")
         mirror_box.connect('changed', self.mirror_selection)
         mirror_box.set_active(0)
 
@@ -453,66 +457,66 @@ class ZFS():
         model[path][3] = not model[path][3]
         if model[path][3] is False:
             zfs_dsk_list.remove(model[path][0] + "-" + model[path][1])
-            if self.mirror == "none":
+            if self.mirror == "single disk":
                 if len(zfs_dsk_list) != 1:
                     self.button3.set_sensitive(False)
                 else:
                     self.button3.set_sensitive(True)
-            elif self.mirror == "mirror":
-                if len(zfs_dsk_list) > 1:
+            elif self.mirror == "2 disk mirror":
+                if len(zfs_dsk_list) = 2:
                     self.button3.set_sensitive(True)
                 else:
                     self.button3.set_sensitive(False)
-            elif self.mirror == "raidz1":
-                if len(zfs_dsk_list) == 4 or len(zfs_dsk_list) == 6 or len(zfs_dsk_list) == 10:
+            elif self.mirror == "3 disk raidz1":
+                if len(zfs_dsk_list) == 3:
                     self.button3.set_sensitive(True)
                 else:
                     self.button3.set_sensitive(False)
-            elif self.mirror == "raidz2":
-                if len(zfs_dsk_list) == 3 or len(zfs_dsk_list) == 5:
+            elif self.mirror == "4 disk raidz2":
+                if len(zfs_dsk_list) == 4:
                     self.button3.set_sensitive(True)
                 else:
                     self.button3.set_sensitive(False)
-            elif self.mirror == "raidz3":
-                if len(zfs_dsk_list) == 5 or len(zfs_dsk_list) == 7 or len(zfs_dsk_list) == 11:
+            elif self.mirror == "5 disk raidz3":
+                if len(zfs_dsk_list) == 5:
                     self.button3.set_sensitive(True)
                 else:
                     self.button3.set_sensitive(False)
-            elif self.mirror == "stripe":
-                if len(zfs_dsk_list) > 1:
+            elif self.mirror == "2+ disk stripe":
+                if len(zfs_dsk_list) >= 2:
                     self.button3.set_sensitive(True)
                 else:
                     self.button3.set_sensitive(False)
         else:
             if self.check_if_small_disk(model[path][1]) is False:
                 zfs_dsk_list.extend([model[path][0] + "-" + model[path][1]])
-                if self.mirror == "none":
+                if self.mirror == "single disk":
                     if len(zfs_dsk_list) != 1:
                         self.button3.set_sensitive(False)
                     else:
                         self.button3.set_sensitive(True)
-                elif self.mirror == "mirror":
-                    if len(zfs_dsk_list) > 1:
+                elif self.mirror == "2 disk mirror":
+                    if len(zfs_dsk_list) == 2 :
                         self.button3.set_sensitive(True)
                     else:
                         self.button3.set_sensitive(False)
-                elif self.mirror == "raidz1":
-                    if len(zfs_dsk_list) == 3 or len(zfs_dsk_list) == 5:
+                elif self.mirror == "3 disk raidz1":
+                    if len(zfs_dsk_list) == 3:
                         self.button3.set_sensitive(True)
                     else:
                         self.button3.set_sensitive(False)
-                elif self.mirror == "raidz2":
-                    if len(zfs_dsk_list) == 4 or len(zfs_dsk_list) == 6 or len(zfs_dsk_list) == 10:
+                elif self.mirror == "4 disk raidz2":
+                    if len(zfs_dsk_list) == 4:
                         self.button3.set_sensitive(True)
                     else:
                         self.button3.set_sensitive(False)
-                elif self.mirror == "raidz3":
-                    if len(zfs_dsk_list) == 5 or len(zfs_dsk_list) == 7 or len(zfs_dsk_list) == 11:
+                elif self.mirror == "5 disk raidz3":
+                    if len(zfs_dsk_list) == 5:
                         self.button3.set_sensitive(True)
                     else:
                         self.button3.set_sensitive(False)
-                elif self.mirror == "stripe":
-                    if len(zfs_dsk_list) > 1:
+                elif self.mirror == "2+ disk stripe":
+                    if len(zfs_dsk_list) >= 2:
                         self.button3.set_sensitive(True)
                     else:
                         self.button3.set_sensitive(False)
