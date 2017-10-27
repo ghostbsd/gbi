@@ -180,7 +180,7 @@ class ZFS():
             else:
                 self.button3.set_sensitive(False)
         elif self.mirror == "4 disk raidz2":
-             self.poolType = 'raidz2'
+            self.poolType = 'raidz2'
             self.mirrorTips.set_text("Please select 4 drive for raidz2" + mirror_mesage)
             if len(zfs_dsk_list) == 4:
                 self.button3.set_sensitive(True)
@@ -463,7 +463,7 @@ class ZFS():
                 else:
                     self.button3.set_sensitive(True)
             elif self.mirror == "2 disk mirror":
-                if len(zfs_dsk_list) = 2:
+                if len(zfs_dsk_list) == 2:
                     self.button3.set_sensitive(True)
                 else:
                     self.button3.set_sensitive(False)
