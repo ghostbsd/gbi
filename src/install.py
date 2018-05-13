@@ -43,13 +43,8 @@ def read_output(command, probar):
     GLib.idle_add(update_progess, probar, "Creating pcinstall.cfg")
 
     # If rc.conf.ghostbsd exists run gbsd_cfg
-    if os.path.exists(rcconfgbsd):
-        gbsd_cfg()
-        call('umount /media/GhostBSD', shell=True)
-    # If rc.conf.desktopbsd exists run dbsd_cfg
-    elif os.path.exists(rcconfdbsd):
-        dbsd_cfg()
-        call('umount /media/DESKTOPBSD', shell=True)
+    gbsd_cfg()
+    call('umount /media/GhostBSD', shell=True)
     sleep(2)
     if os.path.exists(tmp + 'delete'):
         GLib.idle_add(update_progess, probar, "Deleting partition")
@@ -80,11 +75,11 @@ def read_output(command, probar):
         print(bartext)
     call('service hald start', shell=True)
     if bartext.rstrip() == "Installation finished!":
-        Popen('python2 %send.py' % gbi_path, shell=True, close_fds=True)
+        Popen('python2.7 %send.py' % gbi_path, shell=True, close_fds=True)
         call("rm -rf /tmp/.gbi/", shell=True, close_fds=True)
         Gtk.main_quit()
     else:
-        Popen('python2 %serror.py' % gbi_path, shell=True, close_fds=True)
+        Popen('python2.7 %serror.py' % gbi_path, shell=True, close_fds=True)
         Gtk.main_quit()
 
 

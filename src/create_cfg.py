@@ -40,7 +40,7 @@ class gbsd_cfg():
         f.writelines('installMode=fresh\n')
         f.writelines('installInteractive=no\n')
         f.writelines('installType=GhostBSD\n')
-        f.writelines('installMedium=dvd\n')
+        f.writelines('installMedium=livecd\n')
         f.writelines('packageType=livecd\n')
         # System Language
         lang = open(language, 'r')
