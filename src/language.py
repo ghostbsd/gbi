@@ -39,7 +39,7 @@
 from gi.repository import Gtk
 import os
 import os.path
-from subprocess import Popen, PIPE, STDOUT
+from subprocess import Popen, PIPE
 
 # Folder use for the installer.
 tmp = "/tmp/.gbi/"
@@ -50,9 +50,9 @@ if not os.path.exists(tmp):
 logo = "/usr/local/lib/gbi/logo.png"
 language = "%slanguage/avail-langs" % installer
 langfile = '%slanguage' % tmp
-langcmd = '/usr/local/sbin/pc-sysinstall query-langs'
+langcmd = 'pc-sysinstall query-langs'
 langlist = Popen(langcmd, shell=True, stdin=PIPE, stdout=PIPE,
-                 stderr=STDOUT, close_fds=True).stdout.readlines()
+                 universal_newlines=True, close_fds=True).stdout.readlines()
 # Text to be replace be multiple language file.
 title = "Welcome To GhostBSD!"
 welltext = """Select the language you want to use with GhostBSD."""
@@ -93,12 +93,12 @@ class Language:
         self.vbox1.show()
         # Add a second vertical box
         vbox2 = Gtk.VBox(False, 0)
-        #vbox2.set_border_width(0)
+        # vbox2.set_border_width(0)
         self.vbox1.pack_start(vbox2, True, True, 0)
         vbox2.show()
         # Add a defalt horisontal
         hbox = Gtk.HBox(False, 0)
-        #hbox.set_border_width(5)
+        # hbox.set_border_width(5)
         vbox2.pack_start(hbox, True, True, 0)
         hbox.show()
         # Adding a Scrolling Window

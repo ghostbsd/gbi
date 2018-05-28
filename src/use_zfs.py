@@ -1,4 +1,4 @@
-#!/usr/local/bin/python
+#!/usr/bin/env python
 """
 Copyright (c) 2014-2016, GhostBSD. All rights reserved.
 
@@ -28,7 +28,7 @@ ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 """
 
-from gi.repository import Gtk, GObject
+from gi.repository import Gtk
 import os
 import os.path
 import re
@@ -86,7 +86,8 @@ def lowerUpperNumber(strg, search=re.compile(r'[^a-zA-Z0-9]').search):
     return not bool(search(strg))
 
 
-# Find if pasword contain only lowercase, uppercase numbers and some special character.
+# Find if pasword contain only lowercase, uppercase numbers
+# and some special character.
 def allCharacter(strg, search=re.compile(r'[^a-zA-Z0-9~\!@#\$%\^&\*_\+":;\'\-]').search):
     return not bool(search(strg))
 
@@ -122,7 +123,7 @@ class ZFS():
             mirror_dsk = ''
             while disk_len != 0:
                 mirror_dsk += ' ' + ZFS_disk[num].partition('-')[0].rstrip()
-                print mirror_dsk
+                print(mirror_dsk)
                 num += 1
                 disk_len -= 1
             pool_disk = ' (%s:%s)\n' % (self.poolType, mirror_dsk)
@@ -166,8 +167,9 @@ class ZFS():
             else:
                 self.button3.set_sensitive(True)
         elif self.mirror == "2 disk mirror":
-            self.poolType= 'mirror'
-            self.mirrorTips.set_text("Please select 2 drive for mirroring" + mirror_mesage)
+            self.poolType = 'mirror'
+            mir_msg1 = f"Please select 2 drive for mirroring{mirror_mesage}"
+            self.mirrorTips.set_text(mir_msg1)
             if len(zfs_dsk_list) == 2:
                 self.button3.set_sensitive(True)
             else:
@@ -220,13 +222,13 @@ class ZFS():
             self.password.set_sensitive(True)
             self.repassword.set_sensitive(True)
             self.disk_encript = True
-            #self.swap_encrypt_check.set_active(True)
+            # self.swap_encrypt_check.set_active(True)
             self.button3.set_sensitive(False)
         else:
             self.password.set_sensitive(False)
             self.repassword.set_sensitive(False)
             self.disk_encript = False
-            #self.swap_encrypt_check.set_active(False)
+            # self.swap_encrypt_check.set_active(False)
             if self.mirror == "single disk":
                 if len(zfs_dsk_list) != 1:
                     self.button3.set_sensitive(False)
@@ -284,7 +286,7 @@ class ZFS():
         sw = Gtk.ScrolledWindow(hexpand=True, vexpand=True)
         sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
         sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
-        self.store = Gtk.TreeStore(str, str, str,'gboolean')
+        self.store = Gtk.TreeStore(str, str, str, 'gboolean')
         for disk in zfs_disk_query():
             dsk = disk.partition(':')[0].rstrip()
             dsk_name = disk.partition(':')[2].rstrip()
@@ -368,7 +370,7 @@ class ZFS():
         zfs4kcheck.connect("toggled", self.on_check)
         # Swap Size
         ram = Popen(memory, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT,
-        close_fds=True)
+                    universal_newlines=True, close_fds=True)
         mem = ram.stdout.read()
         swap = int(mem.partition(':')[2].strip()) / (1024 * 1024)
         swp_size_label = Gtk.Label('<b>Swap Size(MB)</b>')
@@ -405,7 +407,7 @@ class ZFS():
         # set image for password matching
         self.img = Gtk.Image()
         self.img.set_alignment(0.2, 0.5)
-        #table = Gtk.Table(12, 12, True)
+        # table = Gtk.Table(12, 12, True)
         grid = Gtk.Grid()
         grid.set_row_spacing(10)
         # grid.set_column_homogeneous(True)
@@ -413,8 +415,8 @@ class ZFS():
         grid.attach(Title, 1, 0, 8, 2)
         grid.attach(mirror_label, 1, 2, 1, 1)
         grid.attach(mirror_box, 2, 2, 1, 1)
-        #grid.attach(label, 6, 2, 2, 1)
-        #grid.attach(shemebox, 8, 2, 1, 1)
+        # grid.attach(label, 6, 2, 2, 1)
+        # grid.attach(shemebox, 8, 2, 1, 1)
         grid.attach(self.mirrorTips, 1, 3, 8, 1)
         grid.attach(sw, 1, 4, 8, 4)
         grid.attach(pool_check, 5, 9, 2, 1)
@@ -422,15 +424,15 @@ class ZFS():
         grid.attach(zfs4kcheck, 1, 9, 3, 1)
         grid.attach(swp_size_label, 5, 2, 2, 1)
         grid.attach(self.swap_entry, 7, 2, 2, 1)
-        #grid.attach(self.swap_encrypt_check, 9, 15, 11, 12)
-        #grid.attach(swap_mirror_check, 9, 15, 11, 12)
-        #grid.attach(encrypt_check, 1, 9, 2, 1)
-        #grid.attach(self.passwd_label, 1, 10, 1, 1)
-        #grid.attach(self.password, 2, 10, 2, 1)
-        #grid.attach(self.strenght_label, 4, 10, 2, 1)
-        #grid.attach(self.vpasswd_label, 1, 11, 1, 1)
-        #grid.attach(self.repassword, 2, 11, 2, 1)
-        #grid.attach(self.img, 4, 11, 2, 1)
+        # grid.attach(self.swap_encrypt_check, 9, 15, 11, 12)
+        # grid.attach(swap_mirror_check, 9, 15, 11, 12)
+        # grid.attach(encrypt_check, 1, 9, 2, 1)
+        # grid.attach(self.passwd_label, 1, 10, 1, 1)
+        # grid.attach(self.password, 2, 10, 2, 1)
+        # grid.attach(self.strenght_label, 4, 10, 2, 1)
+        # grid.attach(self.vpasswd_label, 1, 11, 1, 1)
+        # grid.attach(self.repassword, 2, 11, 2, 1)
+        # grid.attach(self.img, 4, 11, 2, 1)
         box2.pack_start(grid, True, True, 10)
         return
 
@@ -496,7 +498,7 @@ class ZFS():
                     else:
                         self.button3.set_sensitive(True)
                 elif self.mirror == "2 disk mirror":
-                    if len(zfs_dsk_list) == 2 :
+                    if len(zfs_dsk_list) == 2:
                         self.button3.set_sensitive(True)
                     else:
                         self.button3.set_sensitive(False)
@@ -524,14 +526,14 @@ class ZFS():
                 self.check_cell.set_sensitive(False)
                 self.small_disk_warning()
 
-        print zfs_dsk_list
+        print(zfs_dsk_list)
         return True
 
     def small_disk_warning(self):
         window = Gtk.Window()
         window.set_title("Warning")
         window.set_border_width(0)
-        #window.set_size_request(480, 200)
+        # window.set_size_request(480, 200)
         window.set_icon_from_file(logo)
         box1 = Gtk.VBox(False, 0)
         window.add(box1)

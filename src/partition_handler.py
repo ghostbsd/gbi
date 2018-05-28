@@ -64,13 +64,13 @@ def disk_query():
 
 def zfs_disk_query():
     disk_output = Popen(sysinstall + " disk-list", shell=True, stdin=PIPE,
-                        stdout=PIPE, stderr=STDOUT, close_fds=True)
+                        stdout=PIPE, universal_newlines=True, close_fds=True)
     return disk_output.stdout.readlines()
 
 
 def zfs_disk_size_query(disk):
     disk_info_output = Popen(sysinstall + " disk-info " + disk, shell=True,
-                             stdin=PIPE, stdout=PIPE, stderr=STDOUT,
+                             stdin=PIPE, stdout=PIPE, universal_newlines=True,
                              close_fds=True)
     return disk_info_output.stdout.readlines()[3].partition('=')[2]
 
@@ -79,7 +79,7 @@ def how_partition(path):
     disk = disk_query()[path[0]][0]
     if os.path.exists(partitiondb + disk):
         part = partition_query(disk)
-        print part
+        print(part)
         return len(part)
     else:
         return 0
@@ -92,6 +92,7 @@ def first_is_free(path):
         return part[0][0]
     else:
         return None
+
 
 def partition_query(disk):
     plist = open(partitiondb + disk, 'rb')
@@ -113,7 +114,7 @@ def scheme_query(path):
 def find_scheme(disk):
         cmd = "%s %s" % (detect_sheme, disk)
         shm_out = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE,
-                        stderr=STDOUT, close_fds=True)
+                        universal_newlines=True, close_fds=True)
         scheme = shm_out.stdout.readlines()[0].rstrip()
         return scheme
 
@@ -193,7 +194,7 @@ class partition_repos():
 
     def disk_list(self):
         disk_output = Popen(query_disk, shell=True, stdin=PIPE, stdout=PIPE,
-        stderr=STDOUT, close_fds=True)
+                            universal_newlines=True,  close_fds=True)
         dlist = []
         for disk in disk_output.stdout:
             dlist.append(disk.split())
@@ -202,21 +203,21 @@ class partition_repos():
     def disk_size(self, disk):
         cmd = "%s %s" % (disk_info, disk)
         ds = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE,
-        stderr=STDOUT, close_fds=True)
+                   universal_newlines=True, stderr=STDOUT, close_fds=True)
         diskSize = ds.stdout.readlines()[0].rstrip()
         return diskSize
 
     def find_Scheme(self, disk):
         cmd = "%s %s" % (detect_sheme, disk)
         shm_out = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE,
-        stderr=STDOUT, close_fds=True)
+                        universal_newlines=True, stderr=STDOUT, close_fds=True)
         scheme = shm_out.stdout.readlines()[0].rstrip()
         return scheme
 
     def mbr_partition_slice_list(self, disk):
         partition_outpput = Popen('%s %s' % (query_partition, disk),
                                   shell=True, stdin=PIPE, stdout=PIPE,
-                                  stderr=STDOUT, close_fds=True)
+                                  universal_newlines=True, close_fds=True)
         plist = []
         mplist = []
         dpsf = open(partitiondb + disk, 'wb')
@@ -231,7 +232,8 @@ class partition_repos():
 
     def mbr_partition_list(self, pslice):
         slice_outpput = Popen('%s %s' % (query_label, pslice), shell=True,
-        stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
+                              stdin=PIPE, stdout=PIPE,
+                              universal_newlines=True, close_fds=True)
         alph = ord('a')
         if pslice == 'freespace':
             pass
@@ -249,7 +251,7 @@ class partition_repos():
                 else:
                     llist.extend((
                                  [pslice + letter, info[0].partition('M')[0],
-                                 '', info[1]]))
+                                  '', info[1]]))
                 mllist.append(llist)
                 llist = []
             pickle.dump(mllist, plf)
@@ -258,7 +260,7 @@ class partition_repos():
     def gpt_partition_list(self, disk):
         partition_outpput = Popen('%s %s' % (query_partition, disk),
                                   shell=True, stdin=PIPE, stdout=PIPE,
-                                  stderr=STDOUT, close_fds=True)
+                                  universal_newlines=True, close_fds=True)
         plist = []
         mplist = []
         psf = open(partitiondb + disk, 'wb')
@@ -339,7 +341,8 @@ class Delete_partition():
         pfile = open(Part_label, 'w')
         for partlist in lablelist:
             if partlist[2] != '':
-                pfile.writelines('%s %s %s\n' % (partlist[3], partlist[1], partlist [2]))
+                pfile.writelines('%s %s %s\n' % (partlist[3], partlist[1],
+                                                 partlist[2]))
         pfile.close()
 
     def __init__(self, part, path):
@@ -425,7 +428,8 @@ class Delete_partition():
             pfile = open(Part_label, 'w')
             for partlist in partition_query(drive):
                 if partlist[2] != '':
-                    pfile.writelines('%s %s %s\n' % (partlist[3], partlist[1], partlist[2]))
+                    pfile.writelines('%s %s %s\n' % (partlist[3], partlist[1],
+                                                     partlist[2]))
             pfile.close()
 
 
@@ -459,7 +463,7 @@ class autoDiskPartition():
         slice_file.writelines('%s\n' % number)
         slice_file.close()
         ram = Popen(memory, shell=True, stdin=PIPE, stdout=PIPE,
-                    stderr=STDOUT, close_fds=True)
+                    universal_newlines=True, close_fds=True)
         mem = ram.stdout.read()
         swap = int(mem.partition(':')[2].strip()) / (1024 * 1024)
         rootNum = number - swap
@@ -499,7 +503,7 @@ class autoDiskPartition():
         slice_file.writelines('%s\n' % number)
         slice_file.close()
         ram = Popen(memory, shell=True, stdin=PIPE, stdout=PIPE,
-        stderr=STDOUT, close_fds=True)
+                    universal_newlines=True,  close_fds=True)
         mem = ram.stdout.read()
         swap = int(mem.partition(':')[2].strip()) / (1024 * 1024)
         if bios_or_uefi() == "UEFI":
@@ -563,7 +567,7 @@ class autoFreeSpace():
         slice_file.writelines('%s\n' % number)
         slice_file.close()
         ram = Popen(memory, shell=True, stdin=PIPE, stdout=PIPE,
-        stderr=STDOUT, close_fds=True)
+                    universal_newlines=True,  close_fds=True)
         mem = ram.stdout.read()
         swap = int(mem.partition(':')[2].strip()) / (1024 * 1024)
         rootNum = number - swap
@@ -616,7 +620,7 @@ class autoFreeSpace():
         slice_file.writelines('%s\n' % number)
         slice_file.close()
         ram = Popen(memory, shell=True, stdin=PIPE, stdout=PIPE,
-        stderr=STDOUT, close_fds=True)
+                    universal_newlines=True, close_fds=True)
         mem = ram.stdout.read()
         swap = int(mem.partition(':')[2].strip()) / (1024 * 1024)
         rootNum = number - swap
@@ -639,12 +643,10 @@ class autoFreeSpace():
             plist.extend(([disk + 'p%s' % sl, bs, 'none', 'BOOT']))
         mplist[path] = plist
         plist = []
-        plist.extend((
-        [disk + 'p%s' % int(sl + 1), rootNum, '/', 'UFS+SUJ']))
+        plist.extend(([disk + 'p%s' % int(sl + 1), rootNum, '/', 'UFS+SUJ']))
         mplist.append(plist)
         plist = []
-        plist.extend((
-        [disk + 'p%s' % int(sl + 2), swap, 'none', 'SWAP']))
+        plist.extend(([disk + 'p%s' % int(sl + 2), swap, 'none', 'SWAP']))
         mplist.append(plist)
         pickle.dump(mplist, plf)
         plf.close()
@@ -705,7 +707,8 @@ class createLabel():
         pfile = open(Part_label, 'w')
         for partlist in labellist:
             if partlist[2] != '':
-                pfile.writelines('%s %s %s\n' % (partlist[3], partlist[1], partlist[2]))
+                pfile.writelines('%s %s %s\n' % (partlist[3], partlist[1],
+                                                 partlist[2]))
         pfile.close()
 
 
@@ -746,7 +749,8 @@ class modifyLabel():
         pfile = open(Part_label, 'w')
         for partlist in labellist:
             if partlist[2] != '':
-                pfile.writelines('%s %s %s\n' % (partlist[3], partlist[1], partlist[2]))
+                pfile.writelines('%s %s %s\n' % (partlist[3], partlist[1],
+                                                 partlist[2]))
         pfile.close()
 
 
@@ -820,7 +824,7 @@ class createPartition():
         if not os.path.exists(dslice):
             slice_file = open(dslice, 'w')
             slice_file.writelines('p%s\n' % pl)
-            #slice_file.writelines('%s\n' % number)
+            # slice_file.writelines('%s\n' % number)
             slice_file.close()
         plist = []
         pslice = '%sp%s' % (disk, pl)
@@ -839,7 +843,8 @@ class createPartition():
         pfile = open(Part_label, 'w')
         for partlist in partition_query(disk):
             if partlist[2] != '':
-                pfile.writelines('%s %s %s\n' % (partlist[3], partlist[1], partlist[2]))
+                pfile.writelines('%s %s %s\n' % (partlist[3], partlist[1],
+                                                 partlist[2]))
         pfile.close()
         if data is True:
             plst = []
@@ -892,7 +897,8 @@ class modifyPartition():
         pfile = open(Part_label, 'w')
         for partlist in partition_query(disk):
             if partlist[2] != '':
-                pfile.writelines('%s %s %s\n' % (partlist[3], partlist[1], partlist[2]))
+                pfile.writelines('%s %s %s\n' % (partlist[3], partlist[1],
+                                 partlist[2]))
         pfile.close()
         if data is True:
             plst = []
@@ -929,23 +935,26 @@ class destroyParttion():
                 scheme = line[1]
                 sleep(2)
                 call('gpart create -s %s %s' % (scheme,
-                 drive), shell=True)
+                     drive), shell=True)
                 sleep(2)
 
 
 def bios_or_uefi():
     kenvcmd = "kenv"
-    kenvoutput = Popen(kenvcmd, shell=True, stdout=PIPE, close_fds=True)
+    kenvoutput = Popen(kenvcmd, shell=True, stdout=PIPE,
+                       universal_newlines=True, close_fds=True)
     if "grub.platform" in kenvoutput.stdout.read():
         cmd = "kenv grub.platform"
-        output = Popen(cmd, shell=True, stdout=PIPE, close_fds=True)
+        output = Popen(cmd, shell=True, stdout=PIPE,
+                       universal_newlines=True, close_fds=True)
         if output.stdout.readlines()[0].rstrip() == "efi":
             return "UEFI"
         else:
             return "BIOS"
     else:
         cmd = "sysctl -n machdep.bootmethod"
-        output = Popen(cmd, shell=True, stdout=PIPE, close_fds=True)
+        output = Popen(cmd, shell=True, stdout=PIPE,
+                       universal_newlines=True, close_fds=True)
         return output.stdout.readlines()[0].rstrip()
 
 

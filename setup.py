@@ -48,6 +48,7 @@ data_files = [
     ('{prefix}/lib/gbi'.format(prefix=sys.prefix), ['src/partition_handler.py']),
     ('{prefix}/lib/gbi'.format(prefix=sys.prefix), ['src/root.py']),
     ('{prefix}/lib/gbi'.format(prefix=sys.prefix), ['src/slides.py']),
+    ('{prefix}/lib/gbi'.format(prefix=sys.prefix), ['src/sys_handler.py']),
     ('{prefix}/lib/gbi'.format(prefix=sys.prefix), ['src/timezone.py']),
     ('{prefix}/lib/gbi'.format(prefix=sys.prefix), ['src/use_ufs.py']),
     ('{prefix}/lib/gbi'.format(prefix=sys.prefix), ['src/use_zfs.py']),
@@ -171,18 +172,8 @@ data_files = [
     ('{prefix}/lib/gbi/slide-images/ghostbsd'.format(prefix=sys.prefix), ['src/slide-images/ghostbsd/social.png']),
     ('{prefix}/lib/gbi/slide-images/ghostbsd'.format(prefix=sys.prefix), ['src/slide-images/ghostbsd/software.png']),
     ('{prefix}/lib/gbi/slide-images/ghostbsd'.format(prefix=sys.prefix), ['src/slide-images/ghostbsd/welcome.png']),
-    ('{prefix}/lib/gbi/timezone'.format(prefix=sys.prefix), ['src/timezone/continent']),
-    ('{prefix}/lib/gbi/timezone/city'.format(prefix=sys.prefix), ['src/timezone/city/Africa']),
-    ('{prefix}/lib/gbi/timezone/city'.format(prefix=sys.prefix), ['src/timezone/city/America']),
-    ('{prefix}/lib/gbi/timezone/city'.format(prefix=sys.prefix), ['src/timezone/city/Antarctica']),
-    ('{prefix}/lib/gbi/timezone/city'.format(prefix=sys.prefix), ['src/timezone/city/Arctic']),
-    ('{prefix}/lib/gbi/timezone/city'.format(prefix=sys.prefix), ['src/timezone/city/Asia']),
-    ('{prefix}/lib/gbi/timezone/city'.format(prefix=sys.prefix), ['src/timezone/city/Atlantic']),
-    ('{prefix}/lib/gbi/timezone/city'.format(prefix=sys.prefix), ['src/timezone/city/Australia']),
-    ('{prefix}/lib/gbi/timezone/city'.format(prefix=sys.prefix), ['src/timezone/city/Europe']),
-    ('{prefix}/lib/gbi/timezone/city'.format(prefix=sys.prefix), ['src/timezone/city/Indian']),
-    ('{prefix}/lib/gbi/timezone/city'.format(prefix=sys.prefix), ['src/timezone/city/Pacific']),
 ]
+
 data_files.extend(datafilelist('{prefix}/share/locale'.format(prefix=sys.prefix), 'build/mo'))
 
 # cmdclass ={

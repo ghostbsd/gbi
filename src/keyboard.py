@@ -36,7 +36,7 @@
 #
 # $Id: gbi_keyboard.py v 0.3 Wednesday, May 30 2012 21:49 Eric Turgeon $
 
-from gi.repository import Gtk, GObject
+from gi.repository import Gtk
 import os
 from subprocess import Popen, PIPE, call
 
@@ -51,21 +51,23 @@ if not os.path.exists(tmp):
 
 logo = "/usr/local/lib/gbi/logo.png"
 
-xk_variant = "%s xkeyboard-variants" % pc_sysinstall
+xk_variant = f"{pc_sysinstall} xkeyboard-variants"
 xk_layout = "%s xkeyboard-layouts" % pc_sysinstall
 
-# xkeyboard_variant = Popen(xk_variant , shell=True, stdout=PIPE, close_fds=True)
-# xkeyboard_layout = Popen(xk_layout , shell=True, stdout=PIPE, close_fds=True)
+# xkeyboard_variant = Popen(xk_variant , shell=True, stdout=PIPE,
+#                           universal_newlines=True, close_fds=True)
+# xkeyboard_layout = Popen(xk_layout , shell=True, stdout=PIPE,
+#                          universal_newlines=True, close_fds=True)
 
 xkeyboard_variant = "/usr/local/lib/gbi/keyboard/variant"
 xkeyboard_layout = "/usr/local/lib/gbi/keyboard/layout"
 
 layout = '%slayout' % tmp
 variant = '%svariant' % tmp
-KBFile= '%skeyboard' % tmp
+KBFile = '%skeyboard' % tmp
+
 
 # This class is for placeholder for entry.
-
 class PlaceholderEntry(Gtk.Entry):
 
     placeholder = 'Type here to test your keyboard'
@@ -87,7 +89,8 @@ class PlaceholderEntry(Gtk.Entry):
     def _focus_out_event(self, widget, event):
         if Gtk.Entry.get_text(self) == '':
             self.set_text(self.placeholder)
-            # self.modify_text(Gtk.STATE_NORMAL, Gtk.gdk.color_parse("#4d4d4d"))
+            # self.modify_text(Gtk.STATE_NORMAL,
+            #                    Gtk.gdk.color_parse("#4d4d4d"))
             self._default = True
         else:
             self._default = False
@@ -126,8 +129,10 @@ class Keyboard:
             tree_iter = model.get_iter(path)
             value = model.get_value(tree_iter, 0)
         self.layout_txt = value
-        if os.path.exists("%s/%s" % (xkeyboard_variant, value.partition("-")[2].strip())):
-            read = open("%s/%s" % (xkeyboard_variant, value.partition("-")[2].strip()), 'r')
+        if os.path.exists("%s/%s" % (xkeyboard_variant,
+                                     value.partition("-")[2].strip())):
+            read = open("%s/%s" % (xkeyboard_variant,
+                                   value.partition("-")[2].strip()), 'r')
             for line in read.readlines():
                 self.variant_store.append(None, [line.rstrip()])
         call("setxkbmap %s" % self.layout_txt.partition("-")[2], shell=True)
@@ -138,10 +143,11 @@ class Keyboard:
         for path in pathlist:
             tree_iter = model.get_iter(path)
             value = model.get_value(tree_iter, 0)
-            #print value
+            # print(value)
         self.variant_txt = value
         call("setxkbmap %s %s" % (self.layout_txt.partition("-")[2],
-        self.variant_txt.partition(":")[2]), shell=True)
+                                  self.variant_txt.partition(":")[2]),
+             shell=True)
 
     def get_model(self):
         return self.box1
@@ -149,7 +155,7 @@ class Keyboard:
     def save_selection(self):
         File = open(KBFile, 'w')
         File.writelines("%s\n" % self.layout_txt)
-        if self.variant_txt != None:
+        if self.variant_txt is not None:
             File.writelines("%s\n" % self.variant_txt)
         File.close()
         return
@@ -211,4 +217,3 @@ class Keyboard:
         self.box1.pack_start(box2, False, False, 0)
         box2.show()
         box2.pack_start(PlaceholderEntry(), True, True, 10)
-

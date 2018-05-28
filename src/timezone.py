@@ -46,13 +46,11 @@ tmp = "/tmp/.gbi/"
 installer = "/usr/local/lib/gbi/"
 if not os.path.exists(tmp):
     os.makedirs(tmp)
+from sys_handler import timezone_dictionary
 
 logo = "/usr/local/lib/gbi/logo.png"
-back = 'python %sgbi_keyboard.py' % installer
-logo = "/usr/local/lib/gbi/logo.png"
-continent = '%s/timezone/continent' % installer
-city = '%s/timezone/city/' % installer
 time = '%stimezone' % tmp
+tzdictionary = timezone_dictionary()
 
 
 class TimeZone:
@@ -77,25 +75,26 @@ class TimeZone:
         column.set_sort_column_id(0)
         treeView.append_column(column)
 
-    def Continent_Selection(self, widget):
-        (model, pathlist) = widget.get_selected_rows()
+    def Continent_Selection(self, tree_selection):
+        model, treeiter = tree_selection.get_selected()
         self.variant_store.clear()
-        for path in pathlist:
-            tree_iter = model.get_iter(path)
-            value = model.get_value(tree_iter, 0)
-        self.continent = value
-        read = open('%s%s' % (city, self.continent), 'r')
-        for line in read.readlines():
-                self.variant_store.append(None, [line.rstrip()])
+        if treeiter is not None:
+            value = model[treeiter][0]
+            self.continent = value
+            print(self.continent)
+            for line in tzdictionary[self.continent]:
+                self.variant_store.append(None, [line])
+            self.citytreeView.set_cursor(0)
 
     def City_Selection(self, tree_selection, button3):
-        (model, pathlist) = tree_selection.get_selected_rows()
-        for path in pathlist:
-            tree_iter = model.get_iter(path)
-            value = model.get_value(tree_iter, 0)
-            #print value
-        self.city = value
-        button3.set_sensitive(True)
+        model, treeiter = tree_selection.get_selected()
+        if treeiter is not None:
+            value = model[treeiter][0]
+            self.city = value
+            print(self.city)
+            button3.set_sensitive(True)
+        else:
+            button3.set_sensitive(False)
 
     def save_selection(self):
         timezone = '%s/%s' % (self.continent, self.city)
@@ -112,7 +111,8 @@ class TimeZone:
         self.box1.pack_start(box2, True, True, 0)
         box2.show()
         table = Gtk.Table(1, 2, True)
-        label = Gtk.Label('<b><span size="xx-large">Time Zone Selection</span></b>')
+        tzTitle = '<b><span size="xx-large">Time Zone Selection</span></b>'
+        label = Gtk.Label(tzTitle)
         label.set_use_markup(True)
         table.attach(label, 0, 2, 0, 1)
         box2.pack_start(table, False, False, 0)
@@ -125,19 +125,16 @@ class TimeZone:
         sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
         sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         store = Gtk.TreeStore(str)
-        read = open(continent, 'r')
-        line0 = read.readlines()[0].strip()
-        self.continent = line0
-        read = open(continent, 'r')
-        for line in read.readlines():
-            store.append(None, [line.rstrip()])
+        for line in tzdictionary:
+            store.append(None, [line])
         self.continenttreeView = Gtk.TreeView(store)
         self.continenttreeView.set_model(store)
         self.continenttreeView.set_rules_hint(True)
         self.continent_columns(self.continenttreeView)
         self.continenttree_selection = self.continenttreeView.get_selection()
         self.continenttree_selection.set_mode(Gtk.SelectionMode.SINGLE)
-        self.continenttree_selection.connect("changed", self.Continent_Selection)
+        self.continenttree_selection.connect("changed",
+                                             self.Continent_Selection)
         sw.add(self.continenttreeView)
         sw.show()
         hbox.pack_start(sw, True, True, 5)
@@ -146,17 +143,18 @@ class TimeZone:
         sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
         sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         self.variant_store = Gtk.TreeStore(str)
-        treeView = Gtk.TreeView(self.variant_store)
-        treeView.set_model(self.variant_store)
-        treeView.set_rules_hint(True)
-        self.city_columns(treeView)
-        tree_selection = treeView.get_selection()
+        self.citytreeView = Gtk.TreeView(self.variant_store)
+        self.citytreeView.set_model(self.variant_store)
+        self.citytreeView.set_rules_hint(True)
+        self.city_columns(self.citytreeView)
+        tree_selection = self.citytreeView.get_selection()
         tree_selection.set_mode(Gtk.SelectionMode.SINGLE)
         tree_selection.connect("changed", self.City_Selection, button3)
-        sw.add(treeView)
+        sw.add(self.citytreeView)
         sw.show()
         hbox.pack_start(sw, True, True, 5)
         return
 
     def get_model(self):
+        self.continenttreeView.set_cursor(1)
         return self.box1

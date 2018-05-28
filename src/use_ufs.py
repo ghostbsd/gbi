@@ -28,7 +28,7 @@ ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 """
 
-from gi.repository import Gtk, GObject
+from gi.repository import Gtk
 import os
 import os.path
 import re
@@ -108,7 +108,7 @@ class use_ufs():
             mirror_dsk = ''
             while disk_len != 0:
                 mirror_dsk += ufs_disk[num].partition('-')[0].rstrip() + " "
-                print mirror_dsk
+                print(mirror_dsk)
                 num += 1
                 disk_len -= 1
             pfile.writelines("mirror=%s\n" % mirror_dsk)
@@ -182,13 +182,13 @@ class use_ufs():
             self.password.set_sensitive(True)
             self.repassword.set_sensitive(True)
             self.disk_encript = True
-            #self.swap_encrypt_check.set_active(True)
+            # self.swap_encrypt_check.set_active(True)
             self.button3.set_sensitive(False)
         else:
             self.password.set_sensitive(False)
             self.repassword.set_sensitive(False)
             self.disk_encript = False
-            #self.swap_encrypt_check.set_active(False)
+            # self.swap_encrypt_check.set_active(False)
             if self.mirror is False:
                 if len(ufs_dsk_list) != 1:
                     self.button3.set_sensitive(False)
@@ -232,7 +232,7 @@ class use_ufs():
         sw = Gtk.ScrolledWindow(hexpand=True, vexpand=True)
         sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
         sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
-        store = Gtk.TreeStore(str, str, str,'gboolean')
+        store = Gtk.TreeStore(str, str, str, 'gboolean')
         for disk in zfs_disk_query():
             dsk = disk.partition(':')[0].rstrip()
             dsk_name = disk.partition(':')[2].rstrip()
@@ -303,7 +303,7 @@ class use_ufs():
         shemebox.set_active(0)
         # Swap Size
         ram = Popen(memory, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT,
-        close_fds=True)
+                    universal_newlines=True, close_fds=True)
         mem = ram.stdout.read()
         swap = int(mem.partition(':')[2].strip()) / (1024 * 1024)
         swp_size_label = Gtk.Label('<b>Swap Size(MB)</b>')
@@ -362,15 +362,15 @@ class use_ufs():
         grid.attach(self.fstype, 7, 9, 1, 1)
         grid.attach(swp_size_label, 5, 2, 2, 1)
         grid.attach(self.swap_entry, 7, 2, 1, 1)
-        #grid.attach(self.swap_encrypt_check, 9, 15, 11, 12)
-        #grid.attach(swap_mirror_check, 9, 15, 11, 12)
-        #grid.attach(encrypt_check, 1, 9, 2, 1)
-        #grid.attach(self.passwd_label, 1, 10, 1, 1)
-        #grid.attach(self.password, 2, 10, 2, 1)
-        #grid.attach(self.strenght_label, 4, 10, 2, 1)
-        #grid.attach(self.vpasswd_label, 1, 11, 1, 1)
-        #grid.attach(self.repassword, 2, 11, 2, 1)
-        #grid.attach(self.img, 4, 11, 2, 1)
+        # grid.attach(self.swap_encrypt_check, 9, 15, 11, 12)
+        # grid.attach(swap_mirror_check, 9, 15, 11, 12)
+        # grid.attach(encrypt_check, 1, 9, 2, 1)
+        # grid.attach(self.passwd_label, 1, 10, 1, 1)
+        # grid.attach(self.password, 2, 10, 2, 1)
+        # grid.attach(self.strenght_label, 4, 10, 2, 1)
+        # grid.attach(self.vpasswd_label, 1, 11, 1, 1)
+        # grid.attach(self.repassword, 2, 11, 2, 1)
+        # grid.attach(self.img, 4, 11, 2, 1)
         box2.pack_start(grid, True, True, 10)
         return
 
@@ -408,7 +408,7 @@ class use_ufs():
                     self.button3.set_sensitive(True)
                 else:
                     self.button3.set_sensitive(False)
-        print ufs_dsk_list
+        print(ufs_dsk_list)
         return
 
     def passwdstrength(self, widget):
