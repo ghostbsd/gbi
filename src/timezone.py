@@ -40,13 +40,12 @@
 from gi.repository import Gtk
 import os.path
 import os
-
+from sys_handler import timezone_dictionary
 # Folder use for the installer.
 tmp = "/tmp/.gbi/"
 installer = "/usr/local/lib/gbi/"
 if not os.path.exists(tmp):
     os.makedirs(tmp)
-from sys_handler import timezone_dictionary
 
 logo = "/usr/local/lib/gbi/logo.png"
 time = '%stimezone' % tmp
@@ -77,13 +76,13 @@ class TimeZone:
 
     def Continent_Selection(self, tree_selection):
         model, treeiter = tree_selection.get_selected()
-        self.variant_store.clear()
+        self.city_store.clear()
         if treeiter is not None:
             value = model[treeiter][0]
             self.continent = value
             print(self.continent)
             for line in tzdictionary[self.continent]:
-                self.variant_store.append(None, [line])
+                self.city_store.append(None, [line])
             self.citytreeView.set_cursor(0)
 
     def City_Selection(self, tree_selection, button3):
@@ -142,9 +141,9 @@ class TimeZone:
         sw = Gtk.ScrolledWindow()
         sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
         sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
-        self.variant_store = Gtk.TreeStore(str)
-        self.citytreeView = Gtk.TreeView(self.variant_store)
-        self.citytreeView.set_model(self.variant_store)
+        self.city_store = Gtk.TreeStore(str)
+        self.citytreeView = Gtk.TreeView(self.city_store)
+        self.citytreeView.set_model(self.city_store)
         self.citytreeView.set_rules_hint(True)
         self.city_columns(self.citytreeView)
         tree_selection = self.citytreeView.get_selection()

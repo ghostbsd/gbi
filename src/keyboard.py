@@ -38,33 +38,23 @@
 
 from gi.repository import Gtk
 import os
-from subprocess import Popen, PIPE, call
-
+from subprocess import call
+from sys_handler import keyboard_dictionary, keyboard_models
 
 # Folder use for the installer.
 tmp = "/tmp/.gbi/"
 installer = "/usr/local/lib/gbi/"
-pc_sysinstall = "/usr/local/bin/pc-sysinstall"
 query = "sh /usr/local/lib/gbi/backend-query/"
-if not os.path.exists(tmp):
-    os.makedirs(tmp)
-
 logo = "/usr/local/lib/gbi/logo.png"
 
-xk_variant = f"{pc_sysinstall} xkeyboard-variants"
-xk_layout = "%s xkeyboard-layouts" % pc_sysinstall
-
-# xkeyboard_variant = Popen(xk_variant , shell=True, stdout=PIPE,
-#                           universal_newlines=True, close_fds=True)
-# xkeyboard_layout = Popen(xk_layout , shell=True, stdout=PIPE,
-#                          universal_newlines=True, close_fds=True)
-
-xkeyboard_variant = "/usr/local/lib/gbi/keyboard/variant"
-xkeyboard_layout = "/usr/local/lib/gbi/keyboard/layout"
+if not os.path.exists(tmp):
+    os.makedirs(tmp)
 
 layout = '%slayout' % tmp
 variant = '%svariant' % tmp
 KBFile = '%skeyboard' % tmp
+kb_dictionary = keyboard_dictionary()
+kbm_dictionary = keyboard_models()
 
 
 # This class is for placeholder for entry.
@@ -115,7 +105,7 @@ class Keyboard:
     def variant_columns(self, treeView):
         cell = Gtk.CellRendererText()
         column = Gtk.TreeViewColumn(None, cell, text=0)
-        column_header = Gtk.Label('<b>Keyboard Variant</b>')
+        column_header = Gtk.Label('<b>Keyboard Models</b>')
         column_header.set_use_markup(True)
         column_header.show()
         column.set_widget(column_header)
@@ -123,40 +113,39 @@ class Keyboard:
         treeView.append_column(column)
 
     def Selection_Layout(self, tree_selection, button3):
-        (model, pathlist) = tree_selection.get_selected_rows()
-        self.variant_store.clear()
-        for path in pathlist:
-            tree_iter = model.get_iter(path)
-            value = model.get_value(tree_iter, 0)
-        self.layout_txt = value
-        if os.path.exists("%s/%s" % (xkeyboard_variant,
-                                     value.partition("-")[2].strip())):
-            read = open("%s/%s" % (xkeyboard_variant,
-                                   value.partition("-")[2].strip()), 'r')
-            for line in read.readlines():
-                self.variant_store.append(None, [line.rstrip()])
-        call("setxkbmap %s" % self.layout_txt.partition("-")[2], shell=True)
-        button3.set_sensitive(True)
+        model, treeiter = tree_selection.get_selected()
+        if treeiter is not None:
+            value = model[treeiter][0]
+            kb_lv = kb_dictionary[value]
+            self.kb_layout = kb_lv['layout']
+            self.kb_variant = kb_lv['variant']
+            print(self.kb_layout)
+            print(self.kb_variant)
+            if self.kb_variant is None:
+                call("setxkbmap %s" % self.kb_layout, shell=True)
+            else:
+                call("setxkbmap %s %s" % (self.kb_layout, self.kb_variant),
+                     shell=True)
+            button3.set_sensitive(True)
+        else:
+            button3.set_sensitive(False)
 
-    def Selection_Variant(self, tree_selection):
-        (model, pathlist) = tree_selection.get_selected_rows()
-        for path in pathlist:
-            tree_iter = model.get_iter(path)
-            value = model.get_value(tree_iter, 0)
-            # print(value)
-        self.variant_txt = value
-        call("setxkbmap %s %s" % (self.layout_txt.partition("-")[2],
-                                  self.variant_txt.partition(":")[2]),
-             shell=True)
+    def Selection_Model(self, tree_selection):
+        model, treeiter = tree_selection.get_selected()
+        if treeiter is not None:
+            value = model[treeiter][0]
+            self.kb_model = kbm_dictionary[value]
+            print(self.kb_model)
 
     def get_model(self):
+        self.treeView.set_cursor(0)
         return self.box1
 
     def save_selection(self):
         File = open(KBFile, 'w')
-        File.writelines("%s\n" % self.layout_txt)
-        if self.variant_txt is not None:
-            File.writelines("%s\n" % self.variant_txt)
+        File.writelines("%s\n" % self.kb_layout)
+        File.writelines("%s\n" % self.kb_variant)
+        File.writelines("%s\n" % self.kb_model)
         File.close()
         return
 
@@ -182,8 +171,10 @@ class Keyboard:
         sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
         sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         store = Gtk.TreeStore(str)
-        read = open(xkeyboard_layout, 'r')
-        for line in read.readlines():
+        store.append(None, ['English (US)'])
+        store.append(None, ['English (Canada)'])
+        store.append(None, ['French (Canada)'])
+        for line in sorted(kb_dictionary):
             store.append(None, [line.rstrip()])
         self.treeView = Gtk.TreeView(store)
         self.treeView.set_model(store)
@@ -199,17 +190,20 @@ class Keyboard:
         sw = Gtk.ScrolledWindow()
         sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
         sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
-        self.variant_store = Gtk.TreeStore(str)
-        treeView = Gtk.TreeView(self.variant_store)
-        treeView.set_model(self.variant_store)
+        self.kb_model = None
+        self.model_store = Gtk.TreeStore(str)
+        for line in sorted(kbm_dictionary):
+            self.model_store.append(None, [line.rstrip()])
+        treeView = Gtk.TreeView(self.model_store)
+        treeView.set_model(self.model_store)
         treeView.set_rules_hint(True)
         self.variant_columns(treeView)
         tree_selection = treeView.get_selection()
         tree_selection.set_mode(Gtk.SelectionMode.SINGLE)
-        tree_selection.connect("changed", self.Selection_Variant)
+        tree_selection.connect("changed", self.Selection_Model)
         sw.add(treeView)
         sw.show()
-        self.variant_txt = None
+        # self.kb_variant = None
         hbox.pack_start(sw, True, True, 5)
 
         box2 = Gtk.HBox(False, 10)

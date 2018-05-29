@@ -3,6 +3,44 @@
 from subprocess import Popen, PIPE
 
 
+def keyboard_dictionary():
+    xkeyboard_layouts = Popen('pc-sysinstall xkeyboard-layouts', shell=True,
+                              stdout=PIPE,
+                              universal_newlines=True).stdout.readlines()
+    dictionary = {}
+    for line in xkeyboard_layouts:
+        keyboard_list = list(filter(None, line.rstrip().split('  ')))
+        kb_name = keyboard_list[1].strip()
+        kb_layouts = keyboard_list[0].strip()
+        kb_variant = None
+        dictionary[kb_name] = {'layout': kb_layouts, 'variant': kb_variant}
+
+    xkeyboard_variants = Popen('pc-sysinstall xkeyboard-variants', shell=True,
+                               stdout=PIPE,
+                               universal_newlines=True).stdout.readlines()
+    for line in xkeyboard_variants:
+        xkb_variant = line.rstrip()
+        kb_name = xkb_variant.partition(':')[2].strip()
+        keyboard_list = list(filter
+                             (None, xkb_variant.partition(':')[0].split()))
+        kb_layouts = keyboard_list[1].strip()
+        kb_variant = keyboard_list[0].strip()
+        dictionary[kb_name] = {'layout': kb_layouts, 'variant': kb_variant}
+    return dictionary
+
+
+def keyboard_models():
+    xkeyboard_models = Popen('pc-sysinstall xkeyboard-models', shell=True,
+                             stdout=PIPE,
+                             universal_newlines=True).stdout.readlines()
+    dictionary = {}
+    for line in xkeyboard_models:
+        kbm_name = line.rstrip().partition(' ')[2]
+        kbm_code = line.rstrip().partition(' ')[0]
+        dictionary[kbm_name] = kbm_code
+    return dictionary
+
+
 def timezone_dictionary():
     tz_list = Popen('pc-sysinstall list-tzones', shell=True,
                     stdout=PIPE, universal_newlines=True).stdout.readlines()
