@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: iso-8859-1 -*-
 #
 #####################################################################
 # Copyright (c) 2009-2012, GhostBSD. All rights reserved.
@@ -119,8 +118,6 @@ class Keyboard:
             kb_lv = kb_dictionary[value]
             self.kb_layout = kb_lv['layout']
             self.kb_variant = kb_lv['variant']
-            print(self.kb_layout)
-            print(self.kb_variant)
             if self.kb_variant is None:
                 call("setxkbmap %s" % self.kb_layout, shell=True)
             else:
@@ -135,7 +132,6 @@ class Keyboard:
         if treeiter is not None:
             value = model[treeiter][0]
             self.kb_model = kbm_dictionary[value]
-            print(self.kb_model)
 
     def get_model(self):
         self.treeView.set_cursor(0)

@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: iso-8859-1 -*-
 #
 #####################################################################
 # Copyright (c) 2009-2012, GhostBSD. All rights reserved.
@@ -39,8 +38,7 @@
 from gi.repository import Gtk
 import os
 import os.path
-from subprocess import Popen, PIPE
-
+from sys_handler import language_dictionary
 # Folder use for the installer.
 tmp = "/tmp/.gbi/"
 installer = "/usr/local/lib/gbi/"
@@ -48,11 +46,8 @@ query = "sh /usr/local/lib/gbi/backend-query/"
 if not os.path.exists(tmp):
     os.makedirs(tmp)
 logo = "/usr/local/lib/gbi/logo.png"
-language = "%slanguage/avail-langs" % installer
 langfile = '%slanguage' % tmp
-langcmd = 'pc-sysinstall query-langs'
-langlist = Popen(langcmd, shell=True, stdin=PIPE, stdout=PIPE,
-                 universal_newlines=True, close_fds=True).stdout.readlines()
+lang_dictionary = language_dictionary()
 # Text to be replace be multiple language file.
 title = "Welcome To GhostBSD!"
 welltext = """Select the language you want to use with GhostBSD."""
@@ -62,11 +57,10 @@ class Language:
 
     # On selection it overwrite the delfaut language file.
     def Language_Selection(self, tree_selection):
-        (model, pathlist) = tree_selection.get_selected_rows()
-        for path in pathlist:
-            tree_iter = model.get_iter(path)
-            value = model.get_value(tree_iter, 0)
-        self.language = value
+        model, treeiter = tree_selection.get_selected()
+        if treeiter is not None:
+            value = model[treeiter][0]
+            self.language = lang_dictionary[value]
         return
 
     def Language_Columns(self, treeView):
@@ -107,8 +101,8 @@ class Language:
         sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         # Adding a treestore and store language in it.
         store = Gtk.TreeStore(str)
-        for line in langlist:
-            store.append(None, [line.rstrip()])
+        for line in lang_dictionary:
+            store.append(None, [line])
         treeView = Gtk.TreeView(store)
         treeView.set_model(store)
         treeView.set_rules_hint(True)

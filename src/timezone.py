@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: iso-8859-1 -*-
 #
 #####################################################################
 # Copyright (c) 2009-2012, GhostBSD. All rights reserved.
@@ -80,7 +79,6 @@ class TimeZone:
         if treeiter is not None:
             value = model[treeiter][0]
             self.continent = value
-            print(self.continent)
             for line in tzdictionary[self.continent]:
                 self.city_store.append(None, [line])
             self.citytreeView.set_cursor(0)
@@ -90,7 +88,6 @@ class TimeZone:
         if treeiter is not None:
             value = model[treeiter][0]
             self.city = value
-            print(self.city)
             button3.set_sensitive(True)
         else:
             button3.set_sensitive(False)

@@ -3,6 +3,19 @@
 from subprocess import Popen, PIPE
 
 
+def language_dictionary():
+    langs = Popen('pc-sysinstall query-langs', shell=True, stdin=PIPE,
+                  stdout=PIPE, universal_newlines=True,
+                  close_fds=True).stdout.readlines()
+    dictionary = {}
+    for line in langs:
+        lang_list = line.rstrip()
+        lang_name = lang_list.partition(' ')[2]
+        lang_code = lang_list.partition(' ')[0]
+        dictionary[lang_name] = lang_code
+    return dictionary
+
+
 def keyboard_dictionary():
     xkeyboard_layouts = Popen('pc-sysinstall xkeyboard-layouts', shell=True,
                               stdout=PIPE,
