@@ -17,7 +17,6 @@ from subprocess import Popen, PIPE, STDOUT, call
 from time import sleep
 from partition_handler import rDeleteParttion, destroyParttion, makingParttion
 from create_cfg import gbsd_cfg
-from create_cfg import dbsd_cfg
 from slides import gbsdSlides
 # from slides import dbsdSlides
 import sys

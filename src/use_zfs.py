@@ -136,7 +136,15 @@ class ZFS():
             ZFS_NUM = ZFS_NUM - 1
         else:
             ZFS_NUM = ZFS_NUM - 1
-        zfsPart = 'disk0-part=ZFS%s %s /(compress=off),/usr(compress=off),/usr/home(compress=lz4),/var(compress=lz4)%s' % (dgeli, ZFS_NUM, pool_disk)
+        zfslayout = "/(compress=lz4|atime=off),/root(compress=lz4)," \
+            "/tmp(compress=lz4),/usr(canmount=off|mountpoint=none)," \
+            "/usr/home(compress=lz4),/usr/jails(compress=lz4)," \
+            "/usr/obj(compress=lz4),/usr/ports(compress=lz4)," \
+            "/usr/src(compress=lz4)," \
+            "/var(canmount=off|atime=on|mountpoint=none)," \
+            "/var/audit(compress=lz4),/var/log(compress=lz4)," \
+            "/var/mail(compress=lz4),/var/tmp(compress=lz4)"
+        zfsPart = 'disk0-part=ZFS%s %s )%s' % (dgeli, ZFS_NUM, zfslayout, pool_disk)
         pfile.writelines(zfsPart)
         if SWAP != 0:
             pfile.writelines('disk0-part=SWAP%s %s none\n' % ('', SWAP))

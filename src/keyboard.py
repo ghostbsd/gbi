@@ -135,6 +135,7 @@ class Keyboard:
 
     def get_model(self):
         self.treeView.set_cursor(0)
+        self.button3.set_sensitive(True)
         return self.box1
 
     def save_selection(self):
@@ -146,6 +147,7 @@ class Keyboard:
         return
 
     def __init__(self, button3):
+        self.button3 = button3
         self.box1 = Gtk.VBox(False, 0)
         self.box1.show()
         box2 = Gtk.VBox(False, 10)

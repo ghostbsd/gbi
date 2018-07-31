@@ -88,7 +88,7 @@ class MainWindow():
             self.window.show_all()
             self.notebook.next_page()
             self.button1.set_sensitive(True)
-            self.button3.set_sensitive(False)
+            self.button3.set_sensitive(True)
         elif page == 1:
             self.kb.save_selection()
             tbbox = Gtk.VBox(False, 0)
@@ -100,7 +100,7 @@ class MainWindow():
             self.notebook.insert_page(tbbox, label, 2)
             self.window.show_all()
             self.notebook.next_page()
-            self.button3.set_sensitive(False)
+            self.button3.set_sensitive(True)
         elif page == 2:
             self.tz.save_selection()
             typebox = Gtk.VBox(False, 0)
@@ -230,8 +230,8 @@ class MainWindow():
         self.window = Gtk.Window()
         self.window.connect("delete_event", self.delete)
         self.window.set_border_width(0)
-        self.window.set_default_size(700, 500)
-        self.window.set_size_request(700, 500)
+        self.window.set_default_size(800, 500)
+        self.window.set_size_request(800, 500)
         self.window.set_title("GhostBSD Installer")
         self.window.set_border_width(0)
         self.window.set_icon_from_file(logo)

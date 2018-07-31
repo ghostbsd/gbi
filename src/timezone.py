@@ -89,8 +89,8 @@ class TimeZone:
             value = model[treeiter][0]
             self.city = value
             button3.set_sensitive(True)
-        else:
-            button3.set_sensitive(False)
+        # else:
+        #     button3.set_sensitive(False)
 
     def save_selection(self):
         timezone = '%s/%s' % (self.continent, self.city)
