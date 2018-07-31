@@ -166,7 +166,7 @@ class gbsd_cfg():
         f.writelines('commitUser\n')
         ifvbox = open('/tmp/.ifvbox', 'w')
         vbguest = Popen('pciconf -lv | grep "VirtualBox Graphics"', shell=True,
-                        stdout=PIPE, close_fds=True)
+                        stdout=PIPE, close_fds=True, universal_newlines=True)
         if "VirtualBox Graphics" in vbguest.stdout.read():
             ifvbox.writelines('True\n')
         else:

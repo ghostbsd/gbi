@@ -374,9 +374,10 @@ class ZFS():
         shemebox.connect('changed', self.sheme_selection)
         shemebox.set_active(0)
         # Force 4k Sectors
-        self.zfs_four_k = "False"
+        self.zfs_four_k = "True"
         zfs4kcheck = Gtk.CheckButton("Force ZFS 4k block size")
         zfs4kcheck.connect("toggled", self.on_check)
+        zfs4kcheck.set_active(True)
         # Swap Size
         ram = Popen(memory, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT,
                     universal_newlines=True, close_fds=True)

@@ -60,7 +60,7 @@ def read_output(command, probar):
         makingParttion()
         sleep(1)
     p = Popen(command, shell=True, stdin=PIPE, stdout=PIPE,
-              stderr=STDOUT, close_fds=True)
+              stderr=STDOUT, close_fds=True, universal_newlines=True)
     while True:
         line = p.stdout.readline()
         if not line:
