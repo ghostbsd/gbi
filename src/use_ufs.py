@@ -305,7 +305,7 @@ class use_ufs():
         ram = Popen(memory, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT,
                     universal_newlines=True, close_fds=True)
         mem = ram.stdout.read()
-        swap = int(mem.partition(':')[2].strip()) / (1024 * 1024)
+        swap = 512
         swp_size_label = Gtk.Label('<b>Swap Size(MB)</b>')
         swp_size_label.set_use_markup(True)
         self.swap_entry = Gtk.Entry()
