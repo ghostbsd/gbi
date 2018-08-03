@@ -332,7 +332,7 @@ class Delete_partition():
                 ll.remove(ll[lnum - 1])
             else:
                 ll[lnum] = ['freespace', free, '', '']
-        savepl = open(partitiondb + spart, 'w')
+        savepl = open(partitiondb + spart, 'wb')
         pickle.dump(ll, savepl)
         savepl.close()
 
@@ -421,7 +421,7 @@ class Delete_partition():
             cf.close()
         if os.path.exists(partitiondb + part):
             os.remove(partitiondb + part)
-        saveps = open(partitiondb + drive, 'w')
+        saveps = open(partitiondb + drive, 'wb')
         pickle.dump(sl, saveps)
         saveps.close()
         if "p" in part:
