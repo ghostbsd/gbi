@@ -569,8 +569,8 @@ class autoFreeSpace():
         ram = Popen(memory, shell=True, stdin=PIPE, stdout=PIPE,
                     universal_newlines=True,  close_fds=True)
         mem = ram.stdout.read()
-        swap = int(mem.partition(':')[2].strip()) / (1024 * 1024)
-        rootNum = number - swap
+        swap = int(int(mem.partition(':')[2].strip()) / (1024 * 1024))
+        rootNum = int(number - swap)
         llist = []
         mllist = []
         plf = open(partitiondb + disk + 's%s' % sl, 'wb')
@@ -622,8 +622,8 @@ class autoFreeSpace():
         ram = Popen(memory, shell=True, stdin=PIPE, stdout=PIPE,
                     universal_newlines=True, close_fds=True)
         mem = ram.stdout.read()
-        swap = int(mem.partition(':')[2].strip()) / (1024 * 1024)
-        rootNum = number - swap
+        swap = int(int(mem.partition(':')[2].strip()) / (1024 * 1024))
+        rootNum = int(number - swap)
         if bios_or_uefi() == "UEFI":
             bs = 100
         else:
