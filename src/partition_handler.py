@@ -465,8 +465,8 @@ class autoDiskPartition():
         ram = Popen(memory, shell=True, stdin=PIPE, stdout=PIPE,
                     universal_newlines=True, close_fds=True)
         mem = ram.stdout.read()
-        swap = int(mem.partition(':')[2].strip()) / (1024 * 1024)
-        rootNum = number - swap
+        swap = int(int(mem.partition(':')[2].strip()) / (1024 * 1024))
+        rootNum = int(number - swap)
         llist = []
         mllist = []
         plf = open(partitiondb + disk + 's1', 'wb')
@@ -505,13 +505,13 @@ class autoDiskPartition():
         ram = Popen(memory, shell=True, stdin=PIPE, stdout=PIPE,
                     universal_newlines=True,  close_fds=True)
         mem = ram.stdout.read()
-        swap = int(mem.partition(':')[2].strip()) / (1024 * 1024)
+        swap = int(int(mem.partition(':')[2].strip()) / (1024 * 1024))
         if bios_or_uefi() == "UEFI":
             bnum = 100
         else:
             bnum = 1
-        rootNum = number - swap
-        rnum = rootNum - bnum
+        rootNum = int(number - swap)
+        rnum = int(rootNum - bnum)
         plist = []
         mplist = []
         plf = open(partitiondb + disk, 'wb')
@@ -628,7 +628,7 @@ class autoFreeSpace():
             bs = 100
         else:
             bs = 1
-        rootNum = rootNum - bs
+        rootNum = int(rootNum - bs)
         plist = []
         mplist = partition_query(disk)
         plf = open(partitiondb + disk, 'wb')
