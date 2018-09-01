@@ -174,6 +174,15 @@ class gbsd_cfg():
         ifvbox.close()
         f.writelines('runScript=/root/iso_to_hd.sh\n')
         f.writelines('runCommand=rm -f /root/iso_to_hd.sh\n')
+        if os.path.exists(zfs_config):
+            kmemsize = """echo 'vm.kmem_size="330M"' >> /boot/loader.conf"""
+            kmemmax = """echo 'vm.kmem_size_max="330M"' >> /boot/loader.conf"""
+            zfsarg = """echo 'vfs.zfs.arc_max="40M"' >> /boot/loader.conf"""
+            zfsvdev = """echo 'vfs.zfs.vdev.cache.size="5M"' >> /boot/loader.conf"""
+            f.writelines('runCommand=%s\n' % kmemsize)
+            f.writelines('runCommand=%s\n' % kmemmax)
+            f.writelines('runCommand=%s\n' % zfsarg)
+            f.writelines('runCommand=%s\n' % zfsvdev)
         if "af" == lang:
             f.writelines('runCommand=pkg install -y af-libreoffice\n')
         elif "ar" == lang:
