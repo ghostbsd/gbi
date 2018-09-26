@@ -69,6 +69,7 @@ partitiondb = "%spartitiondb/" % tmp
 boot_file = "%sboot" % tmp
 ufs_Partiton_list = []
 
+
 class Partitions():
 
     def on_fs(self, widget):
@@ -91,7 +92,6 @@ class Partitions():
             createLabel(path, lnumb, cnumb, lb, fs, data)
         self.window.hide()
         self.update()
-        partlabel = '%spartlabel' % tmp
 
     def on_add_partition(self, widget, entry, inumb, path, data):
         if self.fs == '' or self.label == '':
@@ -108,7 +108,7 @@ class Partitions():
     def cancel(self, widget):
         self.window.hide()
 
-    def labelEditor(self, path, pslice, size, data1, data2):
+    def labelEditor(self, path, pslice, size, data1, modify):
         numb = int(size)
         self.window = Gtk.Window()
         self.window.set_title("Add Partition")
@@ -160,7 +160,7 @@ class Partitions():
         self.fstype.connect("changed", self.on_fs)
         adj = Gtk.Adjustment(numb, 0, numb, 1, 100, 0)
         self.entry = Gtk.SpinButton(adjustment=adj)
-        if data2 == 0:
+        if modify is True:
             self.entry.set_editable(False)
         else:
             self.entry.set_editable(True)
@@ -205,16 +205,20 @@ class Partitions():
         button.connect("clicked", self.cancel)
         bbox.add(button)
         button = Gtk.Button(stock=Gtk.STOCK_ADD)
-        if data2 == 1:
+        if modify is False:
             if data1 == 0:
-                button.connect("clicked", self.on_add_label, self.entry, numb, path, True)
+                button.connect("clicked", self.on_add_label, self.entry,
+                               numb, path, True)
             elif data1 == 1:
-                button.connect("clicked", self.on_add_partition, self.entry, numb, path, True)
+                button.connect("clicked", self.on_add_partition, self.entry,
+                               numb, path, True)
         else:
             if data1 == 0:
-                button.connect("clicked", self.on_add_label, self.entry, numb, path, False)
+                button.connect("clicked", self.on_add_label, self.entry, numb,
+                               path, False)
             elif data1 == 1:
-                button.connect("clicked", self.on_add_partition, self.entry, numb, path, False)
+                button.connect("clicked", self.on_add_partition, self.entry,
+                               numb, path, False)
         bbox.add(button)
         box2.pack_end(bbox, True, True, 5)
         self.window.show_all()
@@ -369,18 +373,18 @@ class Partitions():
     def modify_partition(self, widget):
         if len(self.path) == 3:
             if self.slice != 'freespace':
-                self.labelEditor(self.path, self.slice, self.size, 0, 0)
+                self.labelEditor(self.path, self.slice, self.size, 0, True)
         elif len(self.path) == 2 and self.slice != 'freespace':
             if scheme_query(self.path) == "GPT":
-                self.labelEditor(self.path, self.slice, self.size, 1, 0)
+                self.labelEditor(self.path, self.slice, self.size, 1, True)
 
     def autoPartition(self, widget):
         if len(self.path) == 3:
             pass
-        #elif len(self.path) == 1 and self.scheme is None:
+        # elif len(self.path) == 1 and self.scheme is None:
         #    self.schemeEditor(None)
         #    self.update()
-        #elif len(self.path) == 1:
+        # elif len(self.path) == 1:
         #    autoDiskPartition(self.slice, self.size, self.scheme)
         #    self.Tree_Store()
         #    self.treeview.expand_all()
@@ -414,12 +418,12 @@ class Partitions():
     def create_partition(self, widget):
         if len(self.path) == 3:
             if self.slice == 'freespace':
-                self.labelEditor(self.path, self.slice, self.size, 0, 1)
+                self.labelEditor(self.path, self.slice, self.size, 0, False)
         elif len(self.path) == 2 and self.slice == 'freespace':
             if scheme_query(self.path) == "MBR" and self.path[1] < 4:
                 self.sliceEditor()
             elif scheme_query(self.path) == "GPT":
-                self.labelEditor(self.path, self.slice, self.size, 1, 1)
+                self.labelEditor(self.path, self.slice, self.size, 1, False)
         else:
             if how_partition(self.path) == 1:
                 self.schemeEditor(True)
@@ -430,7 +434,7 @@ class Partitions():
 
     def partition_selection(self, widget):
         model, self.iter, = widget.get_selected()
-        if self.iter != None:
+        if self.iter is not None:
             self.path = model.get_path(self.iter)
             tree_iter3 = model.get_iter(self.path[0])
             self.scheme = model.get_value(tree_iter3, 3)
@@ -446,7 +450,7 @@ class Partitions():
                     slbehind = self.path[1]
                 else:
                     slbehind = int(self.slicebehind.partition('s')[2])
-            elif len(self.path) == 2 and  self.path[1] > 0 and self.scheme == "GPT":
+            elif len(self.path) == 2 and self.path[1] > 0 and self.scheme == "GPT":
                 pathbehind = str(self.path[0]) + ":" + str(int(self.path[1] - 1))
                 tree_iter2 = model.get_iter(pathbehind)
                 self.slicebehind = model.get_value(tree_iter2, 0)
@@ -456,7 +460,7 @@ class Partitions():
                     slbehind = self.path[1]
                 else:
                     slbehind = int(self.slicebehind.partition('p')[2])
-            elif len(self.path) == 3 and  self.path[2] > 0 and self.scheme == "MBR":
+            elif len(self.path) == 3 and self.path[2] > 0 and self.scheme == "MBR":
                 if self.path[1] > 0:
                     pathbehind1 = str(self.path[0]) + ":" + str(int(self.path[1] - 1))
                     tree_iter2 = model.get_iter(pathbehind1)
@@ -481,7 +485,7 @@ class Partitions():
             if 'freespace' in self.slice:
                 if self.path[1] > 3 and self.scheme == "MBR":
                     self.create_bt.set_sensitive(False)
-                elif self.slicebehind == None:
+                elif self.slicebehind is None:
                     self.create_bt.set_sensitive(True)
                 elif sl == slbehind:
                     self.create_bt.set_sensitive(False)
@@ -495,12 +499,12 @@ class Partitions():
             elif 's' in self.slice:
                 self.create_bt.set_sensitive(False)
                 self.delete_bt.set_sensitive(True)
-                #self.modifi_bt.set_sensitive(True)
+                # self.modifi_bt.set_sensitive(True)
                 self.auto_bt.set_sensitive(False)
             elif 'p' in self.slice:
                 self.create_bt.set_sensitive(False)
                 self.delete_bt.set_sensitive(True)
-                #self.modifi_bt.set_sensitive(True)
+                # self.modifi_bt.set_sensitive(True)
                 self.auto_bt.set_sensitive(False)
             else:
                 self.delete_bt.set_sensitive(False)
@@ -522,18 +526,18 @@ class Partitions():
                 if 'GPT' in schm:
                     if len(self.partfile) >= 2:
                         if 'BOOT' in self.partfile[0] or 'BIOS' in self.partfile[0] or 'UEFI' in self.partfile[0]:
-                                if "/boot\n" in self.partfile[1]:
-                                    if len(self.partfile) >= 3:
-                                        if '/\n' in self.partfile[1]:
-                                            self.button3.set_sensitive(True)
-                                        else:
-                                            self.button3.set_sensitive(False)
+                            if "/boot\n" in self.partfile[1]:
+                                if len(self.partfile) >= 3:
+                                    if '/\n' in self.partfile[1]:
+                                        self.button3.set_sensitive(True)
                                     else:
                                         self.button3.set_sensitive(False)
-                                elif '/\n' in self.partfile[1]:
-                                    self.button3.set_sensitive(True)
                                 else:
                                     self.button3.set_sensitive(False)
+                            elif '/\n' in self.partfile[1]:
+                                self.button3.set_sensitive(True)
+                            else:
+                                self.button3.set_sensitive(False)
                         else:
                             self.button3.set_sensitive(False)
                     else:
@@ -636,22 +640,24 @@ class Partitions():
         self.store.clear()
         for disk in disk_query():
             shem = disk[-1]
-            piter = self.store.append(None, [disk[0],
-                                            str(disk[1]), disk[2], disk[3], True])
+            piter = self.store.append(None, [disk[0], str(disk[1]),
+                                      disk[2], disk[3], True])
             if shem == "GPT":
                 for pi in partition_query(disk[0]):
-                    self.store.append(piter, [pi[0], str(pi[1]), pi[2], pi[3], True])
+                    self.store.append(piter, [pi[0], str(pi[1]), pi[2],
+                                      pi[3], True])
             elif shem == "MBR":
                 for pi in partition_query(disk[0]):
-                    piter1 = self.store.append(piter, [pi[0], str(pi[1]), pi[2], pi[3], True])
+                    piter1 = self.store.append(piter, [pi[0], str(pi[1]),
+                                               pi[2], pi[3], True])
                     if pi[0] == 'freespace':
                         pass
                     else:
                         for li in label_query(pi[0]):
-                            self.store.append(piter1, [li[0], str(li[1]), li[2], li[3], True])
+                            self.store.append(piter1, [li[0], str(li[1]),
+                                              li[2], li[3], True])
         return self.store
 
     def get_model(self):
         self.tree_selection.select_path(0)
         return self.box1
-
