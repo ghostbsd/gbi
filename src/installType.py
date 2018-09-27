@@ -34,17 +34,17 @@ class Types():
 
     def fstype(self, radiobutton, val):
         self.ne = val
-        #if self.ne == "ufs":
+        # if self.ne == "ufs":
         #    self.none.set_active(True)
         #    self.grub.set_sensitive(False)
         #    self.bsd.set_sensitive(False)
         #    self.none.set_sensitive(True)
-        #elif self.ne == "custom":
+        # elif self.ne == "custom":
         #    self.grub.set_active(True)
         #    self.grub.set_sensitive(True)
         #    self.bsd.set_sensitive(True)
         #    self.none.set_sensitive(True)
-        #elif self.ne == "zfs":
+        # elif self.ne == "zfs":
         #    self.grub.set_active(True)
         #    self.grub.set_sensitive(True)
         #    self.bsd.set_sensitive(False)
@@ -93,7 +93,7 @@ class Types():
         bbox.pack_start(custom_ufs, False, True, 10)
         custom_ufs.connect("toggled", self.fstype, "custom")
         custom_ufs.show()
-        full_zfs = Gtk.RadioButton.new_with_label_from_widget(custom_ufs, "ZFS Full Disk Configuration(Recommended option)")
+        full_zfs = Gtk.RadioButton.new_with_label_from_widget(custom_ufs, "ZFS Full Disk Configuration(Recommended option for BE)")
         bbox.pack_start(full_zfs, False, True, 10)
         full_zfs.connect("toggled", self.fstype, "zfs")
         full_ufs.show()
@@ -112,7 +112,7 @@ class Types():
         box3.pack_start(hbox, True, True, 0)
         bbox1 = Gtk.VBox()
         bbox1.show()
-        self.grub = Gtk.RadioButton.new_with_label_from_widget(None, "Install Grub2")
+        self.grub = Gtk.RadioButton.new_with_label_from_widget(None, "Install Grub 2")
         # bbox1.pack_start(self.grub, False, True, 10)
         self.grub.connect("toggled", self.boot_manager, "grub")
         self.grub.show()

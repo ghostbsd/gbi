@@ -230,10 +230,15 @@ class Partitions():
         value = data.partition(':')[0]
         self.scheme = value
 
-    def add_gpt_mbr(self, widget):
+    def add_gpt_mbr(self, widget, data):
         diskSchemeChanger(self.scheme, self.path, self.slice, self.size)
         self.update()
         self.window.hide()
+        if data is False:
+            if scheme_query(self.path) == "MBR" and self.path[1] < 4:
+                self.sliceEditor()
+            elif scheme_query(self.path) == "GPT":
+                self.labelEditor(self.path, self.slice, self.size, 1, False)
 
     def autoSchemePartition(self, widget):
         diskSchemeChanger(self.scheme, self.path, self.slice, self.size)
@@ -281,7 +286,7 @@ class Partitions():
         if data is None:
             button.connect("clicked", self.autoSchemePartition)
         else:
-            button.connect("clicked", self.add_gpt_mbr)
+            button.connect("clicked", self.add_gpt_mbr, data)
         bbox.add(button)
         box2.pack_end(bbox, True, True, 5)
         self.window.show_all()
@@ -416,7 +421,12 @@ class Partitions():
         self.treeview.expand_all()
 
     def create_partition(self, widget):
-        if len(self.path) == 3:
+        print(len(self.path))
+        print(self.path)
+        print(how_partition(self.path))
+        if len(self.path) == 2 and how_partition(self.path) == 1 and self.slice == 'freespace':
+            self.schemeEditor(False)
+        elif len(self.path) == 3:
             if self.slice == 'freespace':
                 self.labelEditor(self.path, self.slice, self.size, 0, False)
         elif len(self.path) == 2 and self.slice == 'freespace':
@@ -425,6 +435,7 @@ class Partitions():
             elif scheme_query(self.path) == "GPT":
                 self.labelEditor(self.path, self.slice, self.size, 1, False)
         else:
+            print('scheme')
             if how_partition(self.path) == 1:
                 self.schemeEditor(True)
             elif how_partition(self.path) == 0:
@@ -511,7 +522,7 @@ class Partitions():
                 self.modifi_bt.set_sensitive(False)
                 self.auto_bt.set_sensitive(False)
                 if how_partition(self.path) == 1 and first_is_free(self.path) == 'freespace':
-                    self.create_bt.set_sensitive(True)
+                    self.create_bt.set_sensitive(False)
                 elif how_partition(self.path) == 0:
                     self.create_bt.set_sensitive(True)
                 else:

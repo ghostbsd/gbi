@@ -931,12 +931,25 @@ class destroyParttion():
             ds = pickle.load(dsf)
             for line in ds:
                 drive = line[0]
-                call('gpart destroy -F %s' % drive, shell=True)
                 scheme = line[1]
-                sleep(2)
-                call('gpart create -s %s %s' % (scheme,
-                     drive), shell=True)
-                sleep(2)
+                # Destroy the disk geom
+                gpart_destroy = f"gpart destroy -F {drive}"
+                zpool_clear = f"zpool labelclear -f ${drive}"
+                call(gpart_destroy, shell=True)
+                sleep(1)
+                call(zpool_clear, shell=True)
+                sleep(1)
+                # Make double-sure
+                create_gpt = f"gpart create -s gpt {drive}"
+                call(create_gpt, shell=True)
+                sleep(1)
+                call(gpart_destroy, shell=True)
+                sleep(1)
+                clear_drive = f"dd if=/dev/zero of={drive} bs=1m count=1"
+                call(clear_drive, shell=True)
+                sleep(1)
+                call(f'gpart create -s {scheme} {drive}', shell=True)
+                sleep(1)
 
 
 def bios_or_uefi():
