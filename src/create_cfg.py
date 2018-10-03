@@ -60,7 +60,7 @@ class gbsd_cfg():
             kbv = kb[1].rstrip()
             if kbv is not 'None':
                 f.writelines('localizeKeyVariant=%s\n' % kbv)
-            kbm = kb[3].rstrip()
+            kbm = kb[2].rstrip()
             if kbm is not 'None':
                 f.writelines('localizeKeyModel=%s\n' % kbm)
         # Timezone
