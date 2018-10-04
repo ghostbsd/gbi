@@ -177,121 +177,24 @@ class gbsd_cfg():
         if os.path.exists(zfs_config):
             zfsark = """echo 'vfs.zfs.arc_max="512M"' >> /boot/loader.conf"""
             f.writelines('runCommand=%s\n' % zfsark)
-        if "af" == lang:
-            f.writelines('runCommand=pkg install -y af-libreoffice\n')
-        elif "ar" == lang:
-            f.writelines('runCommand=pkg install -y ar-libreoffice\n')
-        elif "bg" == lang:
-            f.writelines('runCommand=pkg install -y bg-libreoffice\n')
-        elif "bn" == lang:
-            f.writelines('runCommand=pkg install -y bn-libreoffice\n')
-        elif "br" == lang:
-            f.writelines('runCommand=pkg install -y br-libreoffice\n')
-        elif "bs" == lang:
-            f.writelines('runCommand=pkg install -y bs-libreoffice\n')
-        elif "ca" == lang:
-            f.writelines('runCommand=pkg install -y ca-libreoffice\n')
-        elif "cs" == lang:
-            f.writelines('runCommand=pkg install -y cs-libreoffice\n')
-        elif "cy" == lang:
-            f.writelines('runCommand=pkg install -y cy-libreoffice\n')
-        elif "da" == lang:
-            f.writelines('runCommand=pkg install -y da-libreoffice\n')
-        elif "de" == lang:
-            f.writelines('runCommand=pkg install -y de-libreoffice\n')
-        elif "el" == lang:
-            f.writelines('runCommand=pkg install -y el-libreoffice\n')
-        elif "en_GB" == lang:
-            f.writelines('runCommand=pkg install -y en_GB-libreoffice\n')
-        elif "en_ZA" == lang:
-            f.writelines('runCommand=pkg install -y en_ZA-libreoffice\n')
-        elif "es" == lang:
-            f.writelines('runCommand=pkg install -y es-libreoffice\n')
-        elif "et" == lang:
-            f.writelines('runCommand=pkg install -y et-libreoffice\n')
-        elif "eu" == lang:
-            f.writelines('runCommand=pkg install -y eu-libreoffice\n')
-        elif "fa" == lang:
-            f.writelines('runCommand=pkg install -y fa-libreoffice\n')
-        elif "fi" == lang:
-            f.writelines('runCommand=pkg install -y fi-libreoffice\n')
-        elif "fr" in lang:
-            f.writelines('runCommand=pkg install -y fr-libreoffice\n')
-        elif "ga" == lang:
-            f.writelines('runCommand=pkg install -y ga-libreoffice\n')
-        elif "gb" == lang:
-            f.writelines('runCommand=pkg install -y gd-libreoffice\n')
-        elif "gl" == lang:
-            f.writelines('runCommand=pkg install -y gl-libreoffice\n')
-        elif "he" == lang:
-            f.writelines('runCommand=pkg install -y he-libreoffice\n')
-        elif "hi" == lang:
-            f.writelines('runCommand=pkg install -y hi-libreoffice\n')
-        elif "hr" == lang:
-            f.writelines('runCommand=pkg install -y hr-libreoffice\n')
-        elif "hu" == lang:
-            f.writelines('runCommand=pkg install -y hu-libreoffice\n')
-        elif "id" == lang:
-            f.writelines('runCommand=pkg install -y id-libreoffice\n')
-        elif "is" == lang:
-            f.writelines('runCommand=pkg install -y is-libreoffice\n')
-        elif "it" == lang:
-            f.writelines('runCommand=pkg install -y it-libreoffice\n')
-        elif "ja" == lang:
-            f.writelines('runCommand=pkg install -y ja-libreoffice\n')
-        elif "ko" == lang:
-            f.writelines('runCommand=pkg install -y ko-libreoffice\n')
-        elif "lt" == lang:
-            f.writelines('runCommand=pkg install -y lt-libreoffice\n')
-        elif "lv" == lang:
-            f.writelines('runCommand=pkg install -y lv-libreoffice\n')
-        elif "mk" == lang:
-            f.writelines('runCommand=pkg install -y mk-libreoffice\n')
-        elif "mn" == lang:
-            f.writelines('runCommand=pkg install -y mn-libreoffice\n')
-        elif "nb" == lang:
-            f.writelines('runCommand=pkg install -y nb-libreoffice\n')
-        elif "ne" == lang:
-            f.writelines('runCommand=pkg install -y ne-libreoffice\n')
-        elif "nl" == lang:
-            f.writelines('runCommand=pkg install -y nl-libreoffice\n')
-        elif "pa_IN" == lang:
-            f.writelines('runCommand=pkg install -y pa_IN-libreoffice\n')
-        elif "pl" == lang:
-            f.writelines('runCommand=pkg install -y pl-libreoffice\n')
-        elif "pt" == lang:
-            f.writelines('runCommand=pkg install -y pt-libreoffice\n')
-        elif "pt_BR" == lang:
-            f.writelines('runCommand=pkg install -y pt_BR-libreoffice\n')
-        elif "ro" == lang:
-            f.writelines('runCommand=pkg install -y ro-libreoffice\n')
-        elif "ru" == lang:
-            f.writelines('runCommand=pkg install -y ru-libreoffice\n')
-        elif "sd" == lang:
-            f.writelines('runCommand=pkg install -y sd-libreoffice\n')
-        elif "sk" == lang:
-            f.writelines('runCommand=pkg install -y sk-libreoffice\n')
-        elif "sl" == lang:
-            f.writelines('runCommand=pkg install -y sl-libreoffice\n')
-        elif "sr" == lang:
-            f.writelines('runCommand=pkg install -y sr-libreoffice\n')
-        elif "sv" == lang:
-            f.writelines('runCommand=pkg install -y sv-libreoffice\n')
-        elif "ta" == lang:
-            f.writelines('runCommand=pkg install -y ta-libreoffice\n')
-        elif "tg" == lang:
-            f.writelines('runCommand=pkg install -y tg-libreoffice\n')
-        elif "tr" == lang:
-            f.writelines('runCommand=pkg install -y tr-libreoffice\n')
-        elif "uk" == lang:
-            f.writelines('runCommand=pkg install -y uk-libreoffice\n')
-        elif "vi" == lang:
-            f.writelines('runCommand=pkg install -y vi-libreoffice\n')
-        elif "zh_CN" == lang:
-            f.writelines('runCommand=pkg install -y zh_CN-libreoffice\n')
-        elif "zh_TW" == lang:
-            f.writelines('runCommand=pkg install -y zh_TW-libreoffice\n')
-        elif "zu" == lang:
-            f.writelines('runCommand=pkg install -y zu-libreoffice\n')
+        # adding setting for keyboard in slim
+        keyboard_conf = '/usr/local/etc/X11/xorg.conf.d/keyboard.conf'
+        k_conf_list = [
+            'Section "InputClass"',
+            '        Identifier "Keyboard0"',
+            '        Driver "kbd"',
+            '        Option "XkbLayout"      "%s"' % kbl
+        ]
+        if kbv != 'None':
+            k_conf_list.append('        Option "XkbVariant"     "%s"' % kbv)
+        if kbm != 'None':
+            k_conf_list.append('        Option "XkbModel"       "%s"' % kbm)
+        k_conf_list.append('EndSection')
+        for conf_line in k_conf_list:
+            if 'Section "InputClass"' == conf_line:
+                cmd = """echo '%s' > %s""" % (conf_line, keyboard_conf)
+            else:
+                cmd = """echo '%s' >> %s""" % (conf_line, keyboard_conf)
+            f.writelines('runCommand=%s\n' % cmd)
         f.close()
         os.remove(user_passwd)
