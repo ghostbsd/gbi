@@ -14,7 +14,7 @@ from setuptools import setup
 # ,,python setup.py build_i18n -m''
 
 # silence pyflakes, __VERSION__ is properly assigned below...
-__VERSION__ = '5.9'
+__VERSION__ = '6.0'
 # for line in file('networkmgr').readlines():
 #    if (line.startswith('__VERSION__')):
 #        exec(line.strip())
@@ -105,7 +105,7 @@ data_files = [
     (f'{prefix}/lib/gbi/slide-images/ghostbsd', lib_gbi_slide_images)
 ]
 
-# data_files.extend(datafilelist(f'{prefix}/share/locale', 'build/mo'))
+data_files.extend(datafilelist(f'{prefix}/share/locale', 'build/mo'))
 
 # cmdclass ={
 #             "build" : DistUtilsExtra.command.build_extra.build_extra,
