@@ -615,9 +615,9 @@ class autoFreeSpace():
         sfile.close()
         number = int(size.partition('M')[0])
         number = number - 512
+        # put the root slide
         slice_file = open(dslice, 'w')
-        slice_file.writelines('p%s\n' % sl)
-        slice_file.writelines('%s\n' % number)
+        slice_file.writelines('p%s\n' % int(sl + 1))
         slice_file.close()
         ram = Popen(memory, shell=True, stdin=PIPE, stdout=PIPE,
                     universal_newlines=True, close_fds=True)
@@ -821,7 +821,7 @@ class createPartition():
             sfile = open(part_schem, 'w')
             sfile.writelines('partscheme=GPT')
             sfile.close()
-        if not os.path.exists(dslice):
+        if fs == '/':
             slice_file = open(dslice, 'w')
             slice_file.writelines('p%s\n' % pl)
             # slice_file.writelines('%s\n' % number)
@@ -875,10 +875,9 @@ class modifyPartition():
             sfile = open(part_schem, 'w')
             sfile.writelines('partscheme=GPT')
             sfile.close()
-        if not os.path.exists(dslice):
+        if fs == '/':
             slice_file = open(dslice, 'w')
             slice_file.writelines('p%s\n' % pl)
-            # slice_file.writelines('%s\n' % number)
             slice_file.close()
         plist = []
         pslice = '%sp%s' % (disk, pl)
