@@ -515,13 +515,8 @@ class autoDiskPartition():
         plist = []
         mplist = []
         plf = open(partitiondb + disk, 'wb')
-        read = open(boot_file, 'r')
-        line = read.readlines()
-        boot = line[0].strip()
         if bios_or_uefi() == "UEFI":
             plist.extend(([disk + 'p1', bnum, 'none', 'UEFI']))
-        elif boot == "grub":
-            plist.extend(([disk + 'p1', bnum, 'none', 'BIOS']))
         else:
             plist.extend(([disk + 'p1', bnum, 'none', 'BOOT']))
         mplist.append(plist)
@@ -536,8 +531,6 @@ class autoDiskPartition():
         pfile = open(Part_label, 'w')
         if bios_or_uefi() == "UEFI":
             pfile.writelines('UEFI %s none\n' % bnum)
-        elif boot == "grub":
-            pfile.writelines('BIOS %s none\n' % bnum)
         else:
             pfile.writelines('BOOT %s none\n' % bnum)
         pfile.writelines('UFS+SUJ %s /\n' % rnum)
@@ -632,29 +625,29 @@ class autoFreeSpace():
         plist = []
         mplist = partition_query(disk)
         plf = open(partitiondb + disk, 'wb')
-        read = open(boot_file, 'r')
-        line = read.readlines()
-        boot = line[0].strip()
-        if bios_or_uefi() == "UEFI":
+        if bios_or_uefi() == "UEFI" and efi_exist(disk) is False:
             plist.extend(([disk + 'p%s' % sl, bs, 'none', 'UEFI']))
-        elif boot == "grub":
-            plist.extend(([disk + 'p%s' % sl, bs, 'none', 'BIOS']))
+            rsl = int(sl + 1)
+            swsl = int(rsl + 1)
+        elif bios_or_uefi() == "UEFI" and efi_exist(disk) is True:
+            rsl = int(sl)
+            swsl = int(rsl + 1)
         else:
             plist.extend(([disk + 'p%s' % sl, bs, 'none', 'BOOT']))
+            rsl = int(sl + 1)
+            swsl = (rsl + 1)
         mplist[path] = plist
         plist = []
-        plist.extend(([disk + 'p%s' % int(sl + 1), rootNum, '/', 'UFS+SUJ']))
+        plist.extend(([disk + 'p%s' % rsl, rootNum, '/', 'UFS+SUJ']))
         mplist.append(plist)
         plist = []
-        plist.extend(([disk + 'p%s' % int(sl + 2), swap, 'none', 'SWAP']))
+        plist.extend(([disk + 'p%s' % swsl, swap, 'none', 'SWAP']))
         mplist.append(plist)
         pickle.dump(mplist, plf)
         plf.close()
         pfile = open(Part_label, 'w')
-        if bios_or_uefi() == "UEFI":
+        if bios_or_uefi() == "UEFI" and efi_exist(disk) is False:
             pfile.writelines('UEFI %s none\n' % bs)
-        elif boot == "grub":
-            pfile.writelines('BIOS %s none\n' % bs)
         else:
             pfile.writelines('BOOT %s none\n' % bs)
         pfile.writelines('UFS+SUJ %s /\n' % rootNum)
@@ -662,12 +655,15 @@ class autoFreeSpace():
         pfile.close()
         pl = []
         mpl = []
-        if not os.path.exists(tmp + 'create'):
-            pl.extend(([disk + "p%s" % sl, size]))
-            mpl.append(pl)
-            cf = open(tmp + 'create', 'wb')
-            pickle.dump(mpl, cf)
-            cf.close()
+        if bios_or_uefi() == "UEFI" and efi_exist(disk) is True:
+            pass
+        else:
+            if not os.path.exists(tmp + 'create'):
+                pl.extend(([disk + "p%s" % sl, size]))
+                mpl.append(pl)
+                cf = open(tmp + 'create', 'wb')
+                pickle.dump(mpl, cf)
+                cf.close()
 
 
 class createLabel():
@@ -805,7 +801,7 @@ class createSlice():
 
 class createPartition():
 
-    def __init__(self, path, lnumb, inumb, cnumb, lb, fs, data):
+    def __init__(self, path, lnumb, inumb, cnumb, lb, fs, create):
         disk = disk_query()[path[0]][0]
         if not os.path.exists(disk_file):
             file_disk = open(disk_file, 'w')
@@ -846,7 +842,7 @@ class createPartition():
                 pfile.writelines('%s %s %s\n' % (partlist[3], partlist[1],
                                                  partlist[2]))
         pfile.close()
-        if data is True:
+        if create is True:
             plst = []
             mplst = []
             if not os.path.exists(tmp + 'create'):
@@ -965,6 +961,17 @@ def bios_or_uefi():
         return "UEFI"
     else:
         return "BIOS"
+
+
+def efi_exist(disk):
+    cmd = f"gpart {disk} | grep efi"
+    process = Popen(cmd, shell=True, stdout=PIPE,
+                    universal_newlines=True, close_fds=True)
+    output = process.stdout.readlines()
+    if len(output) == 0:
+        return False
+    else:
+        return True
 
 
 class makingParttion():

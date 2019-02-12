@@ -41,6 +41,7 @@ from partition_handler import partition_query, label_query, bios_or_uefi
 from partition_handler import autoDiskPartition, autoFreeSpace, first_is_free
 from partition_handler import createLabel, scheme_query, how_partition
 from partition_handler import diskSchemeChanger, createSlice, createPartition
+from partition_handler import efi_exist
 
 # Folder use pr the installer.
 tmp = "/tmp/.gbi/"
@@ -66,7 +67,6 @@ logo = "/usr/local/lib/gbi/logo.png"
 Part_label = '%spartlabel' % tmp
 part_schem = '%sscheme' % tmp
 partitiondb = "%spartitiondb/" % tmp
-boot_file = "%sboot" % tmp
 ufs_Partiton_list = []
 
 
@@ -81,7 +81,7 @@ class Partitions():
     def save_selection(self):
         pass
 
-    def on_add_label(self, widget, entry, inumb, path, data):
+    def on_add_label(self, widget, entry, inumb, path, create):
         if self.fs == '' or self.label == '':
             pass
         else:
@@ -89,11 +89,11 @@ class Partitions():
             lb = self.label
             cnumb = entry.get_value_as_int()
             lnumb = inumb - cnumb
-            createLabel(path, lnumb, cnumb, lb, fs, data)
+            createLabel(path, lnumb, cnumb, lb, fs, create)
         self.window.hide()
         self.update()
 
-    def on_add_partition(self, widget, entry, inumb, path, data):
+    def on_add_partition(self, widget, entry, inumb, path, create):
         if self.fs == '' or self.label == '':
             pass
         else:
@@ -101,14 +101,14 @@ class Partitions():
             lb = self.label
             cnumb = entry.get_value_as_int()
             lnumb = inumb - cnumb
-            createPartition(path, lnumb, inumb, cnumb, lb, fs, data)
+            createPartition(path, lnumb, inumb, cnumb, lb, fs, create)
         self.window.hide()
         self.update()
 
     def cancel(self, widget):
         self.window.hide()
 
-    def labelEditor(self, path, pslice, size, data1, modify):
+    def labelEditor(self, path, pslice, size, scheme, modify):
         numb = int(size)
         self.window = Gtk.Window()
         self.window.set_title("Add Partition")
@@ -134,23 +134,24 @@ class Partitions():
         self.fstype.append_text('UFS+J')
         self.fstype.append_text('UFS+SUJ')
         self.fstype.append_text('SWAP')
-        if data1 == 1:
-            read = open(boot_file, 'r')
-            line = read.readlines()
-            boot = line[0].strip()
+        if scheme == 'GPT':
             if bios_or_uefi() == "UEFI":
                 self.fstype.append_text("UEFI")
                 self.fs = "UEFI"
-            elif boot == "grub":
-                self.fstype.append_text("BIOS")
-                self.fs = "BIOS"
             else:
                 self.fstype.append_text("BOOT")
                 self.fs = "BOOT"
-        if data1 == 1 and not os.path.exists(Part_label):
-            self.fstype.set_active(5)
-        elif data1 == 1 and len(self.partfile) == 0:
-            self.fstype.set_active(5)
+        if self.fs == "UEFI" and efi_exist(self.disk) is False:
+            if scheme == 'GPT' and not os.path.exists(Part_label):
+                self.fstype.set_active(5)
+            elif scheme == 'GPT' and len(self.partfile) == 0:
+                self.fstype.set_active(5)
+        elif self.fs == "BOOT":
+            if scheme == 'GPT' and not os.path.exists(Part_label):
+                self.fstype.set_active(5)
+            elif scheme == 'GPT' and len(self.partfile) == 0:
+                self.fstype.set_active(5)
+
         elif self.lablebehind == "/":
             self.fstype.set_active(4)
             self.fs = "SWAP"
@@ -171,11 +172,11 @@ class Partitions():
         # The space for root '/ ' is to recognise / from the file.
         self.mountpoint.append_text('/')
         if os.path.exists(Part_label):
-            if data1 == 1 and len(self.partfile) == 1:
+            if scheme == 'GPT' and len(self.partfile) == 1:
                 self.mountpoint.append_text('/boot')
-            elif data1 == 0 and len(self.partfile) == 0:
+            elif scheme == 'MBR' and len(self.partfile) == 0:
                 self.mountpoint.append_text('/boot')
-        elif data1 == 0 and not os.path.exists(Part_label):
+        elif scheme == 'MBR' and not os.path.exists(Part_label):
             self.mountpoint.append_text('/boot')
         self.mountpoint.append_text('/etc')
         self.mountpoint.append_text('/root')
@@ -206,17 +207,23 @@ class Partitions():
         bbox.add(button)
         button = Gtk.Button(stock=Gtk.STOCK_ADD)
         if modify is False:
-            if data1 == 0:
+            if scheme == 'MBR':
                 button.connect("clicked", self.on_add_label, self.entry,
                                numb, path, True)
-            elif data1 == 1:
+            elif scheme == 'GPT' and self.fs == 'BOOT':
                 button.connect("clicked", self.on_add_partition, self.entry,
                                numb, path, True)
+            elif scheme == 'GPT' and self.fs == 'UEFI' and efi_exist(self.disk) is False:
+                button.connect("clicked", self.on_add_partition, self.entry,
+                               numb, path, True)
+            else:
+                button.connect("clicked", self.on_add_partition, self.entry,
+                               numb, path, False)
         else:
-            if data1 == 0:
+            if scheme == 'MBR':
                 button.connect("clicked", self.on_add_label, self.entry, numb,
                                path, False)
-            elif data1 == 1:
+            elif scheme == 'GPT':
                 button.connect("clicked", self.on_add_partition, self.entry,
                                numb, path, False)
         bbox.add(button)
@@ -238,7 +245,7 @@ class Partitions():
             if scheme_query(self.path) == "MBR" and self.path[1] < 4:
                 self.sliceEditor()
             elif scheme_query(self.path) == "GPT":
-                self.labelEditor(self.path, self.slice, self.size, 1, False)
+                self.labelEditor(self.path, self.slice, self.size, 'GPT', False)
 
     def autoSchemePartition(self, widget):
         diskSchemeChanger(self.scheme, self.path, self.slice, self.size)
@@ -378,10 +385,10 @@ class Partitions():
     def modify_partition(self, widget):
         if len(self.path) == 3:
             if self.slice != 'freespace':
-                self.labelEditor(self.path, self.slice, self.size, 0, True)
+                self.labelEditor(self.path, self.slice, self.size, 'MBR', True)
         elif len(self.path) == 2 and self.slice != 'freespace':
             if scheme_query(self.path) == "GPT":
-                self.labelEditor(self.path, self.slice, self.size, 1, True)
+                self.labelEditor(self.path, self.slice, self.size, 'GPT', True)
 
     def autoPartition(self, widget):
         if len(self.path) == 3:
@@ -428,12 +435,12 @@ class Partitions():
             self.schemeEditor(False)
         elif len(self.path) == 3:
             if self.slice == 'freespace':
-                self.labelEditor(self.path, self.slice, self.size, 0, False)
+                self.labelEditor(self.path, self.slice, self.size, 'MBR', False)
         elif len(self.path) == 2 and self.slice == 'freespace':
             if scheme_query(self.path) == "MBR" and self.path[1] < 4:
                 self.sliceEditor()
             elif scheme_query(self.path) == "GPT":
-                self.labelEditor(self.path, self.slice, self.size, 1, False)
+                self.labelEditor(self.path, self.slice, self.size, 'GPT', False)
         else:
             print('scheme')
             if how_partition(self.path) == 1:
@@ -449,9 +456,11 @@ class Partitions():
             self.path = model.get_path(self.iter)
             tree_iter3 = model.get_iter(self.path[0])
             self.scheme = model.get_value(tree_iter3, 3)
+            self.disk = model.get_value(tree_iter3, 0)
             tree_iter = model.get_iter(self.path)
             self.slice = model.get_value(tree_iter, 0)
             self.size = model.get_value(tree_iter, 1)
+            print(self.path)
             if len(self.path) == 2 and self.path[1] > 0 and self.scheme == "MBR":
                 pathbehind = str(self.path[0]) + ":" + str(int(self.path[1] - 1))
                 tree_iter2 = model.get_iter(pathbehind)
