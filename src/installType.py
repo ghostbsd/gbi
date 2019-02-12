@@ -54,7 +54,7 @@ class Types():
         box2.show()
         # auto partition or Customize Disk Partition.
         bbox = Gtk.VBox()
-        label = Gtk.Label('<b><span size="xx-large">Installation Type And Boot Manager</span></b>')
+        label = Gtk.Label('<b><span size="xx-large">Installation Type</span></b>')
         label.set_use_markup(True)
         box2.pack_start(label, False, False, 10)
         # create a Hbox to center the radio button.
