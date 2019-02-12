@@ -34,21 +34,6 @@ class Types():
 
     def fstype(self, radiobutton, val):
         self.ne = val
-        # if self.ne == "ufs":
-        #    self.none.set_active(True)
-        #    self.grub.set_sensitive(False)
-        #    self.bsd.set_sensitive(False)
-        #    self.none.set_sensitive(True)
-        # elif self.ne == "custom":
-        #    self.grub.set_active(True)
-        #    self.grub.set_sensitive(True)
-        #    self.bsd.set_sensitive(True)
-        #    self.none.set_sensitive(True)
-        # elif self.ne == "zfs":
-        #    self.grub.set_active(True)
-        #    self.grub.set_sensitive(True)
-        #    self.bsd.set_sensitive(False)
-        #    self.none.set_sensitive(False)
         pass_file = open(signal, 'w')
         pass_file.writelines(self.ne)
         pass_file.close
@@ -59,12 +44,6 @@ class Types():
 
     def get_model(self):
         return self.box1
-
-    def boot_manager(self, radiobutton, val):
-        self.boot = val
-        boot = open(boot_file, 'w')
-        boot.writelines(self.boot)
-        boot.close()
 
     def __init__(self):
         self.box1 = Gtk.VBox(False, 0)
@@ -99,40 +78,3 @@ class Types():
         full_ufs.show()
         hbox.pack_start(bbox, False, False, 50)
         full_zfs.set_active(True)
-        # Boot option.
-        box3 = Gtk.VBox(False, 0)
-        box3.set_border_width(10)
-        self.box1.pack_start(box3, False, False, 0)
-        box3.show()
-        label = Gtk.Label('<b><span size="x-large">Boot Manager Option</span></b>')
-        label.set_use_markup(True)
-        box3.pack_start(label, False, False, 10)
-        hbox = Gtk.HBox()
-        hbox.show()
-        box3.pack_start(hbox, True, True, 0)
-        bbox1 = Gtk.VBox()
-        bbox1.show()
-        self.grub = Gtk.RadioButton.new_with_label_from_widget(None, "Install Grub 2")
-        # bbox1.pack_start(self.grub, False, True, 10)
-        self.grub.connect("toggled", self.boot_manager, "grub")
-        self.grub.show()
-        self.grub.set_sensitive(False)
-        self.bsd = Gtk.RadioButton.new_with_label_from_widget(None, "Install FreeBSD boot manager + loader(MBR only)")
-        bbox1.pack_start(self.bsd, False, True, 10)
-        self.bsd.connect("toggled", self.boot_manager, "bsd")
-        self.bsd.show()
-        # self.bsd.set_sensitive(False)
-        self.none = Gtk.RadioButton.new_with_label_from_widget(self.bsd, "BIOS: loader only UEFI: install Refind")
-        bbox1.pack_start(self.none, False, True, 10)
-        self.none.connect("toggled", self.boot_manager, "none")
-        self.none.show()
-        hbox.pack_start(bbox1, False, False, 50)
-        self.none.set_active(True)
-        self.boot = "none"
-        boot = open(boot_file, 'w')
-        boot.writelines(self.boot)
-        boot.close()
-        self.box3 = Gtk.VBox(False, 0)
-        self.box3.set_border_width(0)
-        self.box1.pack_start(self.box3, True, True, 0)
-        return

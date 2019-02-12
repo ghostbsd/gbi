@@ -37,6 +37,7 @@ prefix = sys.prefix
 lib_gbi = [
     'src/install-gbsd.png',
     'src/logo.png',
+    'src/boot_manager.py',
     'src/create_cfg.py',
     'src/end.py',
     'src/error.py',

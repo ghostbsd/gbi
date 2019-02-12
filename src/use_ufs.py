@@ -119,13 +119,8 @@ class use_ufs():
         pfile.writelines('partition=ALL\n')
         pfile.writelines('partscheme=%s\n' % self.scheme)
         pfile.writelines('commitDiskPart\n\n')
-        read = open(boot_file, 'r')
-        line = read.readlines()
-        boot = line[0].strip()
         if bios_or_uefi() == "UEFI":
             root_size = root_size - 100
-        elif boot == 'GRUB':
-            root_size = root_size - 1
         else:
             root_size = root_size - 1
         zfsPart = 'disk0-part=%s%s %s /\n' % (self.fs, dgeli, root_size)
@@ -488,7 +483,7 @@ class use_ufs():
 
     def passwdVerification(self, widget):
         if self.password.get_text() == self.repassword.get_text():
-            self.img.set_from_stock(Gtk.STOCK_YES, 10)
+            self.img.set_from_stock(Gtk.STOCK_YES, 5)
             if self.mirror == "none":
                 if len(ufs_dsk_list) != 1:
                     self.button3.set_sensitive(False)
@@ -500,5 +495,5 @@ class use_ufs():
                 else:
                     self.button3.set_sensitive(False)
         else:
-            self.img.set_from_stock(Gtk.STOCK_NO, 10)
+            self.img.set_from_stock(Gtk.STOCK_NO, 5)
             self.button3.set_sensitive(False)

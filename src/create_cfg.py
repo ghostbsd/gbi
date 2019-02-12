@@ -80,7 +80,12 @@ class gbsd_cfg():
                     f.writelines(line)
                     read = open(boot_file, 'r')
                     boot = read.readlines()[0].strip()
-                    f.writelines('bootManager=%s\n' % boot)
+                    if boot == 'refind':
+                        f.writelines('bootManager=none\n')
+                        f.writelines('efiLoader=%s\n' % boot)
+                    else:
+                        f.writelines('bootManager=%s\n' % boot)
+                        f.writelines('efiLoader=none\n')
                     os.remove(boot_file)
                 else:
                     f.writelines(line)
@@ -94,7 +99,12 @@ class gbsd_cfg():
                     f.writelines(line)
                     read = open(boot_file, 'r')
                     boot = read.readlines()[0].strip()
-                    f.writelines('bootManager=%s\n' % boot)
+                    if boot == 'refind':
+                        f.writelines('bootManager=none\n')
+                        f.writelines('efiLoader=%s\n' % boot)
+                    else:
+                        f.writelines('bootManager=%s\n' % boot)
+                        f.writelines('efiLoader=none\n')
                     os.remove(boot_file)
                 else:
                     f.writelines(line)
@@ -116,7 +126,12 @@ class gbsd_cfg():
             read = open(boot_file, 'r')
             line = read.readlines()
             boot = line[0].strip()
-            f.writelines('bootManager=%s\n' % boot)
+            if boot == 'refind':
+                f.writelines('bootManager=none\n')
+                f.writelines('efiLoader=%s\n' % boot)
+            else:
+                f.writelines('bootManager=%s\n' % boot)
+                f.writelines('efiLoader=none\n')
             # os.remove(boot_file)
             # Sheme sheme
             read = open(disk_schem, 'r')

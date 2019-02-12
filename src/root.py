@@ -127,7 +127,6 @@ class RootUser:
         table.attach(self.repassword, 1, 2, 2, 3)
         table.attach(self.img, 2, 3, 2, 3)
         box2.pack_start(table, False, False, 10)
-        
 
     def get_model(self):
         return self.box1
@@ -209,8 +208,8 @@ class RootUser:
 
     def passwdVerification(self, widget, button3):
         if self.password.get_text() == self.repassword.get_text() and self.password.get_text() != "":
-            self.img.set_from_stock(Gtk.STOCK_YES, 10)
+            self.img.set_from_stock(Gtk.STOCK_YES, 5)
             button3.set_sensitive(True)
         else:
-            self.img.set_from_stock(Gtk.STOCK_NO, 10)
+            self.img.set_from_stock(Gtk.STOCK_NO, 5)
             button3.set_sensitive(False)

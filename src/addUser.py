@@ -277,9 +277,9 @@ class AddUser:
 
     def passwdVerification(self, widget, button3):
         if self.password.get_text() == self.repassword.get_text() and self.password.get_text() != "":
-            self.img.set_from_stock(Gtk.STOCK_YES, 10)
+            self.img.set_from_stock(Gtk.STOCK_YES, 5)
             button3.set_sensitive(True)
 
         else:
-            self.img.set_from_stock(Gtk.STOCK_NO, 10)
+            self.img.set_from_stock(Gtk.STOCK_NO, 5)
             button3.set_sensitive(False)

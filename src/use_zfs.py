@@ -127,13 +127,8 @@ class ZFS():
                 num += 1
                 disk_len -= 1
             pool_disk = ' (%s:%s)\n' % (self.poolType, mirror_dsk)
-        read = open(boot_file, 'r')
-        line = read.readlines()
-        boot = line[0].strip()
         if bios_or_uefi() == "UEFI":
             ZFS_NUM = ZFS_NUM - 100
-        elif boot == 'GRUB':
-            ZFS_NUM = ZFS_NUM - 1
         else:
             ZFS_NUM = ZFS_NUM - 1
         zfslayout = "/(compress=lz4|atime=off),/root(compress=lz4)," \
@@ -653,7 +648,7 @@ class ZFS():
 
     def passwdVerification(self, widget):
         if self.password.get_text() == self.repassword.get_text():
-            self.img.set_from_stock(Gtk.STOCK_YES, 10)
+            self.img.set_from_stock(Gtk.STOCK_YES, 5)
             if self.mirror == "single disk":
                 if len(zfs_dsk_list) != 1:
                     self.button3.set_sensitive(False)
@@ -685,5 +680,5 @@ class ZFS():
                 else:
                     self.button3.set_sensitive(False)
         else:
-            self.img.set_from_stock(Gtk.STOCK_NO, 10)
+            self.img.set_from_stock(Gtk.STOCK_NO, 5)
             self.button3.set_sensitive(False)
