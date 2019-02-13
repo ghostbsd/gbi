@@ -608,10 +608,6 @@ class autoFreeSpace():
         sfile.close()
         number = int(size.partition('M')[0])
         number = number - 512
-        # put the root slide
-        slice_file = open(dslice, 'w')
-        slice_file.writelines('p%s\n' % int(sl + 1))
-        slice_file.close()
         ram = Popen(memory, shell=True, stdin=PIPE, stdout=PIPE,
                     universal_newlines=True, close_fds=True)
         mem = ram.stdout.read()
@@ -625,6 +621,7 @@ class autoFreeSpace():
         plist = []
         mplist = partition_query(disk)
         plf = open(partitiondb + disk, 'wb')
+        done = False
         if bios_or_uefi() == "UEFI" and efi_exist(disk) is False:
             plist.extend(([disk + 'p%s' % sl, bs, 'none', 'UEFI']))
             rsl = int(sl + 1)
@@ -636,15 +633,23 @@ class autoFreeSpace():
             plist.extend(([disk + 'p%s' % sl, bs, 'none', 'BOOT']))
             rsl = int(sl + 1)
             swsl = (rsl + 1)
-        mplist[path] = plist
-        plist = []
+        if len(plist) != 0:
+            done = True
+            mplist[path] = plist
+            plist = []
         plist.extend(([disk + 'p%s' % rsl, rootNum, '/', 'UFS+SUJ']))
-        mplist.append(plist)
+        if done is False:
+            mplist[path] = plist
+        else:
+            mplist.append(plist)
         plist = []
         plist.extend(([disk + 'p%s' % swsl, swap, 'none', 'SWAP']))
         mplist.append(plist)
         pickle.dump(mplist, plf)
         plf.close()
+        slice_file = open(dslice, 'w')
+        slice_file.writelines(f'p{rsl}')
+        slice_file.close()
         pfile = open(Part_label, 'w')
         if bios_or_uefi() == "UEFI" and efi_exist(disk) is False:
             pfile.writelines('UEFI %s none\n' % bs)
@@ -964,7 +969,7 @@ def bios_or_uefi():
 
 
 def efi_exist(disk):
-    cmd = f"gpart {disk} | grep efi"
+    cmd = f"gpart show {disk} | grep efi"
     process = Popen(cmd, shell=True, stdout=PIPE,
                     universal_newlines=True, close_fds=True)
     output = process.stdout.readlines()
