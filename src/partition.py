@@ -33,7 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
 # auto_partition.py create and delete partition slice for GhostBSD installer
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, GObject
+from gi.repository import Gtk
 import os
 import shutil
 from partition_handler import partition_repos, disk_query, Delete_partition
@@ -144,12 +144,12 @@ class Partitions():
         if self.fs == "UEFI" and efi_exist(self.disk) is False:
             if scheme == 'GPT' and not os.path.exists(Part_label):
                 self.fstype.set_active(5)
-            elif scheme == 'GPT' and len(self.partfile) == 0:
+            elif scheme == 'GPT' and len(self.prttn) == 0:
                 self.fstype.set_active(5)
         elif self.fs == "BOOT":
             if scheme == 'GPT' and not os.path.exists(Part_label):
                 self.fstype.set_active(5)
-            elif scheme == 'GPT' and len(self.partfile) == 0:
+            elif scheme == 'GPT' and len(self.prttn) == 0:
                 self.fstype.set_active(5)
 
         elif self.lablebehind == "/":
@@ -172,9 +172,9 @@ class Partitions():
         # The space for root '/ ' is to recognise / from the file.
         self.mountpoint.append_text('/')
         if os.path.exists(Part_label):
-            if scheme == 'GPT' and len(self.partfile) == 1:
+            if scheme == 'GPT' and len(self.prttn) == 1:
                 self.mountpoint.append_text('/boot')
-            elif scheme == 'MBR' and len(self.partfile) == 0:
+            elif scheme == 'MBR' and len(self.prttn) == 0:
                 self.mountpoint.append_text('/boot')
         elif scheme == 'MBR' and not os.path.exists(Part_label):
             self.mountpoint.append_text('/boot')
@@ -428,9 +428,6 @@ class Partitions():
         self.treeview.expand_all()
 
     def create_partition(self, widget):
-        print(len(self.path))
-        print(self.path)
-        print(how_partition(self.path))
         if len(self.path) == 2 and how_partition(self.path) == 1 and self.slice == 'freespace':
             self.schemeEditor(False)
         elif len(self.path) == 3:
@@ -442,7 +439,6 @@ class Partitions():
             elif scheme_query(self.path) == "GPT":
                 self.labelEditor(self.path, self.slice, self.size, 'GPT', False)
         else:
-            print('scheme')
             if how_partition(self.path) == 1:
                 self.schemeEditor(True)
             elif how_partition(self.path) == 0:
@@ -460,7 +456,6 @@ class Partitions():
             tree_iter = model.get_iter(self.path)
             self.slice = model.get_value(tree_iter, 0)
             self.size = model.get_value(tree_iter, 1)
-            print(self.path)
             if len(self.path) == 2 and self.path[1] > 0 and self.scheme == "MBR":
                 pathbehind = str(self.path[0]) + ":" + str(int(self.path[1] - 1))
                 tree_iter2 = model.get_iter(pathbehind)
@@ -530,7 +525,9 @@ class Partitions():
                 self.delete_bt.set_sensitive(False)
                 self.modifi_bt.set_sensitive(False)
                 self.auto_bt.set_sensitive(False)
-                if how_partition(self.path) == 1 and first_is_free(self.path) == 'freespace':
+                how_many_prt = how_partition(self.path)
+                firstisfree = first_is_free(self.path)
+                if how_many_prt == 1 and firstisfree == 'freespace':
                     self.create_bt.set_sensitive(False)
                 elif how_partition(self.path) == 0:
                     self.create_bt.set_sensitive(True)
@@ -538,41 +535,76 @@ class Partitions():
                     self.create_bt.set_sensitive(False)
         if os.path.exists(Part_label):
             rd = open(Part_label, 'r')
-            self.partfile = rd.readlines()
+            self.prttn = rd.readlines()
+            rtbt = False
+            for line in self.prttn:
+                if "/boot\n" in line:
+                    rtbt = True
+                    break
             # If Find GPT scheme.
             if os.path.exists(disk_schem):
                 rschm = open(disk_schem, 'r')
                 schm = rschm.readlines()[0]
+                efi = efi_exist(self.disk)
                 if 'GPT' in schm:
-                    if len(self.partfile) >= 2:
-                        if 'BOOT' in self.partfile[0] or 'BIOS' in self.partfile[0] or 'UEFI' in self.partfile[0]:
-                            if "/boot\n" in self.partfile[1]:
-                                if len(self.partfile) >= 3:
-                                    if '/\n' in self.partfile[1]:
+                    if len(self.prttn) >= 2:
+                        if 'BOOT' in self.prttn[0]:
+                            if rtbt is True and "/boot\n" not in self.prttn[1]:
+                                self.button3.set_sensitive(False)
+                            elif "/boot\n" in self.prttn[1]:
+                                if len(self.prttn) >= 3:
+                                    if '/\n' in self.prttn[2]:
                                         self.button3.set_sensitive(True)
                                     else:
                                         self.button3.set_sensitive(False)
                                 else:
                                     self.button3.set_sensitive(False)
-                            elif '/\n' in self.partfile[1]:
+                            elif '/\n' in self.prttn[1]:
                                 self.button3.set_sensitive(True)
                             else:
                                 self.button3.set_sensitive(False)
-                        else:
+                        elif 'UEFI' in self.prttn[0] and efi is False:
+                            if rtbt is True and "/boot\n" not in self.prttn[1]:
+                                self.button3.set_sensitive(False)
+                            elif "/boot\n" in self.prttn[1]:
+                                if len(self.prttn) >= 3:
+                                    if '/\n' in self.prttn[2]:
+                                        self.button3.set_sensitive(True)
+                                    else:
+                                        self.button3.set_sensitive(False)
+                                else:
+                                    self.button3.set_sensitive(False)
+                            elif '/\n' in self.prttn[1]:
+                                self.button3.set_sensitive(True)
+                            else:
+                                self.button3.set_sensitive(False)
+                        elif rtbt is True and "/boot\n" not in self.prttn[1]:
                             self.button3.set_sensitive(False)
-                    else:
-                        self.button3.set_sensitive(False)
-                else:
-                    if len(self.partfile) >= 1:
-                        if "/boot\n" in self.partfile[0]:
-                            if len(self.partfile) >= 2:
-                                if '/\n' in self.partfile[1]:
+                        elif "/boot\n" in self.prttn[0] and efi is True:
+                            if len(self.prttn) >= 2:
+                                if '/\n' in self.prttn[1]:
                                     self.button3.set_sensitive(True)
                                 else:
                                     self.button3.set_sensitive(False)
                             else:
                                 self.button3.set_sensitive(False)
-                        elif '/\n' in self.partfile[0]:
+                        elif '/\n' in self.prttn[0] and efi is True:
+                            self.button3.set_sensitive(True)
+                        else:
+                            self.button3.set_sensitive(False)
+                    else:
+                        self.button3.set_sensitive(False)
+                else:
+                    if len(self.prttn) >= 1:
+                        if "/boot\n" in self.prttn[0]:
+                            if len(self.prttn) >= 2:
+                                if '/\n' in self.prttn[1]:
+                                    self.button3.set_sensitive(True)
+                                else:
+                                    self.button3.set_sensitive(False)
+                            else:
+                                self.button3.set_sensitive(False)
+                        elif '/\n' in self.prttn[0]:
                             self.button3.set_sensitive(True)
                         else:
                             self.button3.set_sensitive(False)

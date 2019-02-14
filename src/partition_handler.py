@@ -79,7 +79,6 @@ def how_partition(path):
     disk = disk_query()[path[0]][0]
     if os.path.exists(partitiondb + disk):
         part = partition_query(disk)
-        print(part)
         return len(part)
     else:
         return 0
@@ -860,7 +859,7 @@ class createPartition():
 
 class modifyPartition():
 
-    def __init__(self, path, lnumb, inumb, cnumb, lb, fs, data):
+    def __init__(self, path, lnumb, inumb, cnumb, label, fs, data):
         disk = disk_query()[path[0]][0]
         if not os.path.exists(disk_file):
             file_disk = open(disk_file, 'w')
@@ -876,7 +875,7 @@ class modifyPartition():
             sfile = open(part_schem, 'w')
             sfile.writelines('partscheme=GPT')
             sfile.close()
-        if fs == '/':
+        if label == '/':
             slice_file = open(dslice, 'w')
             slice_file.writelines('p%s\n' % pl)
             slice_file.close()
@@ -886,7 +885,7 @@ class modifyPartition():
         if lnumb == 0:
             cnumb -= 1
         pf = open(partitiondb + disk, 'wb')
-        plist.extend(([disk + 'p%s' % pl, cnumb, lb, fs]))
+        plist.extend(([disk + 'p%s' % pl, cnumb, label, fs]))
         mplist[lv] = plist
         plist = []
         if lnumb > 0:
