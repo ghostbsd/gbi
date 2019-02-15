@@ -385,12 +385,16 @@ class Delete_partition():
                 sl[snum] = ['freespace', free, '', '']
         else:
             free = int_size(sl[snum][1])
-            if sl[snum + 1][0] == 'freespace' and sl[snum - 1][0] == 'freespace':
-                free = free + int_size(sl[snum + 1][1]) + int_size(sl[snum - 1][1])
+            slice_after = sl[snum + 1][0]
+            slice_before = sl[snum - 1][0]
+            size_after = sl[snum + 1]
+            size_before = sl[snum - 1]
+            if slice_after == 'freespace' and slice_before == 'freespace':
+                free = free + int_size(size_after) + int_size(size_before)
                 sl[snum] = ['freespace', free, '', '']
                 sl.remove(sl[snum + 1])
                 sl.remove(sl[snum - 1])
-            elif sl[snum + 1][0] == 'freespace':
+            elif slice_after == 'freespace':
                 free = free + int_size(sl[snum + 1][1])
                 sl[snum] = ['freespace', free, '', '']
                 sl.remove(sl[snum + 1])
@@ -404,7 +408,7 @@ class Delete_partition():
         dl = []
         mdl = []
         data = True
-        # if delete exist chek if slice is in delete.
+        # if delete exist check if slice is in delete.
         if os.path.exists(tmp + 'delete'):
             df = open(tmp + 'delete', 'rb')
             mdl = pickle.load(df)
@@ -427,8 +431,8 @@ class Delete_partition():
             pfile = open(Part_label, 'w')
             for partlist in partition_query(drive):
                 if partlist[2] != '':
-                    pfile.writelines('%s %s %s\n' % (partlist[3], partlist[1],
-                                                     partlist[2]))
+                    partition = f'{partlist[3]} {partlist[1]} {partlist[2]}\n'
+                    pfile.writelines(partition)
             pfile.close()
 
 
@@ -672,7 +676,7 @@ class autoFreeSpace():
 
 class createLabel():
 
-    def __init__(self, path, lnumb, cnumb, lb, fs, data):
+    def __init__(self, path, lnumb, cnumb, label, fs, data):
         disk = disk_query()[path[0]][0]
         if not os.path.exists(disk_file):
             file_disk = open(disk_file, 'w')
@@ -694,7 +698,7 @@ class createLabel():
         plf = open(partitiondb + disk + 's%s' % sl, 'wb')
         if lnumb == 0:
             cnumb -= 1
-        llist.extend(([disk + 's%s' % sl + letter, cnumb, lb, fs]))
+        llist.extend(([disk + 's%s' % sl + letter, cnumb, label, fs]))
         mllist[lv] = llist
         llist = []
         if lnumb > 0:
@@ -714,7 +718,7 @@ class createLabel():
 
 class modifyLabel():
 
-    def __init__(self, path, lnumb, cnumb, lb, fs, data):
+    def __init__(self, path, lnumb, cnumb, label, fs, data):
         disk = disk_query()[path[0]][0]
         if not os.path.exists(disk_file):
             file_disk = open(disk_file, 'w')
@@ -736,7 +740,7 @@ class modifyLabel():
         plf = open(partitiondb + disk + 's%s' % sl, 'wb')
         if lnumb == 0:
             cnumb -= 1
-        llist.extend(([disk + 's%s' % sl + letter, cnumb, lb, fs]))
+        llist.extend(([disk + 's%s' % sl + letter, cnumb, label, fs]))
         mllist[lv] = llist
         llist = []
         if lnumb > 0:
@@ -805,7 +809,7 @@ class createSlice():
 
 class createPartition():
 
-    def __init__(self, path, lnumb, inumb, cnumb, lb, fs, create):
+    def __init__(self, path, lnumb, inumb, cnumb, label, fs, create):
         disk = disk_query()[path[0]][0]
         if not os.path.exists(disk_file):
             file_disk = open(disk_file, 'w')
@@ -821,7 +825,7 @@ class createPartition():
             sfile = open(part_schem, 'w')
             sfile.writelines('partscheme=GPT')
             sfile.close()
-        if fs == '/':
+        if label == '/':
             slice_file = open(dslice, 'w')
             slice_file.writelines('p%s\n' % pl)
             # slice_file.writelines('%s\n' % number)
@@ -832,7 +836,7 @@ class createPartition():
         if lnumb == 0 and cnumb > 1:
                 cnumb -= 1
         pf = open(partitiondb + disk, 'wb')
-        plist.extend(([disk + 'p%s' % pl, cnumb, lb, fs]))
+        plist.extend(([disk + 'p%s' % pl, cnumb, label, fs]))
         mplist[lv] = plist
         plist = []
         if lnumb > 0:
@@ -979,6 +983,7 @@ def efi_exist(disk):
 
 
 class makingParttion():
+
     def __init__(self):
         if os.path.exists(tmp + 'create'):
             pf = open(tmp + 'create', 'rb')
@@ -999,13 +1004,16 @@ class makingParttion():
                         call(cmd2, shell=True)
                     else:
                         if boot == "grub":
-                            cmd = 'gpart add -a 4k -s 1M -t bios-boot -i %s %s' % (sl, drive)
+                            cmd = 'gpart add -a 4k -s 1M -t bios-boot -i' \
+                                f' {sl} {drive}'
                         else:
-                            cmd = 'gpart add -a 4k -s 512 -t freebsd-boot -i %s %s' % (sl, drive)
+                            cmd = 'gpart add -a 4k -s 512 -t freebsd-boot -i' \
+                                f' {sl} {drive}'
                         call(cmd, shell=True)
                 elif slicePartition(part) == 's':
                     size = int(line[1])
                     block = int(size * 2048)
-                    cmd = 'gpart add -a 4k -s %s -t freebsd -i %s %s' % (block, sl, drive)
+                    cmd = f'gpart add -a 4k -s {block} -t freebsd -i {sl} ' \
+                        f'{drive}'
                     call(cmd, shell=True)
                 sleep(2)
