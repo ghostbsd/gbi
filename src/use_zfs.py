@@ -368,6 +368,10 @@ class ZFS():
         shemebox.append_text("MBR")
         shemebox.connect('changed', self.sheme_selection)
         shemebox.set_active(0)
+        if bios_or_uefi() == "UEFI":
+            shemebox.set_sensitive(False)
+        else:
+            shemebox.set_sensitive(True)
         # Force 4k Sectors
         self.zfs_four_k = "True"
         zfs4kcheck = Gtk.CheckButton("Force ZFS 4k block size")

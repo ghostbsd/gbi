@@ -296,6 +296,10 @@ class use_ufs():
         shemebox.append_text("MBR")
         shemebox.connect('changed', self.sheme_selection)
         shemebox.set_active(0)
+        if bios_or_uefi() == "UEFI":
+            shemebox.set_sensitive(False)
+        else:
+            shemebox.set_sensitive(True)
         # Swap Size
         ram = Popen(memory, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT,
                     universal_newlines=True, close_fds=True)
