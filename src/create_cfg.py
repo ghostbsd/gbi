@@ -187,6 +187,9 @@ class gbsd_cfg():
         else:
             ifvbox.writelines('False\n')
         ifvbox.close()
+        f.writelines('runExtCommand=cat /etc/rc.conf | grep kld_list >> $FSMNT/etc/rc.conf\n')
+        if os.path.exists("/etc/X11/xorg.conf"):
+            f.writelines('runExtCommand=cp /etc/X11/xorg.conf $FSMNT/etc/X11/xorg.conf\n')
         f.writelines('runScript=/root/iso_to_hd.sh\n')
         f.writelines('runCommand=rm -f /root/iso_to_hd.sh\n')
         if os.path.exists(zfs_config):
