@@ -141,17 +141,16 @@ class Partitions():
             else:
                 self.fstype.append_text("BOOT")
                 self.fs = "BOOT"
-        if self.fs == "UEFI" and efi_exist(self.disk) is False:
-            if scheme == 'GPT' and not os.path.exists(Part_label):
-                self.fstype.set_active(5)
-            elif scheme == 'GPT' and len(self.prttn) == 0:
-                self.fstype.set_active(5)
-        elif self.fs == "BOOT":
-            if scheme == 'GPT' and not os.path.exists(Part_label):
-                self.fstype.set_active(5)
-            elif scheme == 'GPT' and len(self.prttn) == 0:
-                self.fstype.set_active(5)
-
+            if self.fs == "UEFI" and efi_exist(self.disk) is False:
+                if not os.path.exists(Part_label):
+                    self.fstype.set_active(5)
+                elif len(self.prttn) == 0:
+                    self.fstype.set_active(5)
+            elif self.fs == "BOOT":
+                if not os.path.exists(Part_label):
+                    self.fstype.set_active(5)
+                elif len(self.prttn) == 0:
+                    self.fstype.set_active(5)
         elif self.lablebehind == "/":
             self.fstype.set_active(4)
             self.fs = "SWAP"

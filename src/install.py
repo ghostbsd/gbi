@@ -94,9 +94,9 @@ class installSlide():
         self.mainVbox = Gtk.VBox(False, 0)
         self.mainVbox.show()
         self.mainHbox.pack_start(self.mainVbox, True, True, 0)
-        #if os.path.exists(rcconfgbsd):
+        # if os.path.exists(rcconfgbsd):
         slide = gbsdSlides()
-        #elif os.path.exists(rcconfdbsd):
+        # elif os.path.exists(rcconfdbsd):
         #    slide = dbsdSlides()
         getSlides = slide.get_slide()
         self.mainVbox.pack_start(getSlides, True, True, 0)
