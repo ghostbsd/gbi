@@ -71,7 +71,7 @@ class bootManager():
         box2.pack_start(hbox, True, True, 0)
         bbox1 = Gtk.VBox()
         bbox1.show()
-        self.refind = Gtk.RadioButton.new_with_label_from_widget(None, "Setup Refine boot manager")
+        self.refind = Gtk.RadioButton.new_with_label_from_widget(None, "Setup rEFInd boot manager")
         bbox1.pack_start(self.refind, False, True, 10)
         self.refind.connect("toggled", self.boot_manager, "refind")
         self.refind.show()
