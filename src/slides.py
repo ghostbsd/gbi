@@ -305,8 +305,8 @@ class dbsdSlides:
         hBox.show()
         vBox.pack_end(hBox, True, True, 0)
         label2 = Gtk.Label(name="slideText")
-        label2.set_markup("Search, install, upgrade, and uninstall software with OctoPkg software manager.\n\n"
-                          "OctoPkg is a powerful tool to manage DesktopBSD/FreeBSD software. It has a simple interface which consists of just 2 panels, a list of all available software including results of searches and a tab widget showing 6 useful tabs information, files, transaction, output, news, and a quick help guide.\n\n"
+        label2.set_markup("Search, install, upgrade, and uninstall software with Software Station software manager.\n\n"
+                          "Software Station is a powerful tool to manage DesktopBSD/FreeBSD software. It has a simple interface which consists of just 2 panels, a list of all available software including results of searches and a tab widget showing 6 useful tabs information, files, transaction, output, news, and a quick help guide.\n\n"
                           "There are over 25000 softwares available to install.")
         label2.set_justify(Gtk.Justification.LEFT)
         label2.set_line_wrap(True)
