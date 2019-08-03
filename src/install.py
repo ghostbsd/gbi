@@ -30,6 +30,13 @@ rcconfdbsd = "/etc/rc.conf.desktopbsd"
 default_site = "/usr/local/lib/gbi/slides/welcome.html"
 logo = "/usr/local/lib/gbi/logo.png"
 
+cmd = "kenv | grep rc_system"
+rc_system = Popen(cmd, shell=True, stdout=PIPE, universal_newlines=True)
+if 'openrc' in rc_system.read():
+    rc = 'rc-'
+else:
+    rc = ''
+
 
 def update_progess(probar, bartext):
     new_val = probar.get_fraction() + 0.000003
@@ -38,7 +45,7 @@ def update_progess(probar, bartext):
 
 
 def read_output(command, probar):
-    call('service hald stop', shell=True)
+    call(f'{rc}service hald stop', shell=True)
     GLib.idle_add(update_progess, probar, "Creating pcinstall.cfg")
 
     # If rc.conf.ghostbsd exists run gbsd_cfg
@@ -72,13 +79,13 @@ def read_output(command, probar):
         # filer.writelines(bartext)
         # filer.close
         print(bartext)
-    call('service hald start', shell=True)
+    call(f'{rc}service hald start', shell=True)
     if bartext.rstrip() == "Installation finished!":
-        Popen('python2.7 %send.py' % gbi_path, shell=True, close_fds=True)
+        Popen('python3.6 %send.py' % gbi_path, shell=True, close_fds=True)
         call("rm -rf /tmp/.gbi/", shell=True, close_fds=True)
         Gtk.main_quit()
     else:
-        Popen('python2.7 %serror.py' % gbi_path, shell=True, close_fds=True)
+        Popen('python3.6 %serror.py' % gbi_path, shell=True, close_fds=True)
         Gtk.main_quit()
 
 

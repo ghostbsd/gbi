@@ -111,11 +111,11 @@ def scheme_query(path):
 
 
 def find_scheme(disk):
-        cmd = "%s %s" % (detect_sheme, disk)
-        shm_out = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE,
-                        universal_newlines=True, close_fds=True)
-        scheme = shm_out.stdout.readlines()[0].rstrip()
-        return scheme
+    cmd = "%s %s" % (detect_sheme, disk)
+    shm_out = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE,
+                    universal_newlines=True, close_fds=True)
+    scheme = shm_out.stdout.readlines()[0].rstrip()
+    return scheme
 
 
 def int_size(size):

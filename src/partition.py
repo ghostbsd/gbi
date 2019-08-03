@@ -612,7 +612,7 @@ class Partitions():
             else:
                 self.button3.set_sensitive(False)
         else:
-                self.button3.set_sensitive(False)
+            self.button3.set_sensitive(False)
 
     def __init__(self, button3):
         self.button3 = button3
@@ -711,4 +711,4 @@ class Partitions():
 
     def get_model(self):
         self.tree_selection.select_path(0)
-        return self.box1
+    return self.box1
