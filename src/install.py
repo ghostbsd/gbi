@@ -32,7 +32,7 @@ logo = "/usr/local/lib/gbi/logo.png"
 
 cmd = "kenv | grep rc_system"
 rc_system = Popen(cmd, shell=True, stdout=PIPE, universal_newlines=True)
-if 'openrc' in rc_system.read():
+if 'openrc' in rc_system.stdout.read():
     rc = 'rc-'
 else:
     rc = ''
