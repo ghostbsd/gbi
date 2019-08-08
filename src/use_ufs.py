@@ -123,7 +123,8 @@ class use_ufs():
             root_size = root_size - 100
         else:
             root_size = root_size - 1
-        zfsPart = 'disk0-part=%s%s %s /\n' % (self.fs, dgeli, root_size)
+        # adding zero to use remaining space
+        zfsPart = f'disk0-part={self.fs}{dgeli} 0 /\n'
         pfile.writelines(zfsPart)
         if swap_size != 0:
             pfile.writelines('disk0-part=SWAP%s %s none\n' % (dgeli, swap_size))

@@ -139,8 +139,8 @@ class ZFS():
             "/var(canmount=off|atime=on|mountpoint=none)," \
             "/var/audit(compress=lz4),/var/log(compress=lz4)," \
             "/var/mail(compress=lz4),/var/tmp(compress=lz4)"
-        zfsPart = 'disk0-part=ZFS%s %s %s%s' % (dgeli, ZFS_NUM, zfslayout,
-                                                pool_disk)
+        # adding zero to use remaining space
+        zfsPart = f'disk0-part=ZFS{dgeli} 0 {zfslayout}{pool_disk}'
         pfile.writelines(zfsPart)
         if SWAP != 0:
             pfile.writelines('disk0-part=SWAP%s %s none\n' % ('', SWAP))
