@@ -94,7 +94,7 @@ def allCharacter(strg, search=re.compile(r'[^a-zA-Z0-9~\!@#\$%\^&\*_\+":;\'\-]')
 
 class ZFS():
     def save_selection(self):
-        SIZE = int(zfs_dsk_list[0].partition('-')[2].rstrip()) - 2
+        SIZE = int(zfs_dsk_list[0].partition('-')[2].rstrip()) - 512
         SWAP = int(self.swap_entry.get_text())
         ZFS_NUM = SIZE - SWAP
         if self.disk_encript is True:
@@ -140,10 +140,10 @@ class ZFS():
             "/var/audit(compress=lz4),/var/log(compress=lz4)," \
             "/var/mail(compress=lz4),/var/tmp(compress=lz4)"
         # adding zero to use remaining space
-        zfsPart = f'disk0-part=ZFS{dgeli} 0 {zfslayout}{pool_disk}'
+        zfsPart = f'disk0-part=ZFS{dgeli} {ZFS_NUM} {zfslayout}{pool_disk}'
         pfile.writelines(zfsPart)
         if SWAP != 0:
-            pfile.writelines('disk0-part=SWAP%s %s none\n' % ('', SWAP))
+            pfile.writelines('disk0-part=SWAP 0 none\n')
         if self.disk_encript is True:
             pfile.writelines('encpass=%s\n' % self.password.get_text())
         else:
@@ -381,7 +381,7 @@ class ZFS():
         ram = Popen(memory, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT,
                     universal_newlines=True, close_fds=True)
         mem = ram.stdout.read()
-        swap = 512
+        swap = 2048
         swp_size_label = Gtk.Label('<b>Swap Size(MB)</b>')
         swp_size_label.set_use_markup(True)
         self.swap_entry = Gtk.Entry()

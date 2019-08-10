@@ -92,7 +92,7 @@ def allCharacter(strg, search=re.compile(r'[^a-zA-Z0-9~\!@#\$%\^&\*_\+":;\'\-]')
 
 class use_ufs():
     def save_selection(self):
-        disk_size = int(ufs_dsk_list[0].partition('-')[2].rstrip()) - 2
+        disk_size = int(ufs_dsk_list[0].partition('-')[2].rstrip()) - 512
         swap_size = int(self.swap_entry.get_text())
         root_size = disk_size - swap_size
         if self.disk_encript is True:
@@ -124,10 +124,10 @@ class use_ufs():
         else:
             root_size = root_size - 1
         # adding zero to use remaining space
-        zfsPart = f'disk0-part={self.fs}{dgeli} 0 /\n'
+        zfsPart = f'disk0-part={self.fs}{dgeli} {root_size} /\n'
         pfile.writelines(zfsPart)
         if swap_size != 0:
-            pfile.writelines('disk0-part=SWAP%s %s none\n' % (dgeli, swap_size))
+            pfile.writelines('disk0-part=SWAP 0 none\n')
         if self.disk_encript is True:
             pfile.writelines('encpass=%s\n' % self.password.get_text())
         else:
@@ -305,7 +305,7 @@ class use_ufs():
         ram = Popen(memory, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT,
                     universal_newlines=True, close_fds=True)
         mem = ram.stdout.read()
-        swap = 512
+        swap = 2048
         swp_size_label = Gtk.Label('<b>Swap Size(MB)</b>')
         swp_size_label.set_use_markup(True)
         self.swap_entry = Gtk.Entry()
