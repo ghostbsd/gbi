@@ -1,8 +1,13 @@
 #!/usr/local/bin/python
 from sys import path
+import os
+import shutil
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
+
+if os.path.exists('/tmp/.gbi'):
+    shutil.rmtree('/tmp/.gbi')
 
 installer = "/usr/local/lib/gbi/"
 # path.append("/home/ericbsd/gbi/src/")

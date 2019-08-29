@@ -2,9 +2,10 @@
 
 from subprocess import Popen, PIPE
 
+pc_sysinstall = '/usr/local/sbin/pc-sysinstall'
 
 def language_dictionary():
-    langs = Popen('pc-sysinstall query-langs', shell=True, stdin=PIPE,
+    langs = Popen(f'{pc_sysinstall} query-langs', shell=True, stdin=PIPE,
                   stdout=PIPE, universal_newlines=True,
                   close_fds=True).stdout.readlines()
     dictionary = {}
@@ -17,7 +18,7 @@ def language_dictionary():
 
 
 def keyboard_dictionary():
-    xkeyboard_layouts = Popen('pc-sysinstall xkeyboard-layouts', shell=True,
+    xkeyboard_layouts = Popen(f'{pc_sysinstall} xkeyboard-layouts', shell=True,
                               stdout=PIPE,
                               universal_newlines=True).stdout.readlines()
     dictionary = {}
@@ -28,8 +29,8 @@ def keyboard_dictionary():
         kb_variant = None
         dictionary[kb_name] = {'layout': kb_layouts, 'variant': kb_variant}
 
-    xkeyboard_variants = Popen('pc-sysinstall xkeyboard-variants', shell=True,
-                               stdout=PIPE,
+    xkeyboard_variants = Popen(f'{pc_sysinstall} xkeyboard-variants',
+                               shell=True, stdout=PIPE,
                                universal_newlines=True).stdout.readlines()
     for line in xkeyboard_variants:
         xkb_variant = line.rstrip()
@@ -43,7 +44,7 @@ def keyboard_dictionary():
 
 
 def keyboard_models():
-    xkeyboard_models = Popen('pc-sysinstall xkeyboard-models', shell=True,
+    xkeyboard_models = Popen(f'{pc_sysinstall} xkeyboard-models', shell=True,
                              stdout=PIPE,
                              universal_newlines=True).stdout.readlines()
     dictionary = {}
@@ -55,7 +56,7 @@ def keyboard_models():
 
 
 def timezone_dictionary():
-    tz_list = Popen('pc-sysinstall list-tzones', shell=True,
+    tz_list = Popen(f'{pc_sysinstall} list-tzones', shell=True,
                     stdout=PIPE, universal_newlines=True).stdout.readlines()
     city_list = []
     dictionary = {}

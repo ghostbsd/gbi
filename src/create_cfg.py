@@ -195,24 +195,5 @@ class gbsd_cfg():
         if os.path.exists(zfs_config):
             zfsark = """echo 'vfs.zfs.arc_max="512M"' >> /boot/loader.conf"""
             f.writelines('runCommand=%s\n' % zfsark)
-        # adding setting for keyboard in slim
-        keyboard_conf = '/usr/local/etc/X11/xorg.conf.d/keyboard.conf'
-        k_conf_list = [
-            'Section "InputClass"',
-            '        Identifier "Keyboard0"',
-            '        Driver "kbd"',
-            '        Option "XkbLayout"      "%s"' % kbl
-        ]
-        if kbv != 'None':
-            k_conf_list.append('        Option "XkbVariant"     "%s"' % kbv)
-        if kbm != 'None':
-            k_conf_list.append('        Option "XkbModel"       "%s"' % kbm)
-        k_conf_list.append('EndSection')
-        for conf_line in k_conf_list:
-            if 'Section "InputClass"' == conf_line:
-                cmd = """echo '%s' > %s""" % (conf_line, keyboard_conf)
-            else:
-                cmd = """echo '%s' >> %s""" % (conf_line, keyboard_conf)
-            f.writelines('runCommand=%s\n' % cmd)
         f.close()
         os.remove(user_passwd)
