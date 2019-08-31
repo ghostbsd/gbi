@@ -179,6 +179,10 @@ class gbsd_cfg():
         f.writelines('defaultGroup=wheel\n')
         f.writelines('userGroups=operator\n')
         f.writelines('commitUser\n')
+        nv = Popen('pciconf -lv | grep -B 4 VGA', shell=True,
+                        stdout=PIPE, close_fds=True, universal_newlines=True)
+        if "NVIDIA" not in nv.stdout.read():
+            f.writelines('runCommand=pkg delete -fy nvidia-driver\n')
         vbguest = Popen('pciconf -lv | grep "VirtualBox"', shell=True,
                         stdout=PIPE, close_fds=True, universal_newlines=True)
         if "VirtualBox" in vbguest.stdout.read():
