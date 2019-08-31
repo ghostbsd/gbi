@@ -61,9 +61,9 @@ class gbsdSlides:
         hBox.show()
         vBox.pack_end(hBox, True, True, 0)
         label2 = Gtk.Label(name="slideText")
-        label2.set_markup("Search, install, upgrade and uninstall software with the OctoPkg software manager.\n\n"
-                          "OctoPkg is a powerful tool to manage GhostBSD/FreeBSD software. It has a simple interface which consists of just 2 panels, a list of all available software packages including results of searches and a tab widget showing 6 useful tabs for information, files, transaction, output, news, and a quick help guide.\n\n"
-                          "There are over 25,000 software packages available to install.")
+        label2.set_markup("Search, install, upgrade and uninstall software with the Software Station software manager.\n\n"
+                          "Software Station is a powerful tool to manage GhostBSD/FreeBSD software. It has a simple interface which consists of just 2 panels, a list of all available software packages including results of searches and a tab widget showing 6 useful tabs for information, files, transaction, output, news, and a quick help guide.\n\n"
+                          "There are over 32,000 software packages available to install.")
         label2.set_justify(Gtk.Justification.LEFT)
         label2.set_line_wrap(True)
         label2.set_alignment(0.1, 0.2)
@@ -159,32 +159,8 @@ class gbsdSlides:
         vBox.pack_end(hBox, True, True, 0)
         label2 = Gtk.Label(name="slideText")
         label2.set_markup("GhostBSD is ready to play videos and music from the web, CDs and DVDs.\n\n"
-                          "The Exaile audio player lets you organize your music and listen to Internet radio, podcasts and more, as well as synchronize your audio collection to a portable audio player.\n\n"
-                          "\nGnome MPlayer allows you to easily watch videos from your computer or DVD.")
-        label2.set_justify(Gtk.Justification.LEFT)
-        label2.set_line_wrap(True)
-        label2.set_alignment(0.1, 0.2)
-        hBox2 = Gtk.HBox(False, 0, name="TransBox")
-        hBox2.show()
-        hBox.pack_start(hBox2, True, True, 0)
-        hBox2.pack_start(label2, True, True, 30)
-        label3 = Gtk.Label()
-        hBox.pack_end(label3, True, True, 160)
-        return vBox
-
-    def communicate(self):
-        vBox = Gtk.VBox(False, 0)
-        vBox.show()
-        label = Gtk.Label("Play your movies and music", name="Header")
-        label.set_property("height-request", 40)
-        vBox.pack_start(label, False, False, 0)
-        hBox = Gtk.HBox(False, 0, name="communicate")
-        hBox.show()
-        vBox.pack_end(hBox, True, True, 0)
-        label2 = Gtk.Label(name="slideText")
-        label2.set_markup("GhostBSD is ready to play videos and music from the web, CDs and DVDs.\n\n"
-                          "The Exaile audio player lets you organize your music and listen to Internet radio, podcasts and more, as well as synchronize your audio collection to a portable audio player.\n\n"
-                          "\nGnome MPlayer allows you to easily watch videos from your computer or DVD.")
+                          "The Rhythmbox audio player lets you organize your music and listen to Internet radio, podcasts and more, as well as synchronize your audio collection to a portable audio player.\n\n"
+                          "\nVLC allows you to plays most multimedia files as well as DVDs, Audio CDs, VCDs, and various streaming protocols.")
         label2.set_justify(Gtk.Justification.LEFT)
         label2.set_line_wrap(True)
         label2.set_alignment(0.1, 0.2)
