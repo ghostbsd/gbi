@@ -179,15 +179,16 @@ class gbsd_cfg():
         f.writelines('defaultGroup=wheel\n')
         f.writelines('userGroups=operator\n')
         f.writelines('commitUser\n')
-        ifvbox = open('/tmp/.ifvbox', 'w')
-        vbguest = Popen('pciconf -lv | grep "VirtualBox Graphics"', shell=True,
+        vbguest = Popen('pciconf -lv | grep "VirtualBox"', shell=True,
                         stdout=PIPE, close_fds=True, universal_newlines=True)
-        if "VirtualBox Graphics" in vbguest.stdout.read():
-            ifvbox.writelines('True\n')
+        if "VirtualBox" in vbguest.stdout.read():
+            f.writelines('runCommand=rc-update add vboxguest default\n')
+            f.writelines('runCommand=rc-update add vboxservice default\n')
         else:
-            ifvbox.writelines('False\n')
-        ifvbox.close()
-        f.writelines('runExtCommand=cat /etc/rc.conf | grep kld_list >> $FSMNT/etc/rc.conf\n')
+            f.writelines('runCommand=pkg delete -fy virtualbox-ose-additions\n')
+        f.writelines('runExtCommand=cp /etc/rc.conf $FSMNT/etc/rc.conf\n')
+        if os.path.exists("/etc/wpa_supplicant.conf"):
+            f.writelines('runExtCommand=cp /etc/wpa_supplicant.conf $FSMNT/etc/wpa_supplicant.conf\n')
         if os.path.exists("/etc/X11/xorg.conf"):
             f.writelines('runExtCommand=cp /etc/X11/xorg.conf $FSMNT/etc/X11/xorg.conf\n')
         f.writelines('runScript=/root/iso_to_hd.sh\n')
