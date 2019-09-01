@@ -193,7 +193,7 @@ class gbsd_cfg():
         f.writelines('runExtCommand=cp /etc/rc.conf $FSMNT/etc/rc.conf\n')
         if os.path.exists("/etc/wpa_supplicant.conf"):
             f.writelines('runExtCommand=cp /etc/wpa_supplicant.conf $FSMNT/etc/wpa_supplicant.conf\n')
-	    f.writelines('runExtCommand=chmod 665 $FSMNT/etc/wpa_supplicant.conf\n')
+            f.writelines('runExtCommand=chmod 665 $FSMNT/etc/wpa_supplicant.conf\n')
         if os.path.exists("/etc/X11/xorg.conf"):
             f.writelines('runExtCommand=cp /etc/X11/xorg.conf $FSMNT/etc/X11/xorg.conf\n')
         f.writelines('runScript=/root/iso_to_hd.sh\n')
