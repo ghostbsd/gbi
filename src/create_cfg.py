@@ -155,10 +155,10 @@ class gbsd_cfg():
         f.writelines('\n# Network Configuration\n')
         readu = open(user_passwd, 'rb')
         uf = pickle.load(readu)
-        net = uf[5]
-        f.writelines('hostname=%s\n' % net)
+        hostname = uf[5]
+        f.writelines(f'hostname={hostname}\n')
         # Set the root pass
-        f.writelines('\n# Network Configuration\n')
+        f.writelines('\n# Root Password\n')
         readr = open('%sroot' % tmp, 'rb')
         rf = pickle.load(readr)
         root = rf[0]
@@ -191,6 +191,7 @@ class gbsd_cfg():
         else:
             f.writelines('runCommand=pkg delete -fy virtualbox-ose-additions\n')
         f.writelines('runExtCommand=cp /etc/rc.conf $FSMNT/etc/rc.conf\n')
+        f.writelines(f"runCommand=sysrc -f /etc/rc.conf hostname='{hostname}'\n")
         if os.path.exists("/etc/wpa_supplicant.conf"):
             f.writelines('runExtCommand=cp /etc/wpa_supplicant.conf $FSMNT/etc/wpa_supplicant.conf\n')
             f.writelines('runExtCommand=chmod 665 $FSMNT/etc/wpa_supplicant.conf\n')
