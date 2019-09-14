@@ -190,8 +190,6 @@ class gbsd_cfg():
             f.writelines('runCommand=rc-update add vboxservice default\n')
         else:
             f.writelines('runCommand=pkg delete -fy virtualbox-ose-additions\n')
-        f.writelines('runExtCommand=cp /etc/rc.conf $FSMNT/etc/rc.conf\n')
-        f.writelines(f"runCommand=sysrc -f /etc/rc.conf hostname='{hostname}'\n")
         if os.path.exists("/etc/wpa_supplicant.conf"):
             f.writelines('runExtCommand=cp /etc/wpa_supplicant.conf $FSMNT/etc/wpa_supplicant.conf\n')
             f.writelines('runExtCommand=chmod 665 $FSMNT/etc/wpa_supplicant.conf\n')
