@@ -675,9 +675,7 @@ class autoFreeSpace():
 
 
 class createLabel():
-
-    def __init__(self, path, lnumb, cnumb, label, fs, data):
-        disk = disk_query()[path[0]][0]
+    def __init__(self, path, disk, partition_behind, left_size, create_size, label, fs, data):
         if not os.path.exists(disk_file):
             file_disk = open(disk_file, 'w')
             file_disk.writelines('%s\n' % disk)
@@ -696,13 +694,13 @@ class createLabel():
         llist = []
         mllist = label_query(disk + 's%s' % sl)
         plf = open(partitiondb + disk + 's%s' % sl, 'wb')
-        if lnumb == 0:
-            cnumb -= 1
-        llist.extend(([disk + 's%s' % sl + letter, cnumb, label, fs]))
+        if left_size == 0:
+            create_size -= 1
+        llist.extend(([disk + 's%s' % sl + letter, create_size, label, fs]))
         mllist[lv] = llist
         llist = []
-        if lnumb > 0:
-            llist.extend((['freespace', lnumb, '', '']))
+        if left_size > 0:
+            llist.extend((['freespace', left_size, '', '']))
             mllist.append(llist)
         pickle.dump(mllist, plf)
         plf.close()
@@ -718,7 +716,7 @@ class createLabel():
 
 class modifyLabel():
 
-    def __init__(self, path, lnumb, cnumb, label, fs, data):
+    def __init__(self, path, left_size, create_size, label, fs, data):
         disk = disk_query()[path[0]][0]
         if not os.path.exists(disk_file):
             file_disk = open(disk_file, 'w')
@@ -738,13 +736,13 @@ class modifyLabel():
         llist = []
         mllist = label_query(disk + 's%s' % sl)
         plf = open(partitiondb + disk + 's%s' % sl, 'wb')
-        if lnumb == 0:
-            cnumb -= 1
-        llist.extend(([disk + 's%s' % sl + letter, cnumb, label, fs]))
+        if left_size == 0:
+            create_size -= 1
+        llist.extend(([disk + 's%s' % sl + letter, create_size, label, fs]))
         mllist[lv] = llist
         llist = []
-        if lnumb > 0:
-            llist.extend((['freespace', lnumb, '', '']))
+        if left_size > 0:
+            llist.extend((['freespace', left_size, '', '']))
             mllist.append(llist)
         pickle.dump(mllist, plf)
         plf.close()
@@ -808,18 +806,17 @@ class createSlice():
 
 
 class createPartition():
-
-    def __init__(self, path, lnumb, inumb, cnumb, label, fs, create):
-        disk = disk_query()[path[0]][0]
+    def __init__(self, path, disk, partition_behind, left_size, create_size, label, fs, create):
         if not os.path.exists(disk_file):
             file_disk = open(disk_file, 'w')
             file_disk.writelines('%s\n' % disk)
             file_disk.close()
-        if len(path) == 1:
+        if partition_behind is None:
             pl = 1
             lv = 0
         else:
-            pl = path[1] + 1
+            p_behind = int(self.slicebehind.partition('p')[2])
+            pl = p_behind + 1
             lv = path[1]
         if not os.path.exists(part_schem):
             sfile = open(part_schem, 'w')
@@ -833,14 +830,14 @@ class createPartition():
         plist = []
         pslice = '%sp%s' % (disk, pl)
         mplist = partition_query(disk)
-        if lnumb == 0 and cnumb > 1:
-                cnumb -= 1
+        if left_size == 0 and create_size > 1:
+            create_size -= 1
         pf = open(partitiondb + disk, 'wb')
-        plist.extend(([disk + 'p%s' % pl, cnumb, label, fs]))
+        plist.extend(([disk + 'p%s' % pl, create_size, label, fs]))
         mplist[lv] = plist
         plist = []
-        if lnumb > 0:
-            plist.extend((['freespace', lnumb, '', '']))
+        if left_size > 0:
+            plist.extend((['freespace', left_size, '', '']))
             mplist.append(plist)
         pickle.dump(mplist, pf)
         pf.close()
@@ -854,7 +851,7 @@ class createPartition():
             plst = []
             mplst = []
             if not os.path.exists(tmp + 'create'):
-                plst.extend(([pslice, cnumb]))
+                plst.extend(([pslice, create_size]))
                 mplst.append(plst)
                 cf = open(tmp + 'create', 'wb')
                 pickle.dump(mplst, cf)
@@ -863,7 +860,7 @@ class createPartition():
 
 class modifyPartition():
 
-    def __init__(self, path, lnumb, inumb, cnumb, label, fs, data):
+    def __init__(self, path, left_size, inumb, create_size, label, fs, data):
         disk = disk_query()[path[0]][0]
         if not os.path.exists(disk_file):
             file_disk = open(disk_file, 'w')
@@ -886,14 +883,14 @@ class modifyPartition():
         plist = []
         pslice = '%sp%s' % (disk, pl)
         mplist = partition_query(disk)
-        if lnumb == 0:
-            cnumb -= 1
+        if left_size == 0:
+            create_size -= 1
         pf = open(partitiondb + disk, 'wb')
-        plist.extend(([disk + 'p%s' % pl, cnumb, label, fs]))
+        plist.extend(([disk + 'p%s' % pl, create_size, label, fs]))
         mplist[lv] = plist
         plist = []
-        if lnumb > 0:
-            plist.extend((['freespace', lnumb, '', '']))
+        if left_size > 0:
+            plist.extend((['freespace', left_size, '', '']))
             mplist.append(plist)
         pickle.dump(mplist, pf)
         pf.close()
@@ -907,7 +904,7 @@ class modifyPartition():
             plst = []
             mplst = []
             if not os.path.exists(tmp + 'create'):
-                plst.extend(([pslice, cnumb]))
+                plst.extend(([pslice, create_size]))
                 mplst.append(plst)
                 cf = open(tmp + 'create', 'wb')
                 pickle.dump(mplst, cf)

@@ -81,27 +81,27 @@ class Partitions():
     def save_selection(self):
         pass
 
-    def on_add_label(self, widget, entry, inumb, path, create):
+    def on_add_label(self, widget, entry, free_space, path, create):
         if self.fs == '' or self.label == '':
             pass
         else:
             fs = self.fs
             lb = self.label
-            cnumb = entry.get_value_as_int()
-            lnumb = inumb - cnumb
-            createLabel(path, lnumb, cnumb, lb, fs, create)
+            create_size = entry.get_value_as_int()
+            left_size = free_space - create_size
+            createLabel(path, self.disk, self.slicebehind, left_size, create_size, lb, fs, create)
         self.window.hide()
         self.update()
 
-    def on_add_partition(self, widget, entry, inumb, path, create):
+    def on_add_partition(self, widget, entry, free_space, path, create):
         if self.fs == '' or self.label == '':
             pass
         else:
             fs = self.fs
             lb = self.label
-            cnumb = entry.get_value_as_int()
-            lnumb = inumb - cnumb
-            createPartition(path, lnumb, inumb, cnumb, lb, fs, create)
+            create_size = entry.get_value_as_int()
+            left_size = int(free_space - create_size)
+            createPartition(path, self.disk, self.slicebehind, left_size, create_size, lb, fs, create)
         self.window.hide()
         self.update()
 
@@ -109,7 +109,7 @@ class Partitions():
         self.window.hide()
 
     def labelEditor(self, path, pslice, size, scheme, modify):
-        numb = int(size)
+        free_space = int(size)
         self.window = Gtk.Window()
         self.window.set_title("Add Partition")
         self.window.set_border_width(0)
@@ -158,8 +158,8 @@ class Partitions():
             self.fstype.set_active(3)
             self.fs = "UFS+SUJ"
         self.fstype.connect("changed", self.on_fs)
-        adj = Gtk.Adjustment(numb, 0, numb, 1, 100, 0)
-        self.entry = Gtk.SpinButton(adjustment=adj)
+        adj = Gtk.Adjustment(free_space, 0, free_space, 1, 100, 0)
+        self.entry = Gtk.SpinButton(adjustment=adj, numeric=True)
         if modify is True:
             self.entry.set_editable(False)
         else:
@@ -208,23 +208,23 @@ class Partitions():
         if modify is False:
             if scheme == 'MBR':
                 button.connect("clicked", self.on_add_label, self.entry,
-                               numb, path, True)
+                               free_space, path, True)
             elif scheme == 'GPT' and self.fs == 'BOOT':
                 button.connect("clicked", self.on_add_partition, self.entry,
-                               numb, path, True)
+                               free_space, path, True)
             elif scheme == 'GPT' and self.fs == 'UEFI' and efi_exist(self.disk) is False:
                 button.connect("clicked", self.on_add_partition, self.entry,
-                               numb, path, True)
+                               free_space, path, True)
             else:
                 button.connect("clicked", self.on_add_partition, self.entry,
-                               numb, path, False)
+                               free_space, path, False)
         else:
             if scheme == 'MBR':
-                button.connect("clicked", self.on_add_label, self.entry, numb,
+                button.connect("clicked", self.on_add_label, self.entry, free_space,
                                path, False)
             elif scheme == 'GPT':
                 button.connect("clicked", self.on_add_partition, self.entry,
-                               numb, path, False)
+                               free_space, path, False)
         bbox.add(button)
         box2.pack_end(bbox, True, True, 5)
         self.window.show_all()
@@ -305,7 +305,7 @@ class Partitions():
         self.window.hide()
 
     def sliceEditor(self):
-        numb = int(self.size)
+        free_space = int(self.size)
         self.window = Gtk.Window()
         self.window.set_title("Add Partition")
         self.window.set_border_width(0)
@@ -324,8 +324,8 @@ class Partitions():
         # label.set_alignment(0, .5)
         table = Gtk.Table(1, 2, True)
         label1 = Gtk.Label("Size(MB):")
-        adj = Gtk.Adjustment(numb, 0, numb, 1, 100, 0)
-        self.entry = Gtk.SpinButton(adjustment=adj)
+        adj = Gtk.Adjustment(free_space, 0, free_space, 1, 100, 0)
+        self.entry = Gtk.SpinButton(adjustment=adj, numeric=True)
         self.entry.set_numeric(True)
         # table.attach(label, 0, 2, 0, 1)
         table.attach(label1, 0, 1, 1, 2)
@@ -454,6 +454,7 @@ class Partitions():
             self.disk = model.get_value(tree_iter3, 0)
             tree_iter = model.get_iter(self.path)
             self.slice = model.get_value(tree_iter, 0)
+            print(self.slice)
             self.size = model.get_value(tree_iter, 1)
             if len(self.path) == 2 and self.path[1] > 0 and self.scheme == "MBR":
                 pathbehind = str(self.path[0]) + ":" + str(int(self.path[1] - 1))
@@ -475,8 +476,8 @@ class Partitions():
                 else:
                     slbehind = int(self.slicebehind.partition('p')[2])
             elif len(self.path) == 3 and self.path[2] > 0 and self.scheme == "MBR":
-                if self.path[1] > 0:
-                    pathbehind1 = str(self.path[0]) + ":" + str(int(self.path[1] - 1))
+                if self.path[2] > 0:
+                    pathbehind1 = str(self.path[0]) + ":" + str(self.path[1]) + ":" + str(int(self.path[2] - 1))
                     tree_iter2 = model.get_iter(pathbehind1)
                     self.slicebehind = model.get_value(tree_iter2, 0)
                 else:
