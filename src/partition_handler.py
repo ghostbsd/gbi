@@ -815,7 +815,7 @@ class createPartition():
             pl = 1
             lv = 0
         else:
-            p_behind = int(self.slicebehind.partition('p')[2])
+            p_behind = int(partition_behind.partition('p')[2])
             pl = p_behind + 1
             lv = path[1]
         if not os.path.exists(part_schem):

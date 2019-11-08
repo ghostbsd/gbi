@@ -137,20 +137,29 @@ class Partitions():
         if scheme == 'GPT':
             if bios_or_uefi() == "UEFI":
                 self.fstype.append_text("UEFI")
-                self.fs = "UEFI"
+                if path[1] == 0:
+                    self.fstype.set_active(5)
+                    self.fs = "UEFI"
+                elif self.lablebehind == "/":
+                    self.fstype.set_active(4)
+                    self.fs = "SWAP"
+                else:
+                    self.fstype.set_active(3)
+                    self.fs = "UFS+SUJ"
             else:
                 self.fstype.append_text("BOOT")
-                self.fs = "BOOT"
-            if self.fs == "UEFI" and efi_exist(self.disk) is False:
                 if not os.path.exists(Part_label):
                     self.fstype.set_active(5)
+                    self.fs = "BOOT"
                 elif len(self.prttn) == 0:
                     self.fstype.set_active(5)
-            elif self.fs == "BOOT":
-                if not os.path.exists(Part_label):
-                    self.fstype.set_active(5)
-                elif len(self.prttn) == 0:
-                    self.fstype.set_active(5)
+                    self.fs = "BOOT"
+                elif self.lablebehind == "/":
+                    self.fstype.set_active(4)
+                    self.fs = "SWAP"
+                else:
+                    self.fstype.set_active(3)
+                    self.fs = "UFS+SUJ"
         elif self.lablebehind == "/":
             self.fstype.set_active(4)
             self.fs = "SWAP"
@@ -212,12 +221,12 @@ class Partitions():
             elif scheme == 'GPT' and self.fs == 'BOOT':
                 button.connect("clicked", self.on_add_partition, self.entry,
                                free_space, path, True)
-            elif scheme == 'GPT' and self.fs == 'UEFI' and efi_exist(self.disk) is False:
+            elif scheme == 'GPT' and self.fs == 'UEFI':
                 button.connect("clicked", self.on_add_partition, self.entry,
                                free_space, path, True)
             else:
                 button.connect("clicked", self.on_add_partition, self.entry,
-                               free_space, path, False)
+                               free_space, path, True)
         else:
             if scheme == 'MBR':
                 button.connect("clicked", self.on_add_label, self.entry, free_space,
@@ -563,7 +572,7 @@ class Partitions():
                                 self.button3.set_sensitive(True)
                             else:
                                 self.button3.set_sensitive(False)
-                        elif 'UEFI' in self.prttn[0] and efi is False:
+                        elif 'UEFI' in self.prttn[0]:
                             if rtbt is True and "/boot\n" not in self.prttn[1]:
                                 self.button3.set_sensitive(False)
                             elif "/boot\n" in self.prttn[1]:
