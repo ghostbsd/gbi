@@ -36,12 +36,12 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 import os
 import shutil
+import re
 from partition_handler import partition_repos, disk_query, Delete_partition
 from partition_handler import partition_query, label_query, bios_or_uefi
 from partition_handler import autoDiskPartition, autoFreeSpace, first_is_free
 from partition_handler import createLabel, scheme_query, how_partition
 from partition_handler import diskSchemeChanger, createSlice, createPartition
-from partition_handler import efi_exist
 
 # Folder use pr the installer.
 tmp = "/tmp/.gbi/"
@@ -68,6 +68,7 @@ Part_label = '%spartlabel' % tmp
 part_schem = '%sscheme' % tmp
 partitiondb = "%spartitiondb/" % tmp
 ufs_Partiton_list = []
+bios_type = bios_or_uefi()
 
 
 class Partitions():
@@ -135,9 +136,9 @@ class Partitions():
         self.fstype.append_text('UFS+SUJ')
         self.fstype.append_text('SWAP')
         if scheme == 'GPT':
-            if bios_or_uefi() == "UEFI":
+            if bios_type == "UEFI":
                 self.fstype.append_text("UEFI")
-                if path[1] == 0:
+                if self.efi_exist is False:
                     self.fstype.set_active(5)
                     self.fs = "UEFI"
                 elif self.lablebehind == "/":
@@ -221,12 +222,12 @@ class Partitions():
             elif scheme == 'GPT' and self.fs == 'BOOT':
                 button.connect("clicked", self.on_add_partition, self.entry,
                                free_space, path, True)
-            elif scheme == 'GPT' and self.fs == 'UEFI':
+            elif scheme == 'GPT' and self.fs == 'UEFI' and self.efi_exist is False:
                 button.connect("clicked", self.on_add_partition, self.entry,
                                free_space, path, True)
             else:
                 button.connect("clicked", self.on_add_partition, self.entry,
-                               free_space, path, True)
+                               free_space, path, False)
         else:
             if scheme == 'MBR':
                 button.connect("clicked", self.on_add_label, self.entry, free_space,
@@ -410,7 +411,7 @@ class Partitions():
         #    self.treeview.expand_all()
         #    self.treeview.set_cursor(self.path)
         elif self.slice == 'freespace':
-            autoFreeSpace(self.path, self.size)
+            autoFreeSpace(self.path, self.size, self.efi_exist)
             self.Tree_Store()
             self.treeview.expand_all()
             self.treeview.set_cursor(self.path)
@@ -463,7 +464,6 @@ class Partitions():
             self.disk = model.get_value(tree_iter3, 0)
             tree_iter = model.get_iter(self.path)
             self.slice = model.get_value(tree_iter, 0)
-            print(self.slice)
             self.size = model.get_value(tree_iter, 1)
             if len(self.path) == 2 and self.path[1] > 0 and self.scheme == "MBR":
                 pathbehind = str(self.path[0]) + ":" + str(int(self.path[1] - 1))
@@ -519,6 +519,13 @@ class Partitions():
                     self.create_bt.set_sensitive(True)
                 self.delete_bt.set_sensitive(False)
                 self.modifi_bt.set_sensitive(False)
+                fisr_partition_path = f"{self.path[0]}:0"
+                first_tree_iter = model.get_iter(fisr_partition_path)
+                first_fs = model.get_value(first_tree_iter, 3)
+                if first_fs == "UEFI" or 'efi' in first_fs:
+                    self.efi_exist = True
+                else:
+                    self.efi_exist = False
                 self.auto_bt.set_sensitive(True)
             elif 's' in self.slice:
                 self.create_bt.set_sensitive(False)
@@ -554,8 +561,22 @@ class Partitions():
             if os.path.exists(disk_schem):
                 rschm = open(disk_schem, 'r')
                 schm = rschm.readlines()[0]
-                efi = efi_exist(self.disk)
                 if 'GPT' in schm:
+                    if os.path.exists(disk_file):
+                        diskfile = open(disk_file, 'r')
+                        disk = diskfile.readlines()[0].strip()
+                        diskfile.close()
+                        disk_num = re.sub("[^0-9]", "", disk)
+                        fisr_partition_path = f"{disk_num}:0"
+                        try:
+                            first_tree_iter = model.get_iter(fisr_partition_path)
+                            first_fs = model.get_value(first_tree_iter, 3)
+                            if first_fs == "UEFI" or 'efi' in first_fs:
+                                self.efi_exist = True
+                            else:
+                                self.efi_exist = False
+                        except ValueError:
+                            pass
                     if len(self.prttn) >= 2:
                         if 'BOOT' in self.prttn[0]:
                             if rtbt is True and "/boot\n" not in self.prttn[1]:
@@ -572,10 +593,22 @@ class Partitions():
                                 self.button3.set_sensitive(True)
                             else:
                                 self.button3.set_sensitive(False)
-                        elif 'UEFI' in self.prttn[0]:
-                            if rtbt is True and "/boot\n" not in self.prttn[1]:
-                                self.button3.set_sensitive(False)
-                            elif "/boot\n" in self.prttn[1]:
+                        elif rtbt is True and "/boot\n" not in self.prttn[1]:
+                            self.button3.set_sensitive(False)
+                        elif self.efi_exist is True and bios_type == 'UEFI':
+                            if '/\n' in self.prttn[0]:
+                                self.button3.set_sensitive(True)
+                            elif "/boot\n" in self.prttn[0]:
+                                if len(self.prttn) >= 2:
+                                    if '/\n' in self.prttn[1]:
+                                        self.button3.set_sensitive(True)
+                                    else:
+                                        self.button3.set_sensitive(False)
+                                else:
+                                    self.button3.set_sensitive(False)
+                            elif 'UEFI' in self.prttn[0] and '/\n' in self.prttn[1]:
+                                self.button3.set_sensitive(True)
+                            elif 'UEFI' in self.prttn[0] and "/boot\n" in self.prttn[0]:
                                 if len(self.prttn) >= 3:
                                     if '/\n' in self.prttn[2]:
                                         self.button3.set_sensitive(True)
@@ -583,27 +616,14 @@ class Partitions():
                                         self.button3.set_sensitive(False)
                                 else:
                                     self.button3.set_sensitive(False)
-                            elif '/\n' in self.prttn[1]:
-                                self.button3.set_sensitive(True)
                             else:
                                 self.button3.set_sensitive(False)
-                        elif rtbt is True and "/boot\n" not in self.prttn[1]:
-                            self.button3.set_sensitive(False)
-                        elif "/boot\n" in self.prttn[0] and efi is True:
-                            if len(self.prttn) >= 2:
-                                if '/\n' in self.prttn[1]:
-                                    self.button3.set_sensitive(True)
-                                else:
-                                    self.button3.set_sensitive(False)
-                            else:
-                                self.button3.set_sensitive(False)
-                        elif '/\n' in self.prttn[0] and efi is True:
-                            self.button3.set_sensitive(True)
                         else:
                             self.button3.set_sensitive(False)
                     else:
                         self.button3.set_sensitive(False)
                 else:
+                    self.efi_exist = False
                     if len(self.prttn) >= 1:
                         if "/boot\n" in self.prttn[0]:
                             if len(self.prttn) >= 2:

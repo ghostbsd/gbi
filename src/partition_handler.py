@@ -118,11 +118,6 @@ def find_scheme(disk):
     return scheme
 
 
-def int_size(size):
-    size = int(size)
-    return size
-
-
 def rpartslice(part):
     item = part
     p = set("p")
@@ -307,26 +302,26 @@ class Delete_partition():
         last_num = len(ll) - 1
         lnum = path[2]
         if last_num == lnum:
-            free = int_size(ll[last_num][1])
+            free = int(ll[last_num][1])
             if lnum != 0 and ll[lnum - 1][0] == 'freespace':
-                free = free + int_size(ll[lnum - 1][1])
+                free = free + int(ll[lnum - 1][1])
                 ll[lnum] = ['freespace', free, '', '']
                 ll.remove(ll[lnum - 1])
             else:
                 ll[lnum] = ['freespace', free, '', '']
         elif lnum == 0:
-            free = int_size(ll[lnum][1])
+            free = int(ll[lnum][1])
             if ll[lnum + 1][0] == 'freespace':
-                free = free + int_size(ll[lnum + 1][1])
+                free = free + int(ll[lnum + 1][1])
                 ll.remove(ll[lnum + 1])
             ll[lnum] = ['freespace', free, '', '']
         else:
-            free = int_size(ll[lnum][1])
+            free = int(ll[lnum][1])
             if ll[lnum + 1][0] == 'freespace':
-                free = free + int_size(ll[lnum + 1][1])
+                free = free + int(ll[lnum + 1][1])
                 ll.remove(ll[lnum + 1])
             if lnum != 0 and ll[lnum - 1][0] == 'freespace':
-                free = free + int_size(ll[lnum - 1][1])
+                free = free + int(ll[lnum - 1][1])
                 ll[lnum] = ['freespace', free, '', '']
                 ll.remove(ll[lnum - 1])
             else:
@@ -366,40 +361,39 @@ class Delete_partition():
                 ptnum = snum - 1
             else:
                 slnum = int(re.sub("[^0-9]", "", slf))
-                ptnum = snum - slnum
         if last_num == snum:
-            free = int_size(sl[last_num][1])
+            free = int(sl[last_num][1])
             if snum != 0 and sl[snum - 1][0] == 'freespace':
-                free = free + int_size(sl[snum - 1][1])
+                free = free + int(sl[snum - 1][1])
                 sl[snum] = ['freespace', free, '', '']
                 sl.remove(sl[snum - 1])
             else:
                 sl[snum] = ['freespace', free, '', '']
         elif snum == 0:
-            free = int_size(sl[snum][1])
+            free = int(sl[snum][1])
             if sl[snum + 1][0] == 'freespace':
-                free = free + int_size(sl[snum + 1][1])
+                free = free + int(sl[snum + 1][1])
                 sl.remove(sl[snum + 1])
                 sl[snum] = ['freespace', free, '', '']
             else:
                 sl[snum] = ['freespace', free, '', '']
         else:
-            free = int_size(sl[snum][1])
+            free = int(sl[snum][1])
             slice_after = sl[snum + 1][0]
             slice_before = sl[snum - 1][0]
-            size_after = sl[snum + 1]
-            size_before = sl[snum - 1]
+            size_after = sl[snum + 1][1]
+            size_before = sl[snum - 1][1]
             if slice_after == 'freespace' and slice_before == 'freespace':
-                free = free + int_size(size_after) + int_size(size_before)
+                free = free + int(size_after) + int(size_before)
                 sl[snum] = ['freespace', free, '', '']
                 sl.remove(sl[snum + 1])
                 sl.remove(sl[snum - 1])
             elif slice_after == 'freespace':
-                free = free + int_size(sl[snum + 1][1])
+                free = free + int(sl[snum + 1][1])
                 sl[snum] = ['freespace', free, '', '']
                 sl.remove(sl[snum + 1])
             elif snum != 0 and sl[snum - 1][0] == 'freespace':
-                free = free + int_size(sl[snum - 1][1])
+                free = free + int(sl[snum - 1][1])
                 sl[snum] = ['freespace', free, '', '']
                 sl.remove(sl[snum - 1])
             else:
@@ -486,6 +480,7 @@ class autoDiskPartition():
         pfile.close()
 
     def __init__(self, disk, size, schm):
+        self.bios_type = bios_or_uefi()
         if schm == 'GPT':
             self.create_gpt_partiton(disk, size)
         elif schm == 'MBR':
@@ -509,8 +504,8 @@ class autoDiskPartition():
                     universal_newlines=True,  close_fds=True)
         mem = ram.stdout.read()
         swap = int(int(mem.partition(':')[2].strip()) / (1024 * 1024))
-        if bios_or_uefi() == "UEFI":
-            bnum = 100
+        if self.bios_type == "UEFI":
+            bnum = 256
         else:
             bnum = 1
         rootNum = int(number - swap)
@@ -518,7 +513,7 @@ class autoDiskPartition():
         plist = []
         mplist = []
         plf = open(partitiondb + disk, 'wb')
-        if bios_or_uefi() == "UEFI":
+        if self.bios_type == "UEFI":
             plist.extend(([disk + 'p1', bnum, 'none', 'UEFI']))
         else:
             plist.extend(([disk + 'p1', bnum, 'none', 'BOOT']))
@@ -532,7 +527,7 @@ class autoDiskPartition():
         pickle.dump(mplist, plf)
         plf.close()
         pfile = open(Part_label, 'w')
-        if bios_or_uefi() == "UEFI":
+        if self.bios_type == "UEFI":
             pfile.writelines('UEFI %s none\n' % bnum)
         else:
             pfile.writelines('BOOT %s none\n' % bnum)
@@ -592,17 +587,18 @@ class autoFreeSpace():
         pickle.dump(mpl, cf)
         cf.close()
 
-    def __init__(self, path, size):
+    def __init__(self, path, size, efi_exist=False):
+        self.bios_type = bios_or_uefi()
         disk = disk_query()[path[0]][0]
         schm = disk_query()[path[0]][3]
         sl = path[1] + 1
         lv = path[1]
         if schm == "GPT":
-            self.create_gpt_partiton(disk, size, sl, lv)
+            self.create_gpt_partiton(disk, size, sl, lv, efi_exist)
         elif schm == "MBR":
             self.create_mbr_partiton(disk, size, sl, lv)
 
-    def create_gpt_partiton(self, disk, size, sl, path):
+    def create_gpt_partiton(self, disk, size, sl, path, efi_exist):
         file_disk = open(disk_file, 'w')
         file_disk.writelines('%s\n' % disk)
         file_disk.close()
@@ -617,7 +613,7 @@ class autoFreeSpace():
         swap = int(int(mem.partition(':')[2].strip()) / (1024 * 1024))
         rootNum = int(number - swap)
         if bios_or_uefi() == "UEFI":
-            bs = 100
+            bs = 256
         else:
             bs = 1
         rootNum = int(rootNum - bs)
@@ -625,11 +621,11 @@ class autoFreeSpace():
         mplist = partition_query(disk)
         plf = open(partitiondb + disk, 'wb')
         done = False
-        if bios_or_uefi() == "UEFI" and efi_exist(disk) is False:
+        if self.bios_type == "UEFI" and efi_exist is False:
             plist.extend(([disk + 'p%s' % sl, bs, 'none', 'UEFI']))
             rsl = int(sl + 1)
             swsl = int(rsl + 1)
-        elif bios_or_uefi() == "UEFI" and efi_exist(disk) is True:
+        elif self.bios_type == "UEFI" and efi_exist is True:
             rsl = int(sl)
             swsl = int(rsl + 1)
         else:
@@ -654,7 +650,7 @@ class autoFreeSpace():
         slice_file.writelines(f'p{rsl}')
         slice_file.close()
         pfile = open(Part_label, 'w')
-        if bios_or_uefi() == "UEFI" and efi_exist(disk) is False:
+        if self.bios_type == "UEFI" and sl == 1:
             pfile.writelines('UEFI %s none\n' % bs)
         else:
             pfile.writelines('BOOT %s none\n' % bs)
@@ -663,11 +659,18 @@ class autoFreeSpace():
         pfile.close()
         pl = []
         mpl = []
-        if bios_or_uefi() == "UEFI" and efi_exist(disk) is True:
+        if self.bios_type == "UEFI" and efi_exist is False:
+            if not os.path.exists(tmp + 'create'):
+                pl.extend(([disk + "p%s" % sl, bs]))
+                mpl.append(pl)
+                cf = open(tmp + 'create', 'wb')
+                pickle.dump(mpl, cf)
+                cf.close()
+        elif self.bios_type == "BOOT" and efi_exist is True:
             pass
         else:
             if not os.path.exists(tmp + 'create'):
-                pl.extend(([disk + "p%s" % sl, size]))
+                pl.extend(([disk + "p%s" % sl, bs]))
                 mpl.append(pl)
                 cf = open(tmp + 'create', 'wb')
                 pickle.dump(mpl, cf)
@@ -968,17 +971,6 @@ def bios_or_uefi():
         return "BIOS"
 
 
-def efi_exist(disk):
-    cmd = f"gpart show {disk} | grep efi"
-    process = Popen(cmd, shell=True, stdout=PIPE,
-                    universal_newlines=True, close_fds=True)
-    output = process.stdout.readlines()
-    if len(output) == 0:
-        return False
-    else:
-        return True
-
-
 class makingParttion():
 
     def __init__(self):
@@ -992,25 +984,21 @@ class makingParttion():
                 part = line[0]
                 drive = rpartslice(part)
                 sl = sliceNum(part)
+                size = int(line[1])
                 if slicePartition(part) == 'p':
                     if bios_or_uefi() == 'UEFI':
-                        cmd = 'gpart add -s 100M -t efi -i %s %s' % (sl, drive)
+                        cmd = f'gpart add -a 4k -s {size}M -t efi -i {sl} {drive}'
                         sleep(2)
-                        cmd2 = 'newfs_msdos -F 16 %sp%s' % (drive, sl)
+                        cmd2 = f'newfs_msdos -F 16 {drive}p{sl}'
                         call(cmd, shell=True)
                         call(cmd2, shell=True)
                     else:
                         if boot == "grub":
-                            cmd = 'gpart add -a 4k -s 1M -t bios-boot -i' \
-                                f' {sl} {drive}'
+                            cmd = f'gpart add -a 4k -s {size}M -t bios-boot -i {sl} {drive}'
                         else:
-                            cmd = 'gpart add -a 4k -s 512 -t freebsd-boot -i' \
-                                f' {sl} {drive}'
+                            cmd = f'gpart add -a 4k -s {size}M -t freebsd-boot -i {sl} {drive}'
                         call(cmd, shell=True)
                 elif slicePartition(part) == 's':
-                    size = int(line[1])
-                    block = int(size * 2048)
-                    cmd = f'gpart add -a 4k -s {block} -t freebsd -i {sl} ' \
-                        f'{drive}'
+                    cmd = f'gpart add -a 4k -s {size}M -t freebsd -i {sl} {drive}'
                     call(cmd, shell=True)
                 sleep(2)
