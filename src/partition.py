@@ -578,7 +578,7 @@ class Partitions():
                         except ValueError:
                             pass
                     if len(self.prttn) >= 2:
-                        if 'BOOT' in self.prttn[0]:
+                        if 'BOOT' in self.prttn[0] and bios_type == 'BIOS':
                             if rtbt is True and "/boot\n" not in self.prttn[1]:
                                 self.button3.set_sensitive(False)
                             elif "/boot\n" in self.prttn[1]:
