@@ -1,12 +1,7 @@
-#!/usr/bin/env python
-#
-# Copyright (c) 2013 GhostBSD
-#
-# See COPYING for licence terms.
-#
-# install.py v 0.4 Sunday, February 08 2015 Eric Turgeon
-#
+#!/usr/bin/env python3
+
 # install.py give the job to pc-sysinstall to install GhostBSD.
+
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GLib
@@ -81,11 +76,11 @@ def read_output(command, probar):
         print(bartext)
     call(f'{rc}service hald start', shell=True)
     if bartext.rstrip() == "Installation finished!":
-        Popen('python3.6 %send.py' % gbi_path, shell=True, close_fds=True)
+        Popen('python3 %send.py' % gbi_path, shell=True, close_fds=True)
         call("rm -rf /tmp/.gbi/", shell=True, close_fds=True)
         Gtk.main_quit()
     else:
-        Popen('python3.6 %serror.py' % gbi_path, shell=True, close_fds=True)
+        Popen('python3 %serror.py' % gbi_path, shell=True, close_fds=True)
         Gtk.main_quit()
 
 

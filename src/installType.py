@@ -1,4 +1,4 @@
-#!/usr/local/bin//python
+#!/usr/bin/env python3
 #
 # Copyright (c) 2015 GhostBSD
 #
