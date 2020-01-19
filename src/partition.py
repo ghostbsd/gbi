@@ -488,11 +488,15 @@ class Partitions():
                     self.create_bt.set_sensitive(True)
                 self.delete_bt.set_sensitive(False)
                 self.modifi_bt.set_sensitive(False)
-                fisr_partition_path = f"{self.path[0]}:0"
-                first_tree_iter = model.get_iter(fisr_partition_path)
-                first_fs = model.get_value(first_tree_iter, 3)
-                if first_fs == "UEFI" or 'efi' in first_fs:
-                    self.efi_exist = True
+                # scan for efi partition 
+                for num in range(self.path[1]):
+                    partition_path = f"{self.path[0]}:{num}"
+                    print(partition_path)
+                    first_tree_iter = model.get_iter(partition_path)
+                    first_fs = model.get_value(first_tree_iter, 3)
+                    if first_fs == "UEFI" or 'efi' in first_fs:
+                        self.efi_exist = True
+                        break
                 else:
                     self.efi_exist = False
                 self.auto_bt.set_sensitive(True)

@@ -928,19 +928,23 @@ class destroyParttion():
 
 
 def bios_or_uefi():
-    cmd = "kenv grub.platform"
-    output = Popen(cmd, shell=True, stdout=PIPE,
-                   universal_newlines=True, close_fds=True)
-    kenvoutput = output.stdout.readlines()
-    if len(kenvoutput) == 0:
-        cmd = "sysctl -n machdep.bootmethod"
-        output1 = Popen(cmd, shell=True, stdout=PIPE,
-                        universal_newlines=True, close_fds=True)
-        return output1.stdout.readlines()[0].rstrip()
-    elif kenvoutput == "efi":
-        return "UEFI"
-    else:
-        return "BIOS"
+    # cmd = "kenv grub.platform"
+    # output = Popen(cmd, shell=True, stdout=PIPE,
+    #                universal_newlines=True, close_fds=True)
+    # kenvoutput = output.stdout.readlines()
+    # if len(kenvoutput) == 0:
+    #     cmd = "sysctl -n machdep.bootmethod"
+    #     output1 = Popen(cmd, shell=True, stdout=PIPE,
+    #                     universal_newlines=True, close_fds=True)
+    #     return output1.stdout.readlines()[0].rstrip()
+    # elif kenvoutput == "efi":
+    #     return "UEFI"
+    # else:
+    #     return "BIOS"
+    cmd = "sysctl -n machdep.bootmethod"
+    output1 = Popen(cmd, shell=True, stdout=PIPE,
+                    universal_newlines=True, close_fds=True)
+    return output1.stdout.readlines()[0].rstrip()
 
 
 class makingParttion():
