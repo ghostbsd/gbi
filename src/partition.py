@@ -540,16 +540,19 @@ class Partitions():
                         disk = diskfile.readlines()[0].strip()
                         diskfile.close()
                         disk_num = re.sub("[^0-9]", "", disk)
-                        fisr_partition_path = f"{disk_num}:0"
-                        try:
-                            first_tree_iter = model.get_iter(fisr_partition_path)
-                            first_fs = model.get_value(first_tree_iter, 3)
-                            if first_fs == "UEFI" or 'efi' in first_fs:
-                                self.efi_exist = True
-                            else:
+                        num = 0
+                        while True:
+                            partition_path = f"{disk_num}:{num}"
+                            try:
+                                first_tree_iter = model.get_iter(partition_path)
+                                first_fs = model.get_value(first_tree_iter, 3)
+                                if first_fs == "UEFI" or 'efi' in first_fs:
+                                    self.efi_exist = True
+                                    break
+                            except ValueError:
                                 self.efi_exist = False
-                        except ValueError:
-                            pass
+                                break
+                            num += 1
                     if len(self.prttn) >= 2:
                         if 'BOOT' in self.prttn[0] and bios_type == 'BIOS':
                             if rtbt is True and "/boot\n" not in self.prttn[1]:
@@ -596,6 +599,7 @@ class Partitions():
                     else:
                         self.button3.set_sensitive(False)
                 else:
+                    # to be changed when MBR UEFI will be supported in the backend.
                     self.efi_exist = False
                     if len(self.prttn) >= 1:
                         if "/boot\n" in self.prttn[0]:
