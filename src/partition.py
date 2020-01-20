@@ -491,7 +491,6 @@ class Partitions():
                 # scan for efi partition
                 for num in range(self.path[1]):
                     partition_path = f"{self.path[0]}:{num}"
-                    print(partition_path)
                     first_tree_iter = model.get_iter(partition_path)
                     first_fs = model.get_value(first_tree_iter, 3)
                     if first_fs == "UEFI" or 'efi' in first_fs:
@@ -499,7 +498,6 @@ class Partitions():
                         break
                 else:
                     self.efi_exist = False
-                print(self.efi_exist)
                 self.auto_bt.set_sensitive(True)
             elif 's' in self.slice:
                 self.create_bt.set_sensitive(False)
@@ -531,19 +529,15 @@ class Partitions():
             if os.path.exists(disk_schem):
                 rschm = open(disk_schem, 'r')
                 schm = rschm.readlines()[0]
-                print(schm)
                 if 'GPT' in schm:
                     if os.path.exists(disk_file):
                         diskfile = open(disk_file, 'r')
                         disk = diskfile.readlines()[0].strip()
                         diskfile.close()
                         disk_num = re.sub("[^0-9]", "", disk)
-                        print(disk)
-                        print(disk_num)
                         num = 0
                         while True:
                             partition_path = f"{disk_num}:{num}"
-                            print(partition_path)
                             try:
                                 first_tree_iter = model.get_iter(partition_path)
                                 first_fs = model.get_value(first_tree_iter, 3)
@@ -554,8 +548,6 @@ class Partitions():
                                 self.efi_exist = False
                                 break
                             num += 1
-                        print(self.efi_exist)
-                    print(bios_type)
                     if 'BOOT' in self.prttn[0] and bios_type == 'BIOS':
                         if "/boot\n" in self.prttn[1]:
                             if len(self.prttn) >= 3:
@@ -570,7 +562,6 @@ class Partitions():
                         else:
                             self.button3.set_sensitive(False)
                     elif self.efi_exist is True and bios_type == 'UEFI':
-                        print(self.prttn)
                         if '/\n' in self.prttn[0]:
                             self.button3.set_sensitive(True)
                         elif "/boot\n" in self.prttn[0]:

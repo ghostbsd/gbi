@@ -622,9 +622,9 @@ class autoFreeSpace():
         slice_file.writelines(f'p{rsl}')
         slice_file.close()
         pfile = open(Part_label, 'w')
-        if self.bios_type == "UEFI" and sl == 1:
+        if self.bios_type == "UEFI" and efi_exist is False:
             pfile.writelines('UEFI %s none\n' % bs)
-        else:
+        elif self.bios_type == "BIOS":
             pfile.writelines('BOOT %s none\n' % bs)
         pfile.writelines('UFS+SUJ %s /\n' % rootNum)
         pfile.writelines('SWAP %s none\n' % int(swap - 1))
