@@ -1,11 +1,11 @@
 #!/usr/local/bin/python
 
-import gi
-gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk
 import os
 import shutil
 import re
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
 from partition_handler import partition_repos, disk_query, Delete_partition
 from partition_handler import partition_query, label_query, bios_or_uefi
 from partition_handler import autoDiskPartition, autoFreeSpace, first_is_free
@@ -35,7 +35,7 @@ psize = '%spart_size' % tmp
 logo = "/usr/local/lib/gbi/logo.png"
 Part_label = '%spartlabel' % tmp
 part_schem = '%sscheme' % tmp
-partitiondb = "%spartitiondb/" % tmp
+partition_db = "%spartition_db/" % tmp
 ufs_Partiton_list = []
 bios_type = bios_or_uefi()
 
@@ -208,7 +208,7 @@ class Partitions():
         box2.pack_end(bbox, True, True, 5)
         self.window.show_all()
 
-    def sheme_selection(self, combobox):
+    def scheme_selection(self, combobox):
         model = combobox.get_model()
         index = combobox.get_active()
         data = model[index][0]
@@ -248,16 +248,16 @@ class Partitions():
         # Creating MBR or GPT drive
         label = Gtk.Label('<b>Select a partition scheme for this drive:</b>')
         label.set_use_markup(True)
-        # Adding a combo box to selecting MBR or GPT sheme.
+        # Adding a combo box to selecting MBR or GPT scheme.
         self.scheme = 'GPT'
-        shemebox = Gtk.ComboBoxText()
-        shemebox.append_text("GPT: GUID Partition Table")
-        shemebox.append_text("MBR: DOS Partition")
-        shemebox.connect('changed', self.sheme_selection)
-        shemebox.set_active(0)
+        scheme_box = Gtk.ComboBoxText()
+        scheme_box.append_text("GPT: GUID Partition Table")
+        scheme_box.append_text("MBR: DOS Partition")
+        scheme_box.connect('changed', self.scheme_selection)
+        scheme_box.set_active(0)
         table = Gtk.Table(1, 2, True)
         table.attach(label, 0, 2, 0, 1)
-        table.attach(shemebox, 0, 2, 1, 2)
+        table.attach(scheme_box, 0, 2, 1, 2)
         box2.pack_start(table, False, False, 0)
         box2 = Gtk.HBox(False, 10)
         box2.set_border_width(5)
@@ -349,9 +349,9 @@ class Partitions():
         self.delete_bt = Gtk.Button("Delete")
         self.delete_bt.connect("clicked", self.delete_partition)
         bbox.add(self.delete_bt)
-        self.modifi_bt = Gtk.Button("Modify")
-        self.modifi_bt.connect("clicked", self.modify_partition)
-        # bbox.add(self.modifi_bt)
+        self.modify_bt = Gtk.Button("Modify")
+        self.modify_bt.connect("clicked", self.modify_partition)
+        # bbox.add(self.modify_bt)
         self.revert_bt = Gtk.Button("Revert")
         self.revert_bt.connect("clicked", self.revertChange)
         bbox.add(self.revert_bt)
@@ -391,8 +391,8 @@ class Partitions():
         self.update()
 
     def revertChange(self, widget):
-        if os.path.exists(partitiondb):
-            shutil.rmtree(partitiondb)
+        if os.path.exists(partition_db):
+            shutil.rmtree(partition_db)
         if os.path.exists(tmp + 'create'):
             os.remove(tmp + 'create')
         if os.path.exists(tmp + 'delete'):
@@ -482,13 +482,13 @@ class Partitions():
                     self.create_bt.set_sensitive(True)
                 elif sl == slbehind:
                     self.create_bt.set_sensitive(False)
-                elif slbehind > 4:
-                    self.create_bt.set_sensitive(False)
+                # elif slbehind > 4:
+                #     self.create_bt.set_sensitive(False)
                 else:
                     self.create_bt.set_sensitive(True)
                 self.delete_bt.set_sensitive(False)
-                self.modifi_bt.set_sensitive(False)
-                # scan for efi partition 
+                self.modify_bt.set_sensitive(False)
+                # scan for efi partition
                 for num in range(self.path[1]):
                     partition_path = f"{self.path[0]}:{num}"
                     print(partition_path)
@@ -499,20 +499,21 @@ class Partitions():
                         break
                 else:
                     self.efi_exist = False
+                print(self.efi_exist)
                 self.auto_bt.set_sensitive(True)
             elif 's' in self.slice:
                 self.create_bt.set_sensitive(False)
                 self.delete_bt.set_sensitive(True)
-                # self.modifi_bt.set_sensitive(True)
+                # self.modify_bt.set_sensitive(True)
                 self.auto_bt.set_sensitive(False)
             elif 'p' in self.slice:
                 self.create_bt.set_sensitive(False)
                 self.delete_bt.set_sensitive(True)
-                # self.modifi_bt.set_sensitive(True)
+                # self.modify_bt.set_sensitive(True)
                 self.auto_bt.set_sensitive(False)
             else:
                 self.delete_bt.set_sensitive(False)
-                self.modifi_bt.set_sensitive(False)
+                self.modify_bt.set_sensitive(False)
                 self.auto_bt.set_sensitive(False)
                 how_many_prt = how_partition(self.path)
                 firstisfree = first_is_free(self.path)
@@ -525,24 +526,24 @@ class Partitions():
         if os.path.exists(Part_label):
             rd = open(Part_label, 'r')
             self.prttn = rd.readlines()
-            rtbt = False
-            for line in self.prttn:
-                if "/boot\n" in line:
-                    rtbt = True
-                    break
-            # If Find GPT scheme.
+            print(self.prttn)
+            # Find if GPT scheme.
             if os.path.exists(disk_schem):
                 rschm = open(disk_schem, 'r')
                 schm = rschm.readlines()[0]
+                print(schm)
                 if 'GPT' in schm:
                     if os.path.exists(disk_file):
                         diskfile = open(disk_file, 'r')
                         disk = diskfile.readlines()[0].strip()
                         diskfile.close()
                         disk_num = re.sub("[^0-9]", "", disk)
+                        print(disk)
+                        print(disk_num)
                         num = 0
                         while True:
                             partition_path = f"{disk_num}:{num}"
+                            print(partition_path)
                             try:
                                 first_tree_iter = model.get_iter(partition_path)
                                 first_fs = model.get_value(first_tree_iter, 3)
@@ -553,43 +554,39 @@ class Partitions():
                                 self.efi_exist = False
                                 break
                             num += 1
-                    if len(self.prttn) >= 2:
-                        if 'BOOT' in self.prttn[0] and bios_type == 'BIOS':
-                            if rtbt is True and "/boot\n" not in self.prttn[1]:
-                                self.button3.set_sensitive(False)
-                            elif "/boot\n" in self.prttn[1]:
-                                if len(self.prttn) >= 3:
-                                    if '/\n' in self.prttn[2]:
-                                        self.button3.set_sensitive(True)
-                                    else:
-                                        self.button3.set_sensitive(False)
+                        print(self.efi_exist)
+                    print(bios_type)
+                    if 'BOOT' in self.prttn[0] and bios_type == 'BIOS':
+                        if "/boot\n" in self.prttn[1]:
+                            if len(self.prttn) >= 3:
+                                if '/\n' in self.prttn[2]:
+                                    self.button3.set_sensitive(True)
                                 else:
                                     self.button3.set_sensitive(False)
-                            elif '/\n' in self.prttn[1]:
-                                self.button3.set_sensitive(True)
                             else:
                                 self.button3.set_sensitive(False)
-                        elif rtbt is True and "/boot\n" not in self.prttn[1]:
+                        elif '/\n' in self.prttn[1]:
+                            self.button3.set_sensitive(True)
+                        else:
                             self.button3.set_sensitive(False)
-                        elif self.efi_exist is True and bios_type == 'UEFI':
-                            if '/\n' in self.prttn[0]:
-                                self.button3.set_sensitive(True)
-                            elif "/boot\n" in self.prttn[0]:
-                                if len(self.prttn) >= 2:
-                                    if '/\n' in self.prttn[1]:
-                                        self.button3.set_sensitive(True)
-                                    else:
-                                        self.button3.set_sensitive(False)
+                    elif self.efi_exist is True and bios_type == 'UEFI':
+                        print(self.prttn)
+                        if '/\n' in self.prttn[0]:
+                            self.button3.set_sensitive(True)
+                        elif "/boot\n" in self.prttn[0]:
+                            if len(self.prttn) >= 2:
+                                if '/\n' in self.prttn[1]:
+                                    self.button3.set_sensitive(True)
                                 else:
                                     self.button3.set_sensitive(False)
-                            elif 'UEFI' in self.prttn[0] and '/\n' in self.prttn[1]:
-                                self.button3.set_sensitive(True)
-                            elif 'UEFI' in self.prttn[0] and "/boot\n" in self.prttn[0]:
-                                if len(self.prttn) >= 3:
-                                    if '/\n' in self.prttn[2]:
-                                        self.button3.set_sensitive(True)
-                                    else:
-                                        self.button3.set_sensitive(False)
+                            else:
+                                self.button3.set_sensitive(False)
+                        elif 'UEFI' in self.prttn[0] and '/\n' in self.prttn[1]:
+                            self.button3.set_sensitive(True)
+                        elif 'UEFI' in self.prttn[0] and "/boot\n" in self.prttn[0]:
+                            if len(self.prttn) >= 3:
+                                if '/\n' in self.prttn[2]:
+                                    self.button3.set_sensitive(True)
                                 else:
                                     self.button3.set_sensitive(False)
                             else:
@@ -697,22 +694,22 @@ class Partitions():
     def Tree_Store(self):
         self.store.clear()
         for disk in disk_query():
-            shem = disk[-1]
-            piter = self.store.append(None, [disk[0], str(disk[1]),
-                                      disk[2], disk[3], True])
-            if shem == "GPT":
+            schem = disk[-1]
+            pinter = self.store.append(None, [disk[0], str(disk[1]),
+                                       disk[2], disk[3], True])
+            if schem == "GPT":
                 for pi in partition_query(disk[0]):
-                    self.store.append(piter, [pi[0], str(pi[1]), pi[2],
+                    self.store.append(pinter, [pi[0], str(pi[1]), pi[2],
                                       pi[3], True])
-            elif shem == "MBR":
+            elif schem == "MBR":
                 for pi in partition_query(disk[0]):
-                    piter1 = self.store.append(piter, [pi[0], str(pi[1]),
-                                               pi[2], pi[3], True])
+                    pinter1 = self.store.append(pinter, [pi[0], str(pi[1]),
+                                                pi[2], pi[3], True])
                     if pi[0] == 'freespace':
                         pass
                     else:
                         for li in label_query(pi[0]):
-                            self.store.append(piter1, [li[0], str(li[1]),
+                            self.store.append(pinter1, [li[0], str(li[1]),
                                               li[2], li[3], True])
         return self.store
 
