@@ -44,6 +44,10 @@ class Partitions():
 
     def on_fs(self, widget):
         self.fs = widget.get_active_text()
+        if 'UFS' in self.fs:
+            self.mountpoint.set_sensitive(True)
+        else:
+            self.mountpoint.set_sensitive(False)
 
     def on_label(self, widget):
         self.label = widget.get_active_text()
@@ -100,6 +104,7 @@ class Partitions():
         label2 = Gtk.Label("Size(MB):")
         label3 = Gtk.Label("Mount point:")
         self.fstype = Gtk.ComboBoxText()
+        # self.fstype.append_text('ZFS')
         self.fstype.append_text('UFS')
         self.fstype.append_text('UFS+S')
         self.fstype.append_text('UFS+J')
@@ -164,6 +169,10 @@ class Partitions():
         self.mountpoint.append_text('/usr/home')
         self.mountpoint.append_text('/var')
         self.mountpoint.set_active(0)
+        if 'UFS' in self.fs:
+            self.mountpoint.set_sensitive(True)
+        else:
+            self.mountpoint.set_sensitive(False)
         self.mountpoint.connect("changed", self.on_label)
         # table.attach(label0, 0, 2, 0, 1)
         table.attach(label1, 0, 1, 1, 2)
