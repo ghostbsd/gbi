@@ -77,6 +77,7 @@ class Partitions():
 
     def cancel(self, widget):
         self.window.hide()
+        self.update()
 
     def labelEditor(self, path, pslice, size, scheme, modify):
         free_space = int(size)
@@ -354,6 +355,7 @@ class Partitions():
         # bbox.add(self.modify_bt)
         self.revert_bt = Gtk.Button("Revert")
         self.revert_bt.connect("clicked", self.revertChange)
+        self.revert_bt.set_sensitive(False)
         bbox.add(self.revert_bt)
         self.auto_bt = Gtk.Button("Auto")
         self.auto_bt.connect("clicked", self.autoPartition)
@@ -406,6 +408,11 @@ class Partitions():
         self.treeview.expand_all()
 
     def create_partition(self, widget):
+        self.create_bt.set_sensitive(False)
+        self.delete_bt.set_sensitive(False)
+        self.modify_bt.set_sensitive(False)
+        self.auto_bt.set_sensitive(False)
+        self.revert_bt.set_sensitive(False)
         if len(self.path) == 2 and how_partition(self.path) == 1 and self.slice == 'freespace':
             self.schemeEditor(False)
         elif len(self.path) == 3:
@@ -608,6 +615,17 @@ class Partitions():
                 self.button3.set_sensitive(False)
         else:
             self.button3.set_sensitive(False)
+        path_exist = [
+            os.path.exists(Part_label),
+            os.path.exists(disk_schem),
+            os.path.exists(disk_file),
+            os.path.exists(psize),
+            os.path.exists(part_schem)
+        ]
+        if any(path_exist):
+            self.revert_bt.set_sensitive(True)
+        else:
+            self.revert_bt.set_sensitive(False)
 
     def __init__(self, button3):
         self.button3 = button3
@@ -621,7 +639,7 @@ class Partitions():
         Title = Gtk.Label("<b><span size='xx-large'>Partition Editor</span></b> ")
         Title.set_use_markup(True)
         box2.pack_start(Title, False, False, 20)
-        # Choosing disk to Select Create or delete partition.
+        # Choosing disk to Select Create, delete partition.
         label = Gtk.Label("<b>Select a drive:</b>")
         label.set_use_markup(True)
         sw = Gtk.ScrolledWindow(hexpand=True, vexpand=True)
