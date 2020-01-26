@@ -510,7 +510,7 @@ class autoDiskPartition():
 
 class autoFreeSpace():
 
-    def create_mbr_partiton(self, disk, size, sl, path):
+    def create_mbr_partiton(self, disk, size, sl, path, fs):
         file_disk = open(disk_file, 'w')
         file_disk.writelines('%s\n' % disk)
         file_disk.close()
@@ -537,7 +537,7 @@ class autoFreeSpace():
         llist = []
         mllist = []
         plf = open(partitiondb + disk + 's%s' % sl, 'wb')
-        llist.extend(([disk + 's%sa' % sl, rootNum, '/', 'UFS+SUJ']))
+        llist.extend(([disk + 's%sa' % sl, rootNum, '/', fs]))
         mllist.append(llist)
         llist = []
         llist.extend(([disk + 's%sb' % sl, swap, 'none', 'SWAP']))
@@ -545,7 +545,7 @@ class autoFreeSpace():
         pickle.dump(mllist, plf)
         plf.close()
         pfile = open(Part_label, 'w')
-        pfile.writelines('UFS+SUJ %s /\n' % rootNum)
+        pfile.writelines(f'{fs} {rootNum} /\n')
         pfile.writelines('SWAP %s none\n' % int(swap - 1))
         pfile.close()
         pl = []
@@ -559,18 +559,18 @@ class autoFreeSpace():
         pickle.dump(mpl, cf)
         cf.close()
 
-    def __init__(self, path, size, efi_exist):
+    def __init__(self, path, size, fs, efi_exist):
         self.bios_type = bios_or_uefi()
         disk = disk_query()[path[0]][0]
         schm = disk_query()[path[0]][3]
         sl = path[1] + 1
         lv = path[1]
         if schm == "GPT":
-            self.create_gpt_partiton(disk, size, sl, lv, efi_exist)
+            self.create_gpt_partiton(disk, size, sl, lv, fs, efi_exist)
         elif schm == "MBR":
-            self.create_mbr_partiton(disk, size, sl, lv)
+            self.create_mbr_partiton(disk, size, sl, lv, fs)
 
-    def create_gpt_partiton(self, disk, size, sl, path, efi_exist):
+    def create_gpt_partiton(self, disk, size, sl, path, fs, efi_exist):
         file_disk = open(disk_file, 'w')
         file_disk.writelines('%s\n' % disk)
         file_disk.close()
@@ -608,7 +608,20 @@ class autoFreeSpace():
             done = True
             mplist[path] = plist
             plist = []
-        plist.extend(([disk + 'p%s' % rsl, rootNum, '/', 'UFS+SUJ']))
+        if fs == "ZFS":
+            layout = "/(compress=lz4|atime=off),/root(compress=lz4)," \
+                "/tmp(compress=lz4),/usr(canmount=off|mountpoint=none)," \
+                "/usr/home(compress=lz4),/usr/jails(compress=lz4)," \
+                "/usr/obj(compress=lz4),/usr/ports(compress=lz4)," \
+                "/usr/src(compress=lz4)," \
+                "/var(canmount=off|atime=on|mountpoint=none)," \
+                "/var/audit(compress=lz4),/var/log(compress=lz4)," \
+                "/var/mail(compress=lz4),/var/tmp(compress=lz4)"
+            layout_test = layout[:8] + ' ...'
+        else:
+            layout = '/'
+            layout_test = layout
+        plist.extend(([disk + 'p%s' % rsl, rootNum, layout_test, fs]))
         if done is False:
             mplist[path] = plist
         else:
@@ -626,7 +639,7 @@ class autoFreeSpace():
             pfile.writelines('UEFI %s none\n' % bs)
         elif self.bios_type == "BIOS":
             pfile.writelines('BOOT %s none\n' % bs)
-        pfile.writelines('UFS+SUJ %s /\n' % rootNum)
+        pfile.writelines(f'{fs} {rootNum} {layout}\n')
         pfile.writelines('SWAP %s none\n' % int(swap - 1))
         pfile.close()
         pl = []

@@ -218,6 +218,55 @@ class Partitions():
         box2.pack_end(bbox, True, True, 5)
         self.window.show_all()
 
+    def choose_fs(self):
+        self.window = Gtk.Window()
+        self.window.set_title("Choose file system")
+        self.window.set_border_width(0)
+        self.window.set_size_request(480, 200)
+        self.window.set_icon_from_file(logo)
+        box1 = Gtk.VBox(False, 0)
+        self.window.add(box1)
+        box1.show()
+        box2 = Gtk.VBox(False, 10)
+        box2.set_border_width(10)
+        box1.pack_start(box2, True, True, 0)
+        box2.show()
+        table = Gtk.Table(1, 2, True)
+        label1 = Gtk.Label("File System:")
+        self.fstype = Gtk.ComboBoxText()
+        self.fstype.append_text('ZFS')
+        self.fstype.append_text('UFS')
+        self.fstype.append_text('UFS+S')
+        self.fstype.append_text('UFS+J')
+        self.fstype.append_text('UFS+SUJ')
+        self.fstype.set_active(0)
+        self.fs = "ZFS"
+        self.fstype.connect("changed", self.on_fs)
+        table.attach(label1, 0, 1, 1, 2)
+        table.attach(self.fstype, 1, 2, 1, 2)
+        box2.pack_start(table, False, False, 0)
+        box2 = Gtk.HBox(False, 10)
+        box2.set_border_width(5)
+        box1.pack_start(box2, False, True, 0)
+        box2.show()
+        # Add button
+        bbox = Gtk.HButtonBox()
+        bbox.set_border_width(5)
+        bbox.set_spacing(10)
+        button = Gtk.Button(stock=Gtk.STOCK_CANCEL)
+        button.connect("clicked", self.cancel)
+        bbox.add(button)
+        button = Gtk.Button(stock=Gtk.STOCK_ADD)
+        button.connect("clicked", self.set_auto_partition)
+        bbox.add(button)
+        box2.pack_end(bbox, True, True, 5)
+        self.window.show_all()
+
+    def set_auto_partition(self, widget):
+        autoFreeSpace(self.path, self.size, self.fs, self.efi_exist)
+        self.window.hide()
+        self.update()
+
     def scheme_selection(self, combobox):
         model = combobox.get_model()
         index = combobox.get_active()
@@ -391,15 +440,12 @@ class Partitions():
         #    self.treeview.expand_all()
         #    self.treeview.set_cursor(self.path)
         elif self.slice == 'freespace':
-            autoFreeSpace(self.path, self.size, self.efi_exist)
-            self.Tree_Store()
-            self.treeview.expand_all()
-            self.treeview.set_cursor(self.path)
+            # autoFreeSpace(self.path, self.size, self.efi_exist)
+            self.choose_fs()
         elif len(self.path) == 2:
             pass
         else:
             pass
-        self.update()
 
     def revertChange(self, widget):
         if os.path.exists(partition_db):
