@@ -537,7 +537,20 @@ class autoFreeSpace():
         llist = []
         mllist = []
         plf = open(partitiondb + disk + 's%s' % sl, 'wb')
-        llist.extend(([disk + 's%sa' % sl, rootNum, '/', fs]))
+        if fs == "ZFS":
+            layout = "/(compress=lz4|atime=off),/root(compress=lz4)," \
+                "/tmp(compress=lz4),/usr(canmount=off|mountpoint=none)," \
+                "/usr/home(compress=lz4),/usr/jails(compress=lz4)," \
+                "/usr/obj(compress=lz4),/usr/ports(compress=lz4)," \
+                "/usr/src(compress=lz4)," \
+                "/var(canmount=off|atime=on|mountpoint=none)," \
+                "/var/audit(compress=lz4),/var/log(compress=lz4)," \
+                "/var/mail(compress=lz4),/var/tmp(compress=lz4)"
+            layout_text = layout[:8] + ' ...'
+        else:
+            layout = '/'
+            layout_text = layout
+        llist.extend(([disk + 's%sa' % sl, rootNum, layout_text, fs]))
         mllist.append(llist)
         llist = []
         llist.extend(([disk + 's%sb' % sl, swap, 'none', 'SWAP']))
@@ -545,7 +558,7 @@ class autoFreeSpace():
         pickle.dump(mllist, plf)
         plf.close()
         pfile = open(Part_label, 'w')
-        pfile.writelines(f'{fs} {rootNum} /\n')
+        pfile.writelines(f'{fs} {rootNum} {layout}\n')
         pfile.writelines('SWAP %s none\n' % int(swap - 1))
         pfile.close()
         pl = []
@@ -617,11 +630,11 @@ class autoFreeSpace():
                 "/var(canmount=off|atime=on|mountpoint=none)," \
                 "/var/audit(compress=lz4),/var/log(compress=lz4)," \
                 "/var/mail(compress=lz4),/var/tmp(compress=lz4)"
-            layout_test = layout[:8] + ' ...'
+            layout_text = layout[:8] + ' ...'
         else:
             layout = '/'
-            layout_test = layout
-        plist.extend(([disk + 'p%s' % rsl, rootNum, layout_test, fs]))
+            layout_text = layout
+        plist.extend(([disk + 'p%s' % rsl, rootNum, layout_text, fs]))
         if done is False:
             mplist[path] = plist
         else:
