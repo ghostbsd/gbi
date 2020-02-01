@@ -597,9 +597,9 @@ class autoFreeSpace():
         mem = ram.stdout.read()
         swap = int(int(mem.partition(':')[2].strip()) / (1024 * 1024))
         rootNum = int(number - swap)
-        if efi_exist == "UEFI":
+        if self.bios_type == "UEFI" and efi_exist is False:
             bs = 256
-        else:
+        elif self.bios_type == "BOOT":
             bs = 1
         rootNum = int(rootNum - bs)
         plist = []

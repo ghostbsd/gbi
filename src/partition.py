@@ -615,20 +615,28 @@ class Partitions():
                             if len(self.prttn) >= 3:
                                 if '/\n' in self.prttn[2]:
                                     self.button3.set_sensitive(True)
+                                elif 'ZFS' in self.prttn[0]:
+                                    self.button3.set_sensitive(True)
                                 else:
                                     self.button3.set_sensitive(False)
                             else:
                                 self.button3.set_sensitive(False)
                         elif '/\n' in self.prttn[1]:
                             self.button3.set_sensitive(True)
+                        elif 'ZFS' in self.prttn[0]:
+                            self.button3.set_sensitive(True)
                         else:
                             self.button3.set_sensitive(False)
                     elif self.efi_exist is True and bios_type == 'UEFI':
                         if '/\n' in self.prttn[0]:
                             self.button3.set_sensitive(True)
+                        elif 'ZFS' in self.prttn[0]:
+                            self.button3.set_sensitive(True)
                         elif "/boot\n" in self.prttn[0]:
                             if len(self.prttn) >= 2:
                                 if '/\n' in self.prttn[1]:
+                                    self.button3.set_sensitive(True)
+                                elif 'ZFS' in self.prttn[0]:
                                     self.button3.set_sensitive(True)
                                 else:
                                     self.button3.set_sensitive(False)
@@ -636,9 +644,13 @@ class Partitions():
                                 self.button3.set_sensitive(False)
                         elif 'UEFI' in self.prttn[0] and '/\n' in self.prttn[1]:
                             self.button3.set_sensitive(True)
+                        elif 'UEFI' in self.prttn[0] and 'ZFS' in self.prttn[1]:
+                            self.button3.set_sensitive(True)
                         elif 'UEFI' in self.prttn[0] and "/boot\n" in self.prttn[0]:
                             if len(self.prttn) >= 3:
                                 if '/\n' in self.prttn[2]:
+                                    self.button3.set_sensitive(True)
+                                elif 'ZFS' in self.prttn[0]:
                                     self.button3.set_sensitive(True)
                                 else:
                                     self.button3.set_sensitive(False)
@@ -656,11 +668,15 @@ class Partitions():
                             if len(self.prttn) >= 2:
                                 if '/\n' in self.prttn[1]:
                                     self.button3.set_sensitive(True)
+                                elif 'ZFS' in self.prttn[0]:
+                                    self.button3.set_sensitive(True)
                                 else:
                                     self.button3.set_sensitive(False)
                             else:
                                 self.button3.set_sensitive(False)
                         elif '/\n' in self.prttn[0]:
+                            self.button3.set_sensitive(True)
+                        elif 'ZFS' in self.prttn[0]:
                             self.button3.set_sensitive(True)
                         else:
                             self.button3.set_sensitive(False)
