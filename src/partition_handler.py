@@ -546,11 +546,9 @@ class autoFreeSpace():
                 "/var(canmount=off|atime=on|mountpoint=none)," \
                 "/var/audit(compress=lz4),/var/log(compress=lz4)," \
                 "/var/mail(compress=lz4),/var/tmp(compress=lz4)"
-            layout_text = layout[:8] + ' ...'
         else:
             layout = '/'
-            layout_text = layout
-        llist.extend(([disk + 's%sa' % sl, rootNum, layout_text, fs]))
+        llist.extend(([disk + 's%sa' % sl, rootNum, layout, fs]))
         mllist.append(llist)
         llist = []
         llist.extend(([disk + 's%sb' % sl, swap, 'none', 'SWAP']))
@@ -630,11 +628,9 @@ class autoFreeSpace():
                 "/var(canmount=off|atime=on|mountpoint=none)," \
                 "/var/audit(compress=lz4),/var/log(compress=lz4)," \
                 "/var/mail(compress=lz4),/var/tmp(compress=lz4)"
-            layout_text = layout[:8] + ' ...'
         else:
             layout = '/'
-            layout_text = layout
-        plist.extend(([disk + 'p%s' % rsl, rootNum, layout_text, fs]))
+        plist.extend(([disk + 'p%s' % rsl, rootNum, layout, fs]))
         if done is False:
             mplist[path] = plist
         else:
@@ -697,6 +693,15 @@ class createLabel():
         plf = open(partitiondb + disk + 's%s' % sl, 'wb')
         if left_size == 0:
             create_size -= 1
+        if fs == "ZFS":
+            label = "/(compress=lz4|atime=off),/root(compress=lz4)," \
+                "/tmp(compress=lz4),/usr(canmount=off|mountpoint=none)," \
+                "/usr/home(compress=lz4),/usr/jails(compress=lz4)," \
+                "/usr/obj(compress=lz4),/usr/ports(compress=lz4)," \
+                "/usr/src(compress=lz4)," \
+                "/var(canmount=off|atime=on|mountpoint=none)," \
+                "/var/audit(compress=lz4),/var/log(compress=lz4)," \
+                "/var/mail(compress=lz4),/var/tmp(compress=lz4)"
         llist.extend(([disk + 's%s' % sl + letter, create_size, label, fs]))
         mllist[lv] = llist
         llist = []
@@ -823,7 +828,7 @@ class createPartition():
             sfile = open(part_schem, 'w')
             sfile.writelines('partscheme=GPT')
             sfile.close()
-        if label == '/':
+        if label == '/' or fs == "ZFS" or fs == "UEFI" or fs == "BOOT":
             slice_file = open(dslice, 'w')
             slice_file.writelines('p%s\n' % pl)
             # slice_file.writelines('%s\n' % number)
@@ -833,6 +838,15 @@ class createPartition():
         mplist = partition_query(disk)
         if left_size == 0 and create_size > 1:
             create_size -= 1
+        if fs == "ZFS":
+            label = "/(compress=lz4|atime=off),/root(compress=lz4)," \
+                "/tmp(compress=lz4),/usr(canmount=off|mountpoint=none)," \
+                "/usr/home(compress=lz4),/usr/jails(compress=lz4)," \
+                "/usr/obj(compress=lz4),/usr/ports(compress=lz4)," \
+                "/usr/src(compress=lz4)," \
+                "/var(canmount=off|atime=on|mountpoint=none)," \
+                "/var/audit(compress=lz4),/var/log(compress=lz4)," \
+                "/var/mail(compress=lz4),/var/tmp(compress=lz4)"
         pf = open(partitiondb + disk, 'wb')
         plist.extend(([disk + 'p%s' % pl, create_size, label, fs]))
         mplist[lv] = plist

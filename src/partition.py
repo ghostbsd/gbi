@@ -104,7 +104,7 @@ class Partitions():
         label2 = Gtk.Label("Size(MB):")
         label3 = Gtk.Label("Mount point:")
         self.fstype = Gtk.ComboBoxText()
-        # self.fstype.append_text('ZFS')
+        self.fstype.append_text('ZFS')
         self.fstype.append_text('UFS')
         self.fstype.append_text('UFS+S')
         self.fstype.append_text('UFS+J')
@@ -114,14 +114,14 @@ class Partitions():
             if bios_type == "UEFI":
                 self.fstype.append_text("UEFI")
                 if self.efi_exist is False:
-                    self.fstype.set_active(5)
+                    self.fstype.set_active(6)
                     self.fs = "UEFI"
-                elif self.lablebehind == "/":
-                    self.fstype.set_active(4)
+                elif self.lablebehind == "/" or self.fsbehind == "ZFS":
+                    self.fstype.set_active(5)
                     self.fs = "SWAP"
                 else:
-                    self.fstype.set_active(3)
-                    self.fs = "UFS+SUJ"
+                    self.fstype.set_active(0)
+                    self.fs = "ZFS"
             else:
                 self.fstype.append_text("BOOT")
                 if not os.path.exists(Part_label):
@@ -130,18 +130,18 @@ class Partitions():
                 elif len(self.prttn) == 0:
                     self.fstype.set_active(5)
                     self.fs = "BOOT"
-                elif self.lablebehind == "/":
+                elif self.lablebehind == "/" or self.fsbehind == "ZFS":
                     self.fstype.set_active(4)
                     self.fs = "SWAP"
                 else:
-                    self.fstype.set_active(3)
-                    self.fs = "UFS+SUJ"
-        elif self.lablebehind == "/":
+                    self.fstype.set_active(0)
+                    self.fs = "ZSF"
+        elif self.lablebehind == "/" or self.fsbehind == "ZFS":
             self.fstype.set_active(4)
             self.fs = "SWAP"
         else:
-            self.fstype.set_active(3)
-            self.fs = "UFS+SUJ"
+            self.fstype.set_active(0)
+            self.fs = "ZFS"
         self.fstype.connect("changed", self.on_fs)
         adj = Gtk.Adjustment(free_space, 0, free_space, 1, 100, 0)
         self.entry = Gtk.SpinButton(adjustment=adj, numeric=True)
@@ -510,6 +510,8 @@ class Partitions():
                 tree_iter2 = model.get_iter(pathbehind)
                 self.slicebehind = model.get_value(tree_iter2, 0)
                 self.lablebehind = model.get_value(tree_iter2, 2)
+                self.fsbehind = model.get_value(tree_iter2, 3)
+
                 sl = int(self.path[1]) + 1
                 if 'freespace' in self.slicebehind:
                     slbehind = self.path[1]
@@ -525,6 +527,7 @@ class Partitions():
                 pathbehind2 = str(self.path[0]) + ":" + str(self.path[1]) + ":" + str(int(self.path[2] - 1))
                 tree_iter3 = model.get_iter(pathbehind2)
                 self.lablebehind = model.get_value(tree_iter3, 2)
+                self.fsbehind = model.get_value(tree_iter3, 3)
                 sl = int(self.path[1]) + 1
                 if self.slicebehind is None:
                     slbehind = self.path[1]
@@ -535,6 +538,7 @@ class Partitions():
             else:
                 self.slicebehind = None
                 self.lablebehind = None
+                self.fsbehind = None
                 sl = 1
                 slbehind = 0
             if 'freespace' in self.slice:
@@ -727,6 +731,8 @@ class Partitions():
         column_header.set_use_markup(True)
         column_header.show()
         column.set_widget(column_header)
+        column.set_resizable(True)
+        column.set_fixed_width(150)
         column.set_sort_column_id(0)
         cell2 = Gtk.CellRendererText()
         column2 = Gtk.TreeViewColumn(None, cell2, text=0)
@@ -734,18 +740,24 @@ class Partitions():
         column_header2.set_use_markup(True)
         column_header2.show()
         column2.set_widget(column_header2)
+        column2.set_resizable(True)
+        column2.set_fixed_width(150)
         cell3 = Gtk.CellRendererText()
         column3 = Gtk.TreeViewColumn(None, cell3, text=0)
         column_header3 = Gtk.Label('Mount Point')
         column_header3.set_use_markup(True)
         column_header3.show()
         column3.set_widget(column_header3)
+        column3.set_resizable(True)
+        column3.set_fixed_width(150)
         cell4 = Gtk.CellRendererText()
         column4 = Gtk.TreeViewColumn(None, cell4, text=0)
         column_header4 = Gtk.Label('System/Type')
         column_header4.set_use_markup(True)
         column_header4.show()
         column4.set_widget(column_header4)
+        column4.set_resizable(True)
+        column4.set_fixed_width(150)
         column.set_attributes(cell, text=0)
         column2.set_attributes(cell2, text=1)
         column3.set_attributes(cell3, text=2)
