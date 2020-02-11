@@ -935,7 +935,9 @@ class rDeleteParttion():
                 part = line[0]
                 num = sliceNum(part)
                 hd = rpartslice(part)
-                call('gpart delete -i %s %s' % (num, hd), shell=True)
+                call(f"zpool labelclear -f ${part}", shell=True)
+                sleep(1)
+                call(f'gpart delete -i {num} {hd}', shell=True)
                 sleep(2)
 
 
@@ -949,10 +951,7 @@ class destroyParttion():
                 scheme = line[1]
                 # Destroy the disk geom
                 gpart_destroy = f"gpart destroy -F {drive}"
-                zpool_clear = f"zpool labelclear -f ${drive}"
                 call(gpart_destroy, shell=True)
-                sleep(1)
-                call(zpool_clear, shell=True)
                 sleep(1)
                 # Make double-sure
                 create_gpt = f"gpart create -s gpt {drive}"
@@ -968,19 +967,6 @@ class destroyParttion():
 
 
 def bios_or_uefi():
-    # cmd = "kenv grub.platform"
-    # output = Popen(cmd, shell=True, stdout=PIPE,
-    #                universal_newlines=True, close_fds=True)
-    # kenvoutput = output.stdout.readlines()
-    # if len(kenvoutput) == 0:
-    #     cmd = "sysctl -n machdep.bootmethod"
-    #     output1 = Popen(cmd, shell=True, stdout=PIPE,
-    #                     universal_newlines=True, close_fds=True)
-    #     return output1.stdout.readlines()[0].rstrip()
-    # elif kenvoutput == "efi":
-    #     return "UEFI"
-    # else:
-    #     return "BIOS"
     cmd = "sysctl -n machdep.bootmethod"
     output1 = Popen(cmd, shell=True, stdout=PIPE,
                     universal_newlines=True, close_fds=True)
