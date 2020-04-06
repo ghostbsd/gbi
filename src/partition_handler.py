@@ -599,6 +599,8 @@ class autoFreeSpace():
             bs = 256
         elif self.bios_type == "BOOT":
             bs = 1
+        else:
+            bs = 0
         rootNum = int(rootNum - bs)
         plist = []
         mplist = partition_query(disk)
