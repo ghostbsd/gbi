@@ -434,7 +434,8 @@ class autoDiskPartition():
         ram = Popen(memory, shell=True, stdin=PIPE, stdout=PIPE,
                     universal_newlines=True, close_fds=True)
         mem = ram.stdout.read()
-        swap = int(int(mem.partition(':')[2].strip()) / (1024 * 1024))
+        # swap = int(int(mem.partition(':')[2].strip()) / (1024 * 1024))
+        swap = 2048
         rootNum = int(number - swap)
         llist = []
         mllist = []
@@ -475,7 +476,8 @@ class autoDiskPartition():
         ram = Popen(memory, shell=True, stdin=PIPE, stdout=PIPE,
                     universal_newlines=True, close_fds=True)
         mem = ram.stdout.read()
-        swap = int(int(mem.partition(':')[2].strip()) / (1024 * 1024))
+        # swap = int(int(mem.partition(':')[2].strip()) / (1024 * 1024))
+        swap = 2048
         if self.bios_type == "UEFI":
             bnum = 256
         else:
@@ -532,7 +534,8 @@ class autoFreeSpace():
         ram = Popen(memory, shell=True, stdin=PIPE, stdout=PIPE,
                     universal_newlines=True, close_fds=True)
         mem = ram.stdout.read()
-        swap = int(int(mem.partition(':')[2].strip()) / (1024 * 1024))
+        # swap = int(int(mem.partition(':')[2].strip()) / (1024 * 1024))
+        swap = 2048
         rootNum = int(number - swap)
         llist = []
         mllist = []
@@ -593,7 +596,8 @@ class autoFreeSpace():
         ram = Popen(memory, shell=True, stdin=PIPE, stdout=PIPE,
                     universal_newlines=True, close_fds=True)
         mem = ram.stdout.read()
-        swap = int(int(mem.partition(':')[2].strip()) / (1024 * 1024))
+        # swap = int(int(mem.partition(':')[2].strip()) / (1024 * 1024))
+        swap = 2048
         rootNum = int(number - swap)
         if self.bios_type == "UEFI" and efi_exist is False:
             bs = 256
@@ -636,10 +640,10 @@ class autoFreeSpace():
         if done is False:
             mplist[path] = plist
         else:
-            mplist.append(plist)
+            mplist.insert(rsl - 1, plist)
         plist = []
         plist.extend(([disk + 'p%s' % swsl, swap, 'none', 'SWAP']))
-        mplist.append(plist)
+        mplist.insert(swsl - 1, plist)
         pickle.dump(mplist, plf)
         plf.close()
         slice_file = open(dslice, 'w')
@@ -709,7 +713,7 @@ class createLabel():
         llist = []
         if left_size > 0:
             llist.extend((['freespace', left_size, '', '']))
-            mllist.append(llist)
+            mllist.insert(lv + 1,llist)
         pickle.dump(mllist, plf)
         plf.close()
         llist = open(partitiondb + disk + 's%s' % sl, 'rb')
@@ -855,7 +859,7 @@ class createPartition():
         plist = []
         if left_size > 0:
             plist.extend((['freespace', left_size, '', '']))
-            mplist.append(plist)
+            mplist.insert(lv + 1, plist)
         pickle.dump(mplist, pf)
         pf.close()
         pfile = open(Part_label, 'w')
