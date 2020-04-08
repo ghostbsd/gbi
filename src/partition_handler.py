@@ -431,9 +431,9 @@ class autoDiskPartition():
         slice_file.writelines('all\n')
         slice_file.writelines('%s\n' % number)
         slice_file.close()
-        ram = Popen(memory, shell=True, stdin=PIPE, stdout=PIPE,
-                    universal_newlines=True, close_fds=True)
-        mem = ram.stdout.read()
+        # ram = Popen(memory, shell=True, stdin=PIPE, stdout=PIPE,
+        #             universal_newlines=True, close_fds=True)
+        # mem = ram.stdout.read()
         # swap = int(int(mem.partition(':')[2].strip()) / (1024 * 1024))
         swap = 2048
         rootNum = int(number - swap)
@@ -473,9 +473,9 @@ class autoDiskPartition():
         slice_file.writelines('all\n')
         slice_file.writelines('%s\n' % number)
         slice_file.close()
-        ram = Popen(memory, shell=True, stdin=PIPE, stdout=PIPE,
-                    universal_newlines=True, close_fds=True)
-        mem = ram.stdout.read()
+        # ram = Popen(memory, shell=True, stdin=PIPE, stdout=PIPE,
+        #             universal_newlines=True, close_fds=True)
+        # mem = ram.stdout.read()
         # swap = int(int(mem.partition(':')[2].strip()) / (1024 * 1024))
         swap = 2048
         if self.bios_type == "UEFI":
@@ -531,9 +531,9 @@ class autoFreeSpace():
         slice_file.writelines('s%s\n' % sl)
         slice_file.writelines('%s\n' % number)
         slice_file.close()
-        ram = Popen(memory, shell=True, stdin=PIPE, stdout=PIPE,
-                    universal_newlines=True, close_fds=True)
-        mem = ram.stdout.read()
+        # ram = Popen(memory, shell=True, stdin=PIPE, stdout=PIPE,
+        #             universal_newlines=True, close_fds=True)
+        # mem = ram.stdout.read()
         # swap = int(int(mem.partition(':')[2].strip()) / (1024 * 1024))
         swap = 2048
         rootNum = int(number - swap)
@@ -593,9 +593,9 @@ class autoFreeSpace():
         sfile.close()
         number = int(size.partition('M')[0])
         number = number - 512
-        ram = Popen(memory, shell=True, stdin=PIPE, stdout=PIPE,
-                    universal_newlines=True, close_fds=True)
-        mem = ram.stdout.read()
+        # ram = Popen(memory, shell=True, stdin=PIPE, stdout=PIPE,
+        #             universal_newlines=True, close_fds=True)
+        # mem = ram.stdout.read()
         # swap = int(int(mem.partition(':')[2].strip()) / (1024 * 1024))
         swap = 2048
         rootNum = int(number - swap)
@@ -666,10 +666,7 @@ class autoFreeSpace():
                 cf = open(tmp + 'create', 'wb')
                 pickle.dump(mpl, cf)
                 cf.close()
-        elif self.bios_type == "BOOT" and efi_exist is True:
-            pass
-        else:
-            if not os.path.exists(tmp + 'create'):
+        elif self.bios_type == "BOOT":
                 pl.extend(([disk + "p%s" % sl, bs]))
                 mpl.append(pl)
                 cf = open(tmp + 'create', 'wb')
