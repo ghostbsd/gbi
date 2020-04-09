@@ -614,17 +614,19 @@ class autoFreeSpace():
             plist.extend(([disk + 'p%s' % sl, bs, 'none', 'UEFI']))
             rsl = int(sl + 1)
             swsl = int(rsl + 1)
-        elif self.bios_type == "UEFI" and efi_exist is True:
-            rsl = int(sl)
-            swsl = int(rsl + 1)
-        else:
+        elif self.bios_type == "BOOT":
             plist.extend(([disk + 'p%s' % sl, bs, 'none', 'BOOT']))
             rsl = int(sl + 1)
             swsl = (rsl + 1)
+        else:
+            rsl = int(sl)
+            swsl = int(rsl + 1)
+
         if len(plist) != 0:
             done = True
             mplist[path] = plist
             plist = []
+
         if fs == "ZFS":
             layout = "/(compress=lz4|atime=off),/root(compress=lz4)," \
                 "/tmp(compress=lz4),/usr(canmount=off|mountpoint=none)," \
@@ -667,11 +669,11 @@ class autoFreeSpace():
                 pickle.dump(mpl, cf)
                 cf.close()
         elif self.bios_type == "BOOT":
-                pl.extend(([disk + "p%s" % sl, bs]))
-                mpl.append(pl)
-                cf = open(tmp + 'create', 'wb')
-                pickle.dump(mpl, cf)
-                cf.close()
+            pl.extend(([disk + "p%s" % sl, bs]))
+            mpl.append(pl)
+            cf = open(tmp + 'create', 'wb')
+            pickle.dump(mpl, cf)
+            cf.close()
 
 
 class createLabel():
