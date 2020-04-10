@@ -940,7 +940,7 @@ class rDeleteParttion():
                 part = line[0]
                 num = sliceNum(part)
                 hd = rpartslice(part)
-                call(f"zpool labelclear -f ${part}", shell=True)
+                call(f"zpool labelclear -f {part}", shell=True)
                 sleep(1)
                 call(f'gpart delete -i {num} {hd}', shell=True)
                 sleep(2)
