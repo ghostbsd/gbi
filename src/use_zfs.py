@@ -79,9 +79,9 @@ class ZFS():
         else:
             pfile.writelines("#zpoolName=None\n")
         if self.zfs_four_k is True:
-            pfile.writelines('zfsForce4k=YES\n\n')
+            pfile.writelines('ashift=12\n\n')
         else:
-            pfile.writelines('#zfsForce4k=No\n\n')
+            pfile.writelines('ashift=9\n\n')
         pfile.writelines('disk0=%s\n' % zfs_dsk_list[0].partition('-')[0].rstrip())
         pfile.writelines('partition=ALL\n')
         pfile.writelines('partscheme=%s\n' % self.scheme)
@@ -350,9 +350,9 @@ class ZFS():
         zfs4kcheck.connect("toggled", self.on_check)
         zfs4kcheck.set_active(True)
         # Swap Size
-        ram = Popen(memory, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT,
-                    universal_newlines=True, close_fds=True)
-        mem = ram.stdout.read()
+        # ram = Popen(memory, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT,
+        #             universal_newlines=True, close_fds=True)
+        # mem = ram.stdout.read()
         swap = 2048
         swp_size_label = Gtk.Label('<b>Swap Size(MB)</b>')
         swp_size_label.set_use_markup(True)
