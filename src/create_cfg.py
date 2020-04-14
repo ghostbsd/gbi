@@ -114,6 +114,7 @@ class gbsd_cfg():
             drive = r.readlines()
             d_output = drive[0].strip()
             f.writelines('\n# Disk Setup\n')
+            r.writelines('ashift=12\n')
             f.writelines('disk0=%s\n' % d_output)
             os.remove(disk)
             # Partition Slice.
@@ -180,7 +181,7 @@ class gbsd_cfg():
         f.writelines('userGroups=operator\n')
         f.writelines('commitUser\n')
         nv = Popen('pciconf -lv | grep -B 4 VGA', shell=True,
-                        stdout=PIPE, close_fds=True, universal_newlines=True)
+                   stdout=PIPE, close_fds=True, universal_newlines=True)
         if "NVIDIA" not in nv.stdout.read():
             f.writelines('runCommand=pkg delete -fy nvidia-driver\n')
         vbguest = Popen('pciconf -lv | grep "VirtualBox"', shell=True,
