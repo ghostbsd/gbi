@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 # install.py give the job to pc-sysinstall to install GhostBSD.
 
@@ -76,11 +76,11 @@ def read_output(command, probar):
         print(bartext)
     call(f'{rc}service hald start', shell=True)
     if bartext.rstrip() == "Installation finished!":
-        Popen('python3 %send.py' % gbi_path, shell=True, close_fds=True)
+        Popen('python %send.py' % gbi_path, shell=True, close_fds=True)
         call("rm -rf /tmp/.gbi/", shell=True, close_fds=True)
         Gtk.main_quit()
     else:
-        Popen('python3 %serror.py' % gbi_path, shell=True, close_fds=True)
+        Popen('python %serror.py' % gbi_path, shell=True, close_fds=True)
         Gtk.main_quit()
 
 
