@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.7
+#!/usr/bin/env python
 """
 Copyright (c) 2010-2013, GhostBSD. All rights reserved.
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.7
+#!/usr/bin/env python
 
 import gi
 gi.require_version('Gtk', '3.0')
