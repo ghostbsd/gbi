@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.7
 # -*- coding: utf-8 -*-
 
 import os
@@ -11,7 +11,7 @@ from setuptools import setup
 # import DistUtilsExtra.command.clean_i18n
 
 # to update i18n .mo files (and merge .pot file into .po files) run on Linux:
-# ,,python setup.py build_i18n -m''
+# ,,python3.7 setup.py build_i18n -m''
 
 # silence pyflakes, __VERSION__ is properly assigned below...
 __VERSION__ = '6.1'
