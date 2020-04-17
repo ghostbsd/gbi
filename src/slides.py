@@ -37,7 +37,7 @@ class gbsdSlides:
         vBox2.show()
         label2 = Gtk.Label(name="slideText")
         label2.set_markup("Thank you for choosing GhostBSD. We hope you enjoy the BSD experience.\n\n"
-                          "We believe every computer operating system should be elegant, lightweight and secure. It should respect your privacy and give the user true freedom. GhostBSD makes FreeBSD desktop computing much easier.\n\n"
+                          "We believe every computer operating system should be elegant, lightweight and secure. GhostBSD developers want you to have an operating system that protects your privacy and is easy to use.\n\n"
                           "We want GhostBSD to work for you. So while your software is installing, this slideshow will introduce you to GhostBSD.")
         label2.set_justify(Gtk.Justification.LEFT)
         label2.set_line_wrap(True)
@@ -62,7 +62,7 @@ class gbsdSlides:
         vBox.pack_end(hBox, True, True, 0)
         label2 = Gtk.Label(name="slideText")
         label2.set_markup("Search, install, upgrade and uninstall software with the Software Station software manager.\n\n"
-                          "Software Station is a powerful tool to manage GhostBSD/FreeBSD software. It has a simple interface which consists of just 2 panels, a list of all available software packages including results of searches and a tab widget showing 6 useful tabs for information, files, transaction, output, news, and a quick help guide.\n\n"
+                          "Software Station is a powerful tool to manage GhostBSD software. It has a simple interface for locating and installing applications quickly.\n\n"
                           "There are over 32,000 software packages available to install.")
         label2.set_justify(Gtk.Justification.LEFT)
         label2.set_line_wrap(True)
@@ -86,7 +86,7 @@ class gbsdSlides:
         vBox.pack_end(hBox, True, True, 0)
         label2 = Gtk.Label(name="slideText")
         label2.set_markup("GhostBSD comes with Mozilla Firefox, the web browser used by millions of people around the world.\n\n"
-                          "Browse the web safely and privately, share your files, software and multimedia, send and receive e-mail and communicate with friends and family.\n\n"
+                          "Browse the web safely and privately. Share your files and communicate with friends and family securely.\n\n"
                           "Web browsers such as Chromium and Epiphany are easily installable.")
         label2.set_justify(Gtk.Justification.LEFT)
         label2.set_line_wrap(True)
@@ -110,7 +110,7 @@ class gbsdSlides:
         vBox.pack_end(hBox, True, True, 0)
         label2 = Gtk.Label(name="slideText")
         label2.set_markup("GhostBSD comes with Mozilla Firefox, the web browser used by millions of people around the world.\n\n"
-                          "Browse the web safely and privately, share your files, software and multimedia, send and receive e-mail and communicate with friends and family.\n\n"
+                          "Browse the web safely and privately. Share your files and communicate with friends and family securely.\n\n"
                           "Web browsers such as Chromium and Epiphany are easily installable.")
         label2.set_justify(Gtk.Justification.LEFT)
         label2.set_line_wrap(True)
@@ -135,7 +135,7 @@ class gbsdSlides:
         vBox.pack_end(hBox, True, True, 0)
         label2 = Gtk.Label(name="slideText")
         label2.set_markup("With Shotwell it is really easy to organize and share your photos.\n\n"
-                          "Use the export option to copy your photos to a remote computer, iPod, a custom HTML gallery or to services such as Flickr, Facebook, PicasaWeb and more.\n\n"
+                          "Use the export option to copy your photos to a remote device, a custom HTML gallery, or services such as Flickr, Facebook, PicasaWeb and more.\n\n"
                           "For more advanced photos editing, Gimp is available for installation.")
         label2.set_justify(Gtk.Justification.LEFT)
         label2.set_line_wrap(True)
@@ -159,7 +159,7 @@ class gbsdSlides:
         vBox.pack_end(hBox, True, True, 0)
         label2 = Gtk.Label(name="slideText")
         label2.set_markup("GhostBSD is ready to play videos and music from the web, CDs and DVDs.\n\n"
-                          "The Rhythmbox audio player lets you organize your music and listen to Internet radio, podcasts and more, as well as synchronize your audio collection to a portable audio player.\n\n"
+                          "The Rhythmbox audio player lets you organize your music and listen to Internet radio, podcasts and more. Also, it allows you to synchronize your audio collection to a portable audio player.\n\n"
                           "\nVLC allows you to plays most multimedia files as well as DVDs, Audio CDs, VCDs, and various streaming protocols.")
         label2.set_justify(Gtk.Justification.LEFT)
         label2.set_line_wrap(True)
@@ -183,7 +183,7 @@ class gbsdSlides:
         vBox.pack_end(hBox, True, True, 0)
         label2 = Gtk.Label(name="slideText")
         label2.set_markup("Check out the forums for answers to all your GhostBSD questions.\n\n"
-                          "There's a good chance your question has already been answered and if not, you'll find volunteers eager to help.\n\n"
+                          "There's a good chance your question has already been answered, and if not, you'll find volunteers eager to help.\n\n"
                           "For more support options go to our <a href='http://www.ghostbsd.org/support'>support page</a>.")
         label2.set_justify(Gtk.Justification.LEFT)
         label2.set_line_wrap(True)
@@ -247,7 +247,7 @@ class dbsdSlides:
     def Welcome(self):
         vBox = Gtk.VBox(False, 0)
         vBox.show()
-        label = Gtk.Label("Welcome to DesktopBSD!", name="Header")
+        label = Gtk.Label("Welcome to GhostBSD!", name="Header")
         label.set_property("height-request", 40)
         vBox.pack_start(label, False, False, 0)
         hBox = Gtk.HBox(False, 0, name="welcome")
@@ -256,9 +256,9 @@ class dbsdSlides:
         vBox2 = Gtk.VBox(False, 0)
         vBox2.show()
         label2 = Gtk.Label(name="slideText")
-        label2.set_markup("Thank you for choosing DesktopBSD. We hope you enjoy the BSD experience.\n\n"
-                          "We believe every computer Operating System should be elegant, lightweight, and secure. It should respect your privacy and give the user true freedom. DesktopBSD makes FreeBSD desktop computing much easier.\n\n"
-                          "We want DesktopBSD to work for you. So while your software is installing, this slideshow will introduce you to DesktopBSD.")
+        label2.set_markup("Thank you for choosing GhostBSD. We hope you enjoy the BSD experience.\n\n"
+                          "We believe every computer Operating System should be elegant, lightweight, and secure. It should respect your privacy and give the user true freedom. GhostBSD desktop computing much easier.\n\n"
+                          "We want GhostBSD to work for you. So while your software is installing, this slideshow will introduce you to GhostBSD.")
         label2.set_justify(Gtk.Justification.LEFT)
         label2.set_line_wrap(True)
         # label2.set_max_width_chars(10)
@@ -282,7 +282,7 @@ class dbsdSlides:
         vBox.pack_end(hBox, True, True, 0)
         label2 = Gtk.Label(name="slideText")
         label2.set_markup("Search, install, upgrade, and uninstall software with Software Station software manager.\n\n"
-                          "Software Station is a powerful tool to manage DesktopBSD/FreeBSD software. It has a simple interface which consists of just 2 panels, a list of all available software including results of searches and a tab widget showing 6 useful tabs information, files, transaction, output, news, and a quick help guide.\n\n"
+                         "Software Station is a powerful tool to manage GhostBSD software. It has a simple interface for locating and installing applications quickly.\n\n"
                           "There are over 25000 softwares available to install.")
         label2.set_justify(Gtk.Justification.LEFT)
         label2.set_line_wrap(True)
@@ -305,8 +305,8 @@ class dbsdSlides:
         hBox.show()
         vBox.pack_end(hBox, True, True, 0)
         label2 = Gtk.Label(name="slideText")
-        label2.set_markup("DesktopBSD includes the BSD licensed Chromium web browser from Google.\n\n"
-                          "Check out the Chrome Web Store for more apps to install in addition to the ones provided by DesktopBSD/FreeBSD.\n\n"
+        label2.set_markup("GhostBSD includes the BSD licensed Chromium web browser from Google.\n\n"
+                          "Check out the Chrome Web Store for more apps to install in addition to the ones provided by GhostBSD.\n\n"
                           "Web browsers such as Firefox and Epiphany are easily installable.")
         label2.set_justify(Gtk.Justification.LEFT)
         label2.set_line_wrap(True)
@@ -329,7 +329,7 @@ class dbsdSlides:
         hBox.show()
         vBox.pack_end(hBox, True, True, 0)
         label2 = Gtk.Label(name="slideText")
-        label2.set_markup("DesktopBSD includes Mozilla Thunderbird.\n\n"
+        label2.set_markup("GhostBSD includes Mozilla Thunderbird.\n\n"
                           "Share your files, software, and multimedia, send and receive e-mail, and communicate with friends and family.\n\n"
                           "Other email clients such as Evolution are easily installable.")
         label2.set_justify(Gtk.Justification.LEFT)
@@ -378,8 +378,8 @@ class dbsdSlides:
         hBox.show()
         vBox.pack_end(hBox, True, True, 0)
         label2 = Gtk.Label(name="slideText")
-        label2.set_markup("DesktopBSD is ready to play videos and music from the web, CDs and DVDs.\n\n"
-                          "Exaile audio player lets you organize your music and listen to Internet radio, podcasts, and more, as well as synchronizes your audio collection to a portable audio player.\n\n"
+        label2.set_markup("GhostBSD is ready to play videos and music from the web, CDs and DVDs.\n\n"
+                          "Rhythmbox audio player lets you organize your music and listen to Internet radio, podcasts, and more. Also, it allows you to synchronizes your audio collection to a portable audio player.\n\n"
                           "\nVLC allows you to easily watch videos from your computer, DVD.")
         label2.set_justify(Gtk.Justification.LEFT)
         label2.set_line_wrap(True)
@@ -402,9 +402,8 @@ class dbsdSlides:
         hBox.show()
         vBox.pack_end(hBox, True, True, 0)
         label2 = Gtk.Label(name="slideText")
-        label2.set_markup("DesktopBSD is setup to connect you to the world.\n\n"
-                          "Hexchat can be used to connect you to the DesktopBSD chat room on IRC.\n\n"
-                          "Pidgin can connect you to many popular instant messaging networks including Facebook.")
+        label2.set_markup("GhostBSD is setup to connect you to the world.\n\n"
+                          "Telegram can connect you to numerous worldwide channels of conversation and interest.")
         label2.set_justify(Gtk.Justification.LEFT)
         label2.set_line_wrap(True)
         label2.set_alignment(0.1, 0.2)
@@ -426,9 +425,9 @@ class dbsdSlides:
         hBox.show()
         vBox.pack_end(hBox, True, True, 0)
         label2 = Gtk.Label(name="slideText")
-        label2.set_markup("Check out the forums for answers to all your DesktopBSD questions.\n\n"
+        label2.set_markup("Check out the forums for answers to all your GhostBSD questions.\n\n"
                           "There's a good chance your question will have been answered already and, if not, you'll find volunteers eager to help.\n\n"
-                          "For more support options, go to our <a href='http://www.desktopbsd.net'>website</a>.")
+                          "For more support options, go to our <a href='http://www.ghostbsd.org'>website</a>.")
         label2.set_justify(Gtk.Justification.LEFT)
         label2.set_line_wrap(True)
         label2.set_alignment(0.1, 0.2)
