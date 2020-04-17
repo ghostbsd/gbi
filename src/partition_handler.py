@@ -592,7 +592,7 @@ class autoFreeSpace():
         sfile.writelines('partscheme=GPT')
         sfile.close()
         number = int(size.partition('M')[0])
-        number = number - 512
+        # number = number - 512
         # ram = Popen(memory, shell=True, stdin=PIPE, stdout=PIPE,
         #             universal_newlines=True, close_fds=True)
         # mem = ram.stdout.read()
@@ -617,7 +617,7 @@ class autoFreeSpace():
         elif self.bios_type == "BOOT":
             plist.extend(([disk + 'p%s' % sl, bs, 'none', 'BOOT']))
             rsl = int(sl + 1)
-            swsl = (rsl + 1)
+            swsl = int(rsl + 1)
         else:
             rsl = int(sl)
             swsl = int(rsl + 1)
@@ -712,7 +712,7 @@ class createLabel():
         llist = []
         if left_size > 0:
             llist.extend((['freespace', left_size, '', '']))
-            mllist.insert(lv + 1,llist)
+            mllist.insert(lv + 1, llist)
         pickle.dump(mllist, plf)
         plf.close()
         llist = open(partitiondb + disk + 's%s' % sl, 'rb')
