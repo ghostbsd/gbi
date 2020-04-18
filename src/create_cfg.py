@@ -114,7 +114,7 @@ class gbsd_cfg():
             drive = r.readlines()
             d_output = drive[0].strip()
             f.writelines('\n# Disk Setup\n')
-            r.writelines('ashift=12\n')
+            f.writelines('ashift=12\n')
             f.writelines('disk0=%s\n' % d_output)
             os.remove(disk)
             # Partition Slice.
