@@ -261,10 +261,6 @@ class partition_repos():
         df.close()
 
 
-partition_repos()
-print(partition_query('ada1'))
-
-
 class Delete_partition():
 
     def find_if_label(self, part):
