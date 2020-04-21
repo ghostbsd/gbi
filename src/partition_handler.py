@@ -2,9 +2,10 @@
 
 import os
 import re
-from subprocess import Popen, PIPE, STDOUT, call
+import json
 import pickle
 from time import sleep
+from subprocess import Popen, PIPE, STDOUT, call
 
 tmp = "/tmp/.gbi/"
 if not os.path.exists(tmp):
@@ -156,15 +157,21 @@ class diskSchemeChanger():
             psf.close()
 
 
-class partition_repos():
+class create_disk_partition_db():
 
     def disk_list(self):
-        disk_output = Popen(query_disk, shell=True, stdin=PIPE, stdout=PIPE,
-                            universal_newlines=True, close_fds=True)
-        dlist = []
-        for disk in disk_output.stdout:
-            dlist.append(disk.split())
-        return dlist
+        cmd = 'sysctl -n kern.disks'
+        disk_Popen = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE,
+                           universal_newlines=True, close_fds=True)
+        disks = disk_Popen.stdout.read()
+        cleaned_disk = re.sub(r'acd[0-9]*|cd[0-9]*|scd[0-9]*', '', disks)
+        return sorted(cleaned_disk.split())
+
+    def device_model(self, disk):
+        cmd = f"diskinfo -v {disk} 2>/dev/null | grep 'Disk descr' | cut -d '#' -f1 | tr -d '\t'"
+        disk_Popen = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE,
+                           universal_newlines=True, close_fds=True)
+        return disk_Popen.stdout.read().strip()
 
     def disk_size(self, disk):
         cmd = "%s %s" % (disk_info, disk)
@@ -180,85 +187,110 @@ class partition_repos():
         scheme = shm_out.stdout.readlines()[0].rstrip()
         return scheme
 
-    def mbr_partition_slice_list(self, disk):
+    def mbr_partition_slice_db(self, disk):
         partition_output = Popen('%s %s' % (query_partition, disk),
                                  shell=True, stdin=PIPE, stdout=PIPE,
-                                 universal_newlines=True, close_fds=True)
-        plist = []
-        mplist = []
-        dpsf = open(partitiondb + disk, 'wb')
+                                 universal_newlines=True)
+        slice_db = {}
+        free_num = 1
         for line in partition_output.stdout:
-            info = line.split()
-            plist.extend((info[0], info[1].partition('M')[0], '', info[2]))
-            mplist.append(plist)
-            plist = []
-            self.mbr_partition_list(info[0])
-        pickle.dump(mplist, dpsf)
-        dpsf.close()
+            info = line.strip().split()
+            slice_name = info[0]
+            if 'freespace' in line:
+                slice_name = f'freespace{free_num}'
+                free_num += 1
+            partitons = {
+                'name': slice_name,
+                'size': info[1].partition('M')[0],
+                'mount_point': '',
+                'file_system': info[2],
+                'change': None,
+                'partition': self.mbr_partition_db(info[0])
+            }
+            slice_db[slice_name] = partitons
+        return slice_db
 
-    def mbr_partition_list(self, pslice):
-        slice_outpput = Popen('%s %s' % (query_label, pslice), shell=True,
-                              stdin=PIPE, stdout=PIPE,
-                              universal_newlines=True, close_fds=True)
-        alph = ord('a')
-        if pslice == 'freespace':
-            pass
+    def mbr_partition_db(self, pslice):
+        if 'freespace' in pslice:
+            return None
         else:
-            llist = []
-            mllist = []
-            plf = open(partitiondb + pslice, 'wb')
-            for line in slice_outpput.stdout:
-                info = line.split()
-                letter = chr(alph)
-                alph = alph + 1
-                if info[0] == 'freespace':
-                    llist.extend(([info[0], info[1].partition('M')[0], '', ''])
-                                 )
+            slice_output = Popen('%s %s' % (query_label, pslice), shell=True,
+                                 stdin=PIPE, stdout=PIPE,
+                                 universal_newlines=True)
+            partition_db = {}
+            alph = ord('a')
+            free_num = 1
+            for line in slice_output.stdout:
+                info = line.strip().split()
+                if 'freespace' in line:
+                    partition_name = f'freespace{free_num}'
+                    free_num += 1
                 else:
-                    llist.extend((
-                                 [pslice + letter, info[0].partition('M')[0],
-                                  '', info[1]]))
-                mllist.append(llist)
-                llist = []
-            pickle.dump(mllist, plf)
-            plf.close()
+                    letter = chr(alph)
+                    partition_name = f'{info[0]}{letter}'
+                    alph += 1
+                partitons = {
+                    'name': partition_name,
+                    'size': info[1].partition('M')[0],
+                    'mount_point': '',
+                    'file_system': info[2],
+                    'change': None,
+                }
+                partition_db[partition_name] = partitons
+            if not partition_db:
+                return None
+            return partition_db
 
-    def gpt_partition_list(self, disk):
+    def gpt_partition_db(self, disk):
         partition_output = Popen('%s %s' % (query_partition, disk),
                                  shell=True, stdin=PIPE, stdout=PIPE,
-                                 universal_newlines=True, close_fds=True)
-        plist = []
-        mplist = []
-        psf = open(partitiondb + disk, 'wb')
+                                 universal_newlines=True)
+        partition_db = {}
+        free_num = 1
         for line in partition_output.stdout:
-            info = line.split()
-            plist.extend((info[0], info[1].partition('M')[0], '', info[2]))
-            mplist.append(plist)
-            plist = []
-        pickle.dump(mplist, psf)
-        psf.close()
+            info = line.strip().split()
+            slice_name = info[0]
+            if 'freespace' in line:
+                slice_name = f'freespace{free_num}'
+                free_num += 1
+            partitons = {
+                'name': info[0],
+                'size': info[1].partition('M')[0],
+                'mount_point': '',
+                'file_system': info[2],
+                'change': None,
+                'partition': None
+            }
+            partition_db[slice_name] = partitons
+        return partition_db
 
     def __init__(self):
-        if not os.path.exists(partitiondb):
-            os.makedirs(partitiondb)
-        df = open(diskdb, 'wb')
-        dlist = []
-        mdlist = []
+        disk_database = f'{tmp}disk.db'
+        df = open(disk_database, 'wb')
+        disk_db = {}
         for disk in self.disk_list():
-            if self.find_Scheme(disk[0]) == "GPT":
-                dlist.extend(([disk[0], self.disk_size(disk[0]), '', 'GPT']))
-                self.gpt_partition_list(disk[0])
-                mdlist.append(dlist)
-            elif self.find_Scheme(disk[0]) == "MBR":
-                dlist.extend(([disk[0], self.disk_size(disk[0]), '', 'MBR']))
-                self.mbr_partition_slice_list(disk[0])
-                mdlist.append(dlist)
+            disk_info_db = {}
+            if self.find_Scheme(disk) == "GPT":
+                disk_info_db['scheme'] = 'GPT'
+                partition_db = []
+                partition_db = self.gpt_partition_db(disk)
+            elif self.find_Scheme(disk) == "MBR":
+                disk_info_db['scheme'] = 'MBR'
+                partition_db = self.mbr_partition_slice_db(disk)
             else:
-                dlist.extend(([disk[0], self.disk_size(disk[0]), '', None]))
-                mdlist.append(dlist)
-            dlist = []
-        pickle.dump(mdlist, df)
+                disk_info_db['scheme'] = None
+                partition_db = None
+            disk_info_db['size'] = self.disk_size(disk)
+            disk_info_db['device_model'] = self.device_model(disk)
+            disk_info_db['partitions'] = partition_db
+            disk_info_db['change'] = None
+            disk_db[disk] = disk_info_db
+        print(json.dumps(disk_db, indent=4))
+        pickle.dump(disk_db, df)
         df.close()
+
+
+create_disk_partition_db()
 
 
 class Delete_partition():
