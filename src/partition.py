@@ -6,36 +6,25 @@ import re
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
-from partition_handler import partition_repos, disk_query, Delete_partition
-from partition_handler import partition_query, label_query, bios_or_uefi
-from partition_handler import autoDiskPartition, autoFreeSpace, first_is_free
-from partition_handler import createLabel, scheme_query, how_partition
-from partition_handler import diskSchemeChanger, createSlice, createPartition
+from partition_handler import create_disk_partition_db, disk_database, Delete_partition
+from partition_handler import bios_or_uefi, how_partition, createSlice
+from partition_handler import autoDiskPartition, autoFreeSpace, createPartition
+from partition_handler import createLabel, diskSchemeChanger
 
 # Folder use pr the installer.
 tmp = "/tmp/.gbi/"
 installer = "/usr/local/lib/gbi/"
-query = "sh /usr/local/lib/gbi/backend-query/"
 if not os.path.exists(tmp):
     os.makedirs(tmp)
 
-add_part = 'gpart add'
-disk_part = '%sdisk-part.sh' % query
-disk_label = '%sdisk-label.sh' % query
-detect_sheme = '%sdetect-sheme.sh' % query
-
-part = '%sdisk-part.sh' % query
-memory = 'sysctl hw.physmem'
-disk_list = '%sdisk-list.sh' % query
-disk_info = '%sdisk-info.sh' % query
-disk_label = '%sdisk-label.sh' % query
 disk_schem = '%sscheme' % tmp
 disk_file = '%sdisk' % tmp
 psize = '%spart_size' % tmp
 logo = "/usr/local/lib/gbi/logo.png"
 Part_label = '%spartlabel' % tmp
 part_schem = '%sscheme' % tmp
-partition_db = "%spartition_db/" % tmp
+
+disk_db_file = f'{tmp}disk.db'
 ufs_Partiton_list = []
 bios_type = bios_or_uefi()
 
@@ -263,7 +252,7 @@ class Partitions():
         self.window.show_all()
 
     def set_auto_partition(self, widget):
-        autoFreeSpace(self.path, self.size, self.fs, self.efi_exist)
+        autoFreeSpace(self.path, self.size, self.fs, self.efi_exist, self.disk, self.scheme)
         self.window.hide()
         self.update()
 
@@ -279,9 +268,9 @@ class Partitions():
         self.update()
         self.window.hide()
         if data is False:
-            if scheme_query(self.path) == "MBR" and self.path[1] < 4:
+            if self.scheme == "MBR" and self.path[1] < 4:
                 self.sliceEditor()
-            elif scheme_query(self.path) == "GPT":
+            elif self.scheme == "GPT":
                 self.labelEditor(self.path, self.slice, self.size, 'GPT', False)
 
     def autoSchemePartition(self, widget):
@@ -425,7 +414,7 @@ class Partitions():
             if self.slice != 'freespace':
                 self.labelEditor(self.path, self.slice, self.size, 'MBR', True)
         elif len(self.path) == 2 and self.slice != 'freespace':
-            if scheme_query(self.path) == "GPT":
+            if self.scheme == "GPT":
                 self.labelEditor(self.path, self.slice, self.size, 'GPT', True)
 
     def autoPartition(self, widget):
@@ -448,8 +437,8 @@ class Partitions():
             pass
 
     def revertChange(self, widget):
-        if os.path.exists(partition_db):
-            shutil.rmtree(partition_db)
+        if os.path.exists(disk_db_file):
+            shutil.rmtree(disk_db_file)
         if os.path.exists(tmp + 'create'):
             os.remove(tmp + 'create')
         if os.path.exists(tmp + 'delete'):
@@ -458,7 +447,7 @@ class Partitions():
             os.remove(tmp + 'destroy')
         if os.path.exists(Part_label):
             os.remove(Part_label)
-        partition_repos()
+        create_disk_partition_db()
         self.Tree_Store()
         self.treeview.expand_all()
 
@@ -474,9 +463,9 @@ class Partitions():
             if self.slice == 'freespace':
                 self.labelEditor(self.path, self.slice, self.size, 'MBR', False)
         elif len(self.path) == 2 and self.slice == 'freespace':
-            if scheme_query(self.path) == "MBR" and self.path[1] < 4:
+            if self.scheme == "MBR" and self.path[1] < 4:
                 self.sliceEditor()
-            elif scheme_query(self.path) == "GPT":
+            elif self.scheme == "GPT":
                 self.labelEditor(self.path, self.slice, self.size, 'GPT', False)
         else:
             if how_partition(self.path) == 1:
@@ -579,11 +568,7 @@ class Partitions():
                 self.delete_bt.set_sensitive(False)
                 self.modify_bt.set_sensitive(False)
                 self.auto_bt.set_sensitive(False)
-                how_many_prt = how_partition(self.path)
-                firstisfree = first_is_free(self.path)
-                if how_many_prt == 1 and firstisfree == 'freespace':
-                    self.create_bt.set_sensitive(False)
-                elif how_partition(self.path) == 0:
+                if how_partition(self.disk) == 0:
                     self.create_bt.set_sensitive(True)
                 else:
                     self.create_bt.set_sensitive(False)
@@ -785,24 +770,32 @@ class Partitions():
 
     def Tree_Store(self):
         self.store.clear()
-        for disk in disk_query():
-            schem = disk[-1]
-            pinter = self.store.append(None, [disk[0], str(disk[1]),
-                                       disk[2], disk[3], True])
-            if schem == "GPT":
-                for pi in partition_query(disk[0]):
-                    self.store.append(pinter, [pi[0], str(pi[1]), pi[2],
-                                      pi[3], True])
-            elif schem == "MBR":
-                for pi in partition_query(disk[0]):
-                    pinter1 = self.store.append(pinter, [pi[0], str(pi[1]),
-                                                pi[2], pi[3], True])
-                    if pi[0] == 'freespace':
-                        pass
-                    else:
-                        for li in label_query(pi[0]):
-                            self.store.append(pinter1, [li[0], str(li[1]),
-                                              li[2], li[3], True])
+        disk_db = disk_database()
+        for disk in disk_db:
+            print(disk)
+            print(disk_db[disk])
+            disk_info = disk_db[disk]
+            disk_scheme = disk_info['scheme']
+            mount_point = ''
+            disk_size = str(disk_info['size'])
+            disk_partitions = disk_info['partitions']
+            pinter1 = self.store.append(None, [disk, disk_size, mount_point, disk_scheme, True])
+            for partition in disk_partitions:
+                partition_info = disk_partitions[partition]
+                file_system = partition_info['file_system']
+                mount_point = partition_info['mount_point']
+                partition_size = str(partition_info['size'])
+                partition_partitions = partition_info['partitions']
+                if partition_partitions is None:
+                    self.store.append(pinter1, [partition, partition_size, mount_point, file_system, True])
+                else:
+                    pinter2 = self.store.append(pinter1, [partition, partition_size, mount_point, file_system, True])
+                    for partition in partition_partitions:
+                        partition_info = disk_partitions[partition]
+                        file_system = partition_info['file_system']
+                        mount_point = partition_info['mount_point']
+                        partition_size = str(partition_info['size'])
+                        self.store.append(pinter2, [partition, partition_size, mount_point, file_system, True])
         return self.store
 
     def get_model(self):

@@ -2,7 +2,6 @@
 
 import os
 import re
-import json
 import pickle
 from time import sleep
 from subprocess import Popen, PIPE, STDOUT, call
@@ -27,10 +26,11 @@ dslice = '%sslice' % tmp
 Part_label = '%spartlabel' % tmp
 part_schem = '%sscheme' % tmp
 boot_file = '%sboot' % tmp
+disk_db_file = f'{tmp}disk.db'
 
 
-def disk_query():
-    df = open(diskdb, 'rb')
+def disk_database():
+    df = open(disk_db_file, 'rb')
     dl = pickle.load(df)
     return dl
 
@@ -48,39 +48,29 @@ def zfs_disk_size_query(disk):
     return disk_info_output.stdout.readlines()[3].partition('=')[2]
 
 
-def how_partition(path):
-    disk = disk_query()[path[0]][0]
-    if os.path.exists(partitiondb + disk):
-        part = partition_query(disk)
-        return len(part)
-    else:
+def how_partition(disk):
+    partitions = disk_database()[disk]['partitions']
+    if partitions is None:
         return 0
-
-
-def first_is_free(path):
-    disk = disk_query()[path[0]][0]
-    if os.path.exists(partitiondb + disk):
-        part = partition_query(disk)
-        return part[0][0]
     else:
-        return None
+        return len(partitions)
 
 
-def partition_query(disk):
-    plist = open(partitiondb + disk, 'rb')
-    pl = pickle.load(plist)
-    return pl
+# def partition_query(disk):
+#     plist = open(partitiondb + disk, 'rb')
+#     pl = pickle.load(plist)
+#     return pl
 
 
-def label_query(pslice):
-    llist = open(partitiondb + pslice, 'rb')
-    ll = pickle.load(llist)
-    return ll
+# def label_query(pslice):
+#     llist = open(partitiondb + pslice, 'rb')
+#     ll = pickle.load(llist)
+#     return ll
 
 
-def scheme_query(path):
-    disk = disk_query()[path[0]]
-    return disk[-1]
+# def scheme_query(path):
+#     disk = disk_query()[path[0]]
+#     return disk[-1]
 
 
 def find_scheme(disk):
@@ -126,7 +116,7 @@ def slicePartition(part):
 class diskSchemeChanger():
 
     def __init__(self, schm, path, disk, size):
-        dlist = disk_query()
+        dlist = disk_database()
         dselected = dlist[path[0]]
         if schm is None:
             dselected[-1] = 'GPT'
@@ -205,7 +195,7 @@ class create_disk_partition_db():
                 'mount_point': '',
                 'file_system': info[2],
                 'change': None,
-                'partition': self.mbr_partition_db(info[0])
+                'partitions': self.mbr_partition_db(info[0])
             }
             slice_db[slice_name] = partitons
         return slice_db
@@ -259,14 +249,13 @@ class create_disk_partition_db():
                 'mount_point': '',
                 'file_system': info[2],
                 'change': None,
-                'partition': None
+                'partitions': None
             }
             partition_db[slice_name] = partitons
         return partition_db
 
     def __init__(self):
-        disk_database = f'{tmp}disk.db'
-        df = open(disk_database, 'wb')
+        df = open(disk_db_file, 'wb')
         disk_db = {}
         for disk in self.disk_list():
             disk_info_db = {}
@@ -285,12 +274,9 @@ class create_disk_partition_db():
             disk_info_db['partitions'] = partition_db
             disk_info_db['change'] = None
             disk_db[disk] = disk_info_db
-        print(json.dumps(disk_db, indent=4))
+        # print(json.dumps(disk_db, indent=4))
         pickle.dump(disk_db, df)
         df.close()
-
-
-create_disk_partition_db()
 
 
 class Delete_partition():
@@ -605,10 +591,8 @@ class autoFreeSpace():
         pickle.dump(mpl, cf)
         cf.close()
 
-    def __init__(self, path, size, fs, efi_exist):
+    def __init__(self, path, size, fs, efi_exist, disk, schm):
         self.bios_type = bios_or_uefi()
-        disk = disk_query()[path[0]][0]
-        schm = disk_query()[path[0]][3]
         sl = path[1] + 1
         lv = path[1]
         if schm == "GPT":
@@ -759,8 +743,7 @@ class createLabel():
 
 class modifyLabel():
 
-    def __init__(self, path, left_size, create_size, label, fs, data):
-        disk = disk_query()[path[0]][0]
+    def __init__(self, path, left_size, create_size, label, fs, data, disk):
         if not os.path.exists(disk_file):
             file_disk = open(disk_file, 'w')
             file_disk.writelines('%s\n' % disk)
@@ -801,8 +784,7 @@ class modifyLabel():
 
 class createSlice():
 
-    def __init__(self, size, rs, path):
-        disk = disk_query()[path[0]][0]
+    def __init__(self, size, rs, path, disk):
         file_disk = open(disk_file, 'w')
         file_disk.writelines('%s\n' % disk)
         file_disk.close()
@@ -912,8 +894,7 @@ class createPartition():
 
 class modifyPartition():
 
-    def __init__(self, path, left_size, inumb, create_size, label, fs, data):
-        disk = disk_query()[path[0]][0]
+    def __init__(self, path, left_size, inumb, create_size, label, fs, data, disk):
         if not os.path.exists(disk_file):
             file_disk = open(disk_file, 'w')
             file_disk.writelines('%s\n' % disk)
