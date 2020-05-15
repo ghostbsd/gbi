@@ -418,23 +418,10 @@ class Partitions():
                 self.labelEditor(self.path, self.slice, self.size, 'GPT', True)
 
     def autoPartition(self, widget):
-        if len(self.path) == 3:
-            pass
-        # elif len(self.path) == 1 and self.scheme is None:
-        #    self.schemeEditor(None)
-        #    self.update()
-        # elif len(self.path) == 1:
-        #    autoDiskPartition(self.slice, self.size, self.scheme)
-        #    self.Tree_Store()
-        #    self.treeview.expand_all()
-        #    self.treeview.set_cursor(self.path)
-        elif self.slice == 'freespace':
-            # autoFreeSpace(self.path, self.size, self.efi_exist)
+        if self.slice == 'freespace':
             self.choose_fs()
-        elif len(self.path) == 2:
-            pass
         else:
-            pass
+            print('wrong utilization')
 
     def revertChange(self, widget):
         if os.path.exists(disk_db_file):
@@ -457,7 +444,7 @@ class Partitions():
         self.modify_bt.set_sensitive(False)
         self.auto_bt.set_sensitive(False)
         self.revert_bt.set_sensitive(False)
-        if len(self.path) == 2 and how_partition(self.path) == 1 and self.slice == 'freespace':
+        if len(self.path) == 2 and how_partition(self.disk) == 1 and self.slice == 'freespace':
             self.schemeEditor(False)
         elif len(self.path) == 3:
             if self.slice == 'freespace':
@@ -468,9 +455,9 @@ class Partitions():
             elif self.scheme == "GPT":
                 self.labelEditor(self.path, self.slice, self.size, 'GPT', False)
         else:
-            if how_partition(self.path) == 1:
+            if how_partition(self.disk) == 1:
                 self.schemeEditor(True)
-            elif how_partition(self.path) == 0:
+            elif how_partition(self.disk) == 0:
                 self.schemeEditor(True)
             else:
                 pass
@@ -779,23 +766,22 @@ class Partitions():
             mount_point = ''
             disk_size = str(disk_info['size'])
             disk_partitions = disk_info['partitions']
+            partition_list = disk_info['partition_list']
             pinter1 = self.store.append(None, [disk, disk_size, mount_point, disk_scheme, True])
-            for partition in disk_partitions:
+            for partition in partition_list:
                 partition_info = disk_partitions[partition]
                 file_system = partition_info['file_system']
                 mount_point = partition_info['mount_point']
                 partition_size = str(partition_info['size'])
                 partition_partitions = partition_info['partitions']
-                if partition_partitions is None:
-                    self.store.append(pinter1, [partition, partition_size, mount_point, file_system, True])
-                else:
-                    pinter2 = self.store.append(pinter1, [partition, partition_size, mount_point, file_system, True])
-                    for partition in partition_partitions:
-                        partition_info = disk_partitions[partition]
-                        file_system = partition_info['file_system']
-                        mount_point = partition_info['mount_point']
-                        partition_size = str(partition_info['size'])
-                        self.store.append(pinter2, [partition, partition_size, mount_point, file_system, True])
+                partition_list = partition_info['partition_list']
+                pinter2 = self.store.append(pinter1, [partition, partition_size, mount_point, file_system, True])
+                for partition in partition_list:
+                    partition_info = partition_partitions[partition]
+                    file_system = partition_info['file_system']
+                    mount_point = partition_info['mount_point']
+                    partition_size = str(partition_info['size'])
+                    self.store.append(pinter2, [partition, partition_size, mount_point, file_system, True])
         return self.store
 
     def get_model(self):

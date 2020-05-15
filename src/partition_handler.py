@@ -56,95 +56,18 @@ def how_partition(disk):
         return len(partitions)
 
 
-# def partition_query(disk):
-#     plist = open(partitiondb + disk, 'rb')
-#     pl = pickle.load(plist)
-#     return pl
+def get_disk_from_partition(part):
+    if set("p") & set(part):
+        return part.partition('p')[0]
+    else:
+        return part.partition('s')[0]
 
 
-# def label_query(pslice):
-#     llist = open(partitiondb + pslice, 'rb')
-#     ll = pickle.load(llist)
-#     return ll
-
-
-# def scheme_query(path):
-#     disk = disk_query()[path[0]]
-#     return disk[-1]
-
-
-def find_scheme(disk):
-    cmd = "%s %s" % (detect_sheme, disk)
-    shm_out = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE,
-                    universal_newlines=True, close_fds=True)
-    scheme = shm_out.stdout.readlines()[0].rstrip()
-    return scheme
-
-
-def rpartslice(part):
-    item = part
-    p = set("p")
-    s = set("s")
-    if p & set(item):
-        drive = item.partition('p')[0]
-    elif s & set(item):
-        drive = item.partition('s')[0]
-    return drive
-
-
-def sliceNum(part):
-    item = part
-    p = set("p")
-    s = set("s")
-    if p & set(item):
-        num = int(item.partition('p')[2])
-    elif s & set(item):
-        num = int(item.partition('s')[2])
-    return num
-
-
-def slicePartition(part):
-    item = part
-    p = set("p")
-    s = set("s")
-    if p & set(item):
-        return 'p'
-    elif s & set(item):
-        return 's'
-
-
-class diskSchemeChanger():
-
-    def __init__(self, schm, path, disk, size):
-        dlist = disk_database()
-        dselected = dlist[path[0]]
-        if schm is None:
-            dselected[-1] = 'GPT'
-        else:
-            dselected[-1] = schm
-        dlist[path[0]] = dselected
-        disk = dselected[0]
-        df = open(diskdb, 'wb')
-        pickle.dump(dlist, df)
-        df.close()
-        dsl = []
-        mdsl = []
-        if os.path.exists(tmp + 'destroy'):
-            df = open(tmp + 'destroy', 'rb')
-            mdsl = pickle.load(df)
-        dsl.extend(([disk, schm]))
-        mdsl.append(dsl)
-        cf = open(tmp + 'destroy', 'wb')
-        pickle.dump(mdsl, cf)
-        cf.close()
-        if not os.path.exists(partitiondb + disk):
-            plist = []
-            mplist = []
-            psf = open(partitiondb + disk, 'wb')
-            plist.extend((['freespace', size, '', '']))
-            mplist.append(plist)
-            pickle.dump(mplist, psf)
-            psf.close()
+def slice_number(part):
+    if set("p") & set(part):
+        return int(part.partition('p')[2])
+    else:
+        return int(part.partition('s')[2])
 
 
 class create_disk_partition_db():
@@ -189,15 +112,18 @@ class create_disk_partition_db():
             if 'freespace' in line:
                 slice_name = f'freespace{free_num}'
                 free_num += 1
-            partitons = {
+            partition_db = self.mbr_partition_db(info[0])
+            # partition_list = [] if partition_db is None else list(partition_db.keys())
+            partitions = {
                 'name': slice_name,
                 'size': info[1].partition('M')[0],
                 'mount_point': '',
                 'file_system': info[2],
                 'change': None,
-                'partitions': self.mbr_partition_db(info[0])
+                'partitions': partition_db,
+                'partition_list': [] if partition_db is None else list(partition_db.keys())
             }
-            slice_db[slice_name] = partitons
+            slice_db[slice_name] = partitions
         return slice_db
 
     def mbr_partition_db(self, pslice):
@@ -219,14 +145,14 @@ class create_disk_partition_db():
                     letter = chr(alph)
                     partition_name = f'{info[0]}{letter}'
                     alph += 1
-                partitons = {
+                partitions = {
                     'name': partition_name,
                     'size': info[1].partition('M')[0],
                     'mount_point': '',
                     'file_system': info[2],
                     'change': None,
                 }
-                partition_db[partition_name] = partitons
+                partition_db[partition_name] = partitions
             if not partition_db:
                 return None
             return partition_db
@@ -243,15 +169,16 @@ class create_disk_partition_db():
             if 'freespace' in line:
                 slice_name = f'freespace{free_num}'
                 free_num += 1
-            partitons = {
+            partitions = {
                 'name': info[0],
                 'size': info[1].partition('M')[0],
                 'mount_point': '',
                 'file_system': info[2],
                 'change': None,
-                'partitions': None
+                'partitions': None,
+                'partition_list': []
             }
-            partition_db[slice_name] = partitons
+            partition_db[slice_name] = partitions
         return partition_db
 
     def __init__(self):
@@ -272,11 +199,48 @@ class create_disk_partition_db():
             disk_info_db['size'] = self.disk_size(disk)
             disk_info_db['device_model'] = self.device_model(disk)
             disk_info_db['partitions'] = partition_db
+            disk_info_db['partition_list'] = [] if partition_db is None else list(partition_db.keys())
             disk_info_db['change'] = None
             disk_db[disk] = disk_info_db
         # print(json.dumps(disk_db, indent=4))
         pickle.dump(disk_db, df)
         df.close()
+
+
+def diskSchemeChanger(scheme, path, disk, size):
+    disk_data = disk_database()
+    if scheme is None:
+        disk_data[disk]['scheme'] = 'GPT'
+    else:
+        disk_data[disk]['scheme'] = scheme
+    dsl = []
+    mdsl = []
+    if os.path.exists(tmp + 'destroy'):
+        df = open(tmp + 'destroy', 'rb')
+        mdsl = pickle.load(df)
+    dsl.extend(([disk, scheme]))
+    mdsl.append(dsl)
+    cf = open(tmp + 'destroy', 'wb')
+    pickle.dump(mdsl, cf)
+    cf.close()
+    if disk_data[disk]['partitions'] is None:
+        disk_data[disk]['partitions'] = {
+            'freespace1': {
+                'name': 'freespace1',
+                'size': size,
+                'mount_point': '',
+                'file_system': 'none',
+                'change': None,
+                'partitions': None,
+                'partition_list': []
+            }
+        }
+        disk_data[disk]['partition_list'] = [
+            'freespace1'
+        ]
+    df = open(disk_db_file, 'wb')
+    pickle.dump(disk_data, df)
+    df.close()
 
 
 class Delete_partition():
@@ -336,7 +300,7 @@ class Delete_partition():
             spart = part[:-1]
             self.delete_label(part, spart, path)
         else:
-            drive = rpartslice(part)
+            drive = get_disk_from_partition(part)
             self.delete_slice(drive, part, path)
 
     def delete_slice(self, drive, part, path):
@@ -344,13 +308,6 @@ class Delete_partition():
         sl = pickle.load(slist)
         last_num = len(sl) - 1
         snum = path[1]
-        # if os.path.exists(dslice):
-        #     sfile = open(dslice, 'r')
-        #     slf = sfile.readlines()[0].rstrip()
-        #     if slf == 'all':
-        #         ptnum = snum - 1
-        #     else:
-        #         slnum = int(re.sub("[^0-9]", "", slf))
         if last_num == snum:
             free = int(sl[last_num][1])
             if snum != 0 and sl[snum - 1][0] == 'freespace':
@@ -470,11 +427,11 @@ class autoDiskPartition():
         pfile.writelines('SWAP 0 none\n')
         pfile.close()
 
-    def __init__(self, disk, size, schm):
+    def __init__(self, disk, size, scheme):
         self.bios_type = bios_or_uefi()
-        if schm == 'GPT':
+        if scheme == 'GPT':
             self.create_gpt_partiton(disk, size)
-        elif schm == 'MBR':
+        elif scheme == 'MBR':
             if os.path.exists(partitiondb + disk):
                 self.delete_mbr_partition(disk)
             self.create_mbr_partiton(disk, size)
@@ -591,13 +548,13 @@ class autoFreeSpace():
         pickle.dump(mpl, cf)
         cf.close()
 
-    def __init__(self, path, size, fs, efi_exist, disk, schm):
+    def __init__(self, path, size, fs, efi_exist, disk, scheme):
         self.bios_type = bios_or_uefi()
         sl = path[1] + 1
         lv = path[1]
-        if schm == "GPT":
+        if scheme == "GPT":
             self.create_gpt_partiton(disk, size, sl, lv, fs, efi_exist)
-        elif schm == "MBR":
+        elif scheme == "MBR":
             self.create_mbr_partiton(disk, size, sl, lv, fs)
 
     def create_gpt_partiton(self, disk, size, sl, path, fs, efi_exist):
@@ -951,8 +908,8 @@ class rDeleteParttion():
             dl = pickle.load(df)
             for line in dl:
                 part = line[0]
-                num = sliceNum(part)
-                hd = rpartslice(part)
+                num = slice_number(part)
+                hd = get_disk_from_partition(part)
                 call(f"zpool labelclear -f {part}", shell=True)
                 sleep(1)
                 call(f'gpart delete -i {num} {hd}', shell=True)
@@ -1002,10 +959,10 @@ class makingParttion():
             size = 0
             for line in pl:
                 part = line[0]
-                drive = rpartslice(part)
-                sl = sliceNum(part)
+                drive = get_disk_from_partition(part)
+                sl = slice_number(part)
                 size = int(line[1])
-                if slicePartition(part) == 'p':
+                if set("p") & set(part):
                     if bios_or_uefi() == 'UEFI':
                         cmd = f'gpart add -a 4k -s {size}M -t efi -i {sl} {drive}'
                         sleep(2)
@@ -1018,7 +975,7 @@ class makingParttion():
                         else:
                             cmd = f'gpart add -a 4k -s {size}M -t freebsd-boot -i {sl} {drive}'
                         call(cmd, shell=True)
-                elif slicePartition(part) == 's':
+                elif set("s") & set(part):
                     cmd = f'gpart add -a 4k -s {size}M -t freebsd -i {sl} {drive}'
                     call(cmd, shell=True)
                 sleep(2)
