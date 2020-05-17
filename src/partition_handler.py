@@ -258,61 +258,172 @@ class Delete_partition():
         if re.search('[a-z]', last):
             return True
 
-    def delete_label(self, part, spart, path):
+    def delete_label(self, drive, label_partition, partition, path):
         disk_data = disk_database()
-        llist = open(partitiondb + spart, 'rb')
-        ll = pickle.load(llist)
-        last_num = len(ll) - 1
-        lnum = path[2]
-        if last_num == lnum:
-            free = int(ll[last_num][1])
-            if lnum != 0 and ll[lnum - 1][0] == 'freespace':
-                free = free + int(ll[lnum - 1][1])
-                ll[lnum] = ['freespace', free, '', '']
-                ll.remove(ll[lnum - 1])
+        partitions_info = disk_data[drive]['partitions'][partition]['partitions']
+        partition_list = disk_data[drive]['partitions'][partition]['partition_list']
+        last_list_number = len(partition_list) - 1
+        store_list_number = path[1]
+        size_free = int(partitions_info[partition]['size'])
+        if last_list_number == store_list_number and len(partition_list) > 1:
+            partition_behind = partition_list[store_list_number - 1]
+            if 'freespace' in partition_behind:
+                size_free += int(partitions_info[partition_behind]['size'])
+                partition_list.remove(partition)
+                disk_data[drive]['partitions'][partition]['partitions'].pop(partition, None)
+                disk_data[drive]['partitions'][partition]['partitions'][partition_behind] = {
+                    'name': partition_behind,
+                    'size': size_free,
+                    'mount_point': '',
+                    'file_system': 'none',
+                    'stat': None,
+                    'partitions': None,
+                    'partition_list': []
+                }
+                disk_data[drive]['partitions'][partition]['partition_list'] = partition_list
             else:
-                ll[lnum] = ['freespace', free, '', '']
-        elif lnum == 0:
-            free = int(ll[lnum][1])
-            if ll[lnum + 1][0] == 'freespace':
-                free = free + int(ll[lnum + 1][1])
-                ll.remove(ll[lnum + 1])
-            ll[lnum] = ['freespace', free, '', '']
+                free_name = find_next_partition('freespace', partition_list)
+                partition_list[store_list_number] = free_name
+                disk_data[drive]['partitions'][partition]['partitions'].pop(partition, None)
+                disk_data[drive]['partitions'][partition]['partitions'][free_name] = {
+                    'name': free_name,
+                    'size': size_free,
+                    'mount_point': '',
+                    'file_system': 'none',
+                    'stat': None,
+                    'partitions': None,
+                    'partition_list': []
+                }
+                disk_data[drive]['partitions'][partition]['partition_list'] = partition_list
+        elif store_list_number == 0 and len(partition_list) > 1:
+            partition_after = partition_list[store_list_number + 1]
+            if 'freespace' in partition_after:
+                size_free += int(partitions_info[partition_after]['size'])
+                partition_list.remove(partition)
+                disk_data[drive]['partitions'][partition]['partitions'].pop(partition, None)
+                disk_data[drive]['partitions'][partition]['partitions'][partition_after] = {
+                    'name': partition_after,
+                    'size': size_free,
+                    'mount_point': '',
+                    'file_system': 'none',
+                    'stat': None,
+                    'partitions': None,
+                    'partition_list': []
+                }
+                disk_data[drive]['partitions'][partition]['partition_list'] = partition_list
+            else:
+                free_name = find_next_partition('freespace', partition_list)
+                partition_list[store_list_number] = free_name
+                disk_data[drive]['partitions'][partition]['partitions'].pop(partition, None)
+                disk_data[drive]['partitions'][partition]['partitions'][free_name] = {
+                    'name': free_name,
+                    'size': size_free,
+                    'mount_point': '',
+                    'file_system': 'none',
+                    'stat': None,
+                    'partitions': None,
+                    'partition_list': []
+                }
+                disk_data[drive]['partitions'][partition]['partition_list'] = partition_list
+        elif len(partition_list) > 2:
+            partition_behind = partition_list[store_list_number - 1]
+            partition_after = partition_list[store_list_number + 1]
+            size_behind = int(partitions_info[partition_behind]['size'])
+            size_after = int(partitions_info[partition_after]['size'])
+            if 'freespace' in partition_behind and 'freespace' in partition_after:
+                size_free += size_behind + size_after
+                partition_list.remove(partition)
+                partition_list.remove(partition_after)
+                disk_data[drive]['partitions'][partition]['partitions'].pop(partition, None)
+                disk_data[drive]['partitions'][partition]['partitions'][partition_behind] = {
+                    'name': partition_behind,
+                    'size': size_free,
+                    'mount_point': '',
+                    'file_system': 'none',
+                    'stat': None,
+                    'partitions': None,
+                    'partition_list': []
+                }
+                disk_data[drive]['partitions'][partition]['partition_list'] = partition_list
+            elif 'freespace' in partition_behind:
+                size_free += size_behind
+                partition_list.remove(partition)
+                disk_data[drive]['partitions'][partition]['partitions'].pop(partition, None)
+                disk_data[drive]['partitions'][partition]['partitions'][partition_behind] = {
+                    'name': partition_behind,
+                    'size': size_free,
+                    'mount_point': '',
+                    'file_system': 'none',
+                    'stat': None,
+                    'partitions': None,
+                    'partition_list': []
+                }
+                disk_data[drive]['partitions'][partition]['partition_list'] = partition_list
+            elif 'freespace' in partition_after:
+                size_free += size_after
+                partition_list.remove(partition)
+                disk_data[drive]['partitions'][partition]['partitions'].pop(partition, None)
+                disk_data[drive]['partitions'][partition]['partitions'][partition_after] = {
+                    'name': partition_after,
+                    'size': size_free,
+                    'mount_point': '',
+                    'file_system': 'none',
+                    'stat': None,
+                    'partitions': None,
+                    'partition_list': []
+                }
+                disk_data[drive]['partitions'][partition]['partition_list'] = partition_list
+            else:
+                free_name = find_next_partition('freespace', partition_list)
+                partition_list[store_list_number] = free_name
+                disk_data[drive]['partitions'][partition]['partitions'].pop(partition, None)
+                disk_data[drive]['partitions'][partition]['partitions'][free_name] = {
+                    'name': free_name,
+                    'size': size_free,
+                    'mount_point': '',
+                    'file_system': 'none',
+                    'stat': None,
+                    'partitions': None,
+                    'partition_list': []
+                }
+                disk_data[drive]['partitions'][partition]['partition_list'] = partition_list
         else:
-            free = int(ll[lnum][1])
-            if ll[lnum + 1][0] == 'freespace':
-                free = free + int(ll[lnum + 1][1])
-                ll.remove(ll[lnum + 1])
-            if lnum != 0 and ll[lnum - 1][0] == 'freespace':
-                free = free + int(ll[lnum - 1][1])
-                ll[lnum] = ['freespace', free, '', '']
-                ll.remove(ll[lnum - 1])
-            else:
-                ll[lnum] = ['freespace', free, '', '']
-        savepl = open(partitiondb + spart, 'wb')
-        pickle.dump(ll, savepl)
-        savepl.close()
-        df = open(disk_db_file, 'wb')
-        pickle.dump(disk_data, df)
-        df.close()
+            free_name = find_next_partition('freespace', partition_list)
+            partition_list[store_list_number] = free_name
+            disk_data[drive]['partitions'][partition]['partitions'].pop(partition, None)
+            disk_data[drive]['partitions'][partition]['partitions'][free_name] = {
+                'name': free_name,
+                'size': size_free,
+                'mount_point': '',
+                'file_system': 'none',
+                'stat': None,
+                'partitions': None,
+                'partition_list': []
+            }
+            disk_data[drive]['partitions'][partition]['partition_list'] = partition_list
+        disk_db = open(disk_db_file, 'wb')
+        pickle.dump(disk_data, disk_db)
+        disk_db.close()
 
-        llist = open(partitiondb + spart, 'rb')
-        lablelist = pickle.load(llist)
-        pfile = open(Part_label, 'w')
-        for partlist in lablelist:
-            if partlist[2] != '':
-                pfile.writelines('%s %s %s\n' % (partlist[3], partlist[1],
-                                                 partlist[2]))
-        pfile.close()
+        new_partitions = open(Part_label, 'w')
+        for part in partition_list:
+            partitions_info = disk_data[drive]['partitions'][partition]['partitions']
+            size = partitions_info[part]['size']
+            mount_point = partitions_info[part]['mount_point']
+            file_system = partitions_info[part]['file_system']
+            stat = partitions_info[part]['stat']
+            if stat == 'new':
+                new_partitions.writelines(f'{file_system} {size} {mount_point}\n')
+        new_partitions.close()
 
     def __init__(self, part, path):
+        drive = get_disk_from_partition(part)
         if part == "freespace":
             pass
         elif self.find_if_label(part) is True:
             spart = part[:-1]
-            self.delete_label(part, spart, path)
+            self.delete_label(drive, part, spart, path)
         else:
-            drive = get_disk_from_partition(part)
             self.delete_slice(drive, part, path)
 
     def delete_slice(self, drive, partition, path):
@@ -517,10 +628,6 @@ class autoDiskPartition():
         slice_file.writelines('all\n')
         slice_file.writelines('%s\n' % number)
         slice_file.close()
-        # ram = Popen(memory, shell=True, stdin=PIPE, stdout=PIPE,
-        #             universal_newlines=True, close_fds=True)
-        # mem = ram.stdout.read()
-        # swap = int(int(mem.partition(':')[2].strip()) / (1024 * 1024))
         swap = 2048
         rootNum = int(number - swap)
         llist = []
@@ -559,10 +666,6 @@ class autoDiskPartition():
         slice_file.writelines('all\n')
         slice_file.writelines('%s\n' % number)
         slice_file.close()
-        # ram = Popen(memory, shell=True, stdin=PIPE, stdout=PIPE,
-        #             universal_newlines=True, close_fds=True)
-        # mem = ram.stdout.read()
-        # swap = int(int(mem.partition(':')[2].strip()) / (1024 * 1024))
         swap = 2048
         if self.bios_type == "UEFI":
             bnum = 256
@@ -617,10 +720,6 @@ class autoFreeSpace():
         slice_file.writelines('s%s\n' % sl)
         slice_file.writelines('%s\n' % number)
         slice_file.close()
-        # ram = Popen(memory, shell=True, stdin=PIPE, stdout=PIPE,
-        #             universal_newlines=True, close_fds=True)
-        # mem = ram.stdout.read()
-        # swap = int(int(mem.partition(':')[2].strip()) / (1024 * 1024))
         swap = 2048
         rootNum = int(number - swap)
         llist = []
@@ -677,10 +776,6 @@ class autoFreeSpace():
         sfile.close()
         number = int(size.partition('M')[0])
         # number = number - 512
-        # ram = Popen(memory, shell=True, stdin=PIPE, stdout=PIPE,
-        #             universal_newlines=True, close_fds=True)
-        # mem = ram.stdout.read()
-        # swap = int(int(mem.partition(':')[2].strip()) / (1024 * 1024))
         swap = 2048
         rootNum = int(number - swap)
         if self.bios_type == "UEFI" and efi_exist is False:
