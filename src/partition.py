@@ -22,7 +22,6 @@ disk_file = '%sdisk' % tmp
 psize = '%spart_size' % tmp
 logo = "/usr/local/lib/gbi/logo.png"
 Part_label = '%spartlabel' % tmp
-part_schem = '%sscheme' % tmp
 
 disk_db_file = f'{tmp}disk.db'
 ufs_Partiton_list = []
@@ -424,10 +423,14 @@ class Partitions():
             print('wrong utilization')
 
     def revertChange(self, widget):
-        if os.path.exists(disk_db_file):
-            shutil.rmtree(disk_db_file)
         if os.path.exists(tmp + 'create'):
             os.remove(tmp + 'create')
+        if os.path.exists(disk_schem):
+            os.remove(disk_schem)
+        if os.path.exists(disk_file):
+            os.remove(disk_file)
+        if os.path.exists(psize):
+            os.remove(psize)
         if os.path.exists(tmp + 'delete'):
             os.remove(tmp + 'delete')
         if os.path.exists(tmp + 'destroy'):
@@ -663,11 +666,13 @@ class Partitions():
         else:
             self.button3.set_sensitive(False)
         path_exist = [
-            os.path.exists(Part_label),
+            os.path.exists(tmp + 'create'),
             os.path.exists(disk_schem),
             os.path.exists(disk_file),
             os.path.exists(psize),
-            os.path.exists(part_schem)
+            os.path.exists(tmp + 'delete'),
+            os.path.exists(tmp + 'destroy'),
+            os.path.exists(Part_label)
         ]
         if any(path_exist):
             self.revert_bt.set_sensitive(True)

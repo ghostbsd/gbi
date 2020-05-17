@@ -119,7 +119,7 @@ class create_disk_partition_db():
                 'size': info[1].partition('M')[0],
                 'mount_point': '',
                 'file_system': info[2],
-                'change': None,
+                'stat': None,
                 'partitions': partition_db,
                 'partition_list': [] if partition_db is None else list(partition_db.keys())
             }
@@ -150,7 +150,7 @@ class create_disk_partition_db():
                     'size': info[1].partition('M')[0],
                     'mount_point': '',
                     'file_system': info[2],
-                    'change': None,
+                    'stat': None,
                 }
                 partition_db[partition_name] = partitions
             if not partition_db:
@@ -174,7 +174,7 @@ class create_disk_partition_db():
                 'size': info[1].partition('M')[0],
                 'mount_point': '',
                 'file_system': info[2],
-                'change': None,
+                'stat': None,
                 'partitions': None,
                 'partition_list': []
             }
@@ -182,6 +182,8 @@ class create_disk_partition_db():
         return partition_db
 
     def __init__(self):
+        if os.path.exists(disk_db_file):
+            os.remove(disk_db_file)
         df = open(disk_db_file, 'wb')
         disk_db = {}
         for disk in self.disk_list():
@@ -200,7 +202,7 @@ class create_disk_partition_db():
             disk_info_db['device_model'] = self.device_model(disk)
             disk_info_db['partitions'] = partition_db
             disk_info_db['partition_list'] = [] if partition_db is None else list(partition_db.keys())
-            disk_info_db['change'] = None
+            disk_info_db['stat'] = None
             disk_db[disk] = disk_info_db
         # print(json.dumps(disk_db, indent=4))
         pickle.dump(disk_db, df)
@@ -230,7 +232,7 @@ def diskSchemeChanger(scheme, path, disk, size):
                 'size': size,
                 'mount_point': '',
                 'file_system': 'none',
-                'change': None,
+                'stat': None,
                 'partitions': None,
                 'partition_list': []
             }
@@ -243,6 +245,12 @@ def diskSchemeChanger(scheme, path, disk, size):
     df.close()
 
 
+def find_next_partition(partition_name, partition_list):
+    for num in range(1, 10000):
+        if f'{partition_name}{num}' not in partition_list:
+            return f'{partition_name}{num}'
+
+
 class Delete_partition():
 
     def find_if_label(self, part):
@@ -251,6 +259,7 @@ class Delete_partition():
             return True
 
     def delete_label(self, part, spart, path):
+        disk_data = disk_database()
         llist = open(partitiondb + spart, 'rb')
         ll = pickle.load(llist)
         last_num = len(ll) - 1
@@ -283,6 +292,9 @@ class Delete_partition():
         savepl = open(partitiondb + spart, 'wb')
         pickle.dump(ll, savepl)
         savepl.close()
+        df = open(disk_db_file, 'wb')
+        pickle.dump(disk_data, df)
+        df.close()
 
         llist = open(partitiondb + spart, 'rb')
         lablelist = pickle.load(llist)
@@ -303,78 +315,177 @@ class Delete_partition():
             drive = get_disk_from_partition(part)
             self.delete_slice(drive, part, path)
 
-    def delete_slice(self, drive, part, path):
-        slist = open(partitiondb + drive, 'rb')
-        sl = pickle.load(slist)
-        last_num = len(sl) - 1
-        snum = path[1]
-        if last_num == snum:
-            free = int(sl[last_num][1])
-            if snum != 0 and sl[snum - 1][0] == 'freespace':
-                free = free + int(sl[snum - 1][1])
-                sl[snum] = ['freespace', free, '', '']
-                sl.remove(sl[snum - 1])
+    def delete_slice(self, drive, partition, path):
+        disk_data = disk_database()
+        partitions_info = disk_data[drive]['partitions']
+        partition_list = disk_data[drive]['partition_list']
+        last_list_number = len(partition_list) - 1
+        store_list_number = path[1]
+        size_free = int(partitions_info[partition]['size'])
+        if last_list_number == store_list_number and len(partition_list) > 1:
+            partition_behind = partition_list[store_list_number - 1]
+            if 'freespace' in partition_behind:
+                size_free += int(partitions_info[partition_behind]['size'])
+                partition_list.remove(partition)
+                disk_data[drive]['partitions'].pop(partition, None)
+                disk_data[drive]['partitions'][partition_behind] = {
+                    'name': partition_behind,
+                    'size': size_free,
+                    'mount_point': '',
+                    'file_system': 'none',
+                    'stat': None,
+                    'partitions': None,
+                    'partition_list': []
+                }
+                disk_data[drive]['partition_list'] = partition_list
             else:
-                sl[snum] = ['freespace', free, '', '']
-        elif snum == 0:
-            free = int(sl[snum][1])
-            if sl[snum + 1][0] == 'freespace':
-                free = free + int(sl[snum + 1][1])
-                sl.remove(sl[snum + 1])
-                sl[snum] = ['freespace', free, '', '']
+                free_name = find_next_partition('freespace', partition_list)
+                partition_list[store_list_number] = free_name
+                disk_data[drive]['partitions'].pop(partition, None)
+                disk_data[drive]['partitions'][free_name] = {
+                    'name': free_name,
+                    'size': size_free,
+                    'mount_point': '',
+                    'file_system': 'none',
+                    'stat': None,
+                    'partitions': None,
+                    'partition_list': []
+                }
+                disk_data[drive]['partition_list'] = partition_list
+        elif store_list_number == 0 and len(partition_list) > 1:
+            partition_after = partition_list[store_list_number + 1]
+            if 'freespace' in partition_after:
+                size_free += int(partitions_info[partition_after]['size'])
+                partition_list.remove(partition)
+                disk_data[drive]['partitions'].pop(partition, None)
+                disk_data[drive]['partitions'][partition_after] = {
+                    'name': partition_after,
+                    'size': size_free,
+                    'mount_point': '',
+                    'file_system': 'none',
+                    'stat': None,
+                    'partitions': None,
+                    'partition_list': []
+                }
+                disk_data[drive]['partition_list'] = partition_list
             else:
-                sl[snum] = ['freespace', free, '', '']
+                free_name = find_next_partition('freespace', partition_list)
+                partition_list[store_list_number] = free_name
+                disk_data[drive]['partitions'].pop(partition, None)
+                disk_data[drive]['partitions'][free_name] = {
+                    'name': free_name,
+                    'size': size_free,
+                    'mount_point': '',
+                    'file_system': 'none',
+                    'stat': None,
+                    'partitions': None,
+                    'partition_list': []
+                }
+                disk_data[drive]['partition_list'] = partition_list
+        elif len(partition_list) > 2:
+            partition_behind = partition_list[store_list_number - 1]
+            partition_after = partition_list[store_list_number + 1]
+            size_behind = int(partitions_info[partition_behind]['size'])
+            size_after = int(partitions_info[partition_after]['size'])
+            if 'freespace' in partition_behind and 'freespace' in partition_after:
+                size_free += size_behind + size_after
+                partition_list.remove(partition)
+                partition_list.remove(partition_after)
+                disk_data[drive]['partitions'].pop(partition, None)
+                disk_data[drive]['partitions'][partition_behind] = {
+                    'name': partition_behind,
+                    'size': size_free,
+                    'mount_point': '',
+                    'file_system': 'none',
+                    'stat': None,
+                    'partitions': None,
+                    'partition_list': []
+                }
+                disk_data[drive]['partition_list'] = partition_list
+            elif 'freespace' in partition_behind:
+                size_free += size_behind
+                partition_list.remove(partition)
+                disk_data[drive]['partitions'].pop(partition, None)
+                disk_data[drive]['partitions'][partition_behind] = {
+                    'name': partition_behind,
+                    'size': size_free,
+                    'mount_point': '',
+                    'file_system': 'none',
+                    'stat': None,
+                    'partitions': None,
+                    'partition_list': []
+                }
+                disk_data[drive]['partition_list'] = partition_list
+            elif 'freespace' in partition_after:
+                size_free += size_after
+                partition_list.remove(partition)
+                disk_data[drive]['partitions'].pop(partition, None)
+                disk_data[drive]['partitions'][partition_after] = {
+                    'name': partition_after,
+                    'size': size_free,
+                    'mount_point': '',
+                    'file_system': 'none',
+                    'stat': None,
+                    'partitions': None,
+                    'partition_list': []
+                }
+                disk_data[drive]['partition_list'] = partition_list
+            else:
+                free_name = find_next_partition('freespace', partition_list)
+                partition_list[store_list_number] = free_name
+                disk_data[drive]['partitions'].pop(partition, None)
+                disk_data[drive]['partitions'][free_name] = {
+                    'name': free_name,
+                    'size': size_free,
+                    'mount_point': '',
+                    'file_system': 'none',
+                    'stat': None,
+                    'partitions': None,
+                    'partition_list': []
+                }
+                disk_data[drive]['partition_list'] = partition_list
         else:
-            free = int(sl[snum][1])
-            slice_after = sl[snum + 1][0]
-            slice_before = sl[snum - 1][0]
-            size_after = sl[snum + 1][1]
-            size_before = sl[snum - 1][1]
-            if slice_after == 'freespace' and slice_before == 'freespace':
-                free = free + int(size_after) + int(size_before)
-                sl[snum] = ['freespace', free, '', '']
-                sl.remove(sl[snum + 1])
-                sl.remove(sl[snum - 1])
-            elif slice_after == 'freespace':
-                free = free + int(sl[snum + 1][1])
-                sl[snum] = ['freespace', free, '', '']
-                sl.remove(sl[snum + 1])
-            elif snum != 0 and sl[snum - 1][0] == 'freespace':
-                free = free + int(sl[snum - 1][1])
-                sl[snum] = ['freespace', free, '', '']
-                sl.remove(sl[snum - 1])
-            else:
-                sl[snum] = ['freespace', free, '', '']
-        # Making delete file
-        dl = []
-        mdl = []
-        data = True
-        # if delete exist check if slice is in delete.
+            free_name = find_next_partition('freespace', partition_list)
+            partition_list[store_list_number] = free_name
+            disk_data[drive]['partitions'].pop(partition, None)
+            disk_data[drive]['partitions'][free_name] = {
+                'name': free_name,
+                'size': size_free,
+                'mount_point': '',
+                'file_system': 'none',
+                'stat': None,
+                'partitions': None,
+                'partition_list': []
+            }
+            disk_data[drive]['partition_list'] = partition_list
+
+        disk_db = open(disk_db_file, 'wb')
+        pickle.dump(disk_data, disk_db)
+        disk_db.close()
+
+        # if delete file exist check if slice is in the list
         if os.path.exists(tmp + 'delete'):
             df = open(tmp + 'delete', 'rb')
-            mdl = pickle.load(df)
-            for line in mdl:
-                if part in line:
-                    data = False
-                    break
-        if data is True:
-            dl.extend(([part, free]))
-            mdl.append(dl)
-            cf = open(tmp + 'delete', 'wb')
-            pickle.dump(mdl, cf)
-            cf.close()
-        if os.path.exists(partitiondb + part):
-            os.remove(partitiondb + part)
-        saveps = open(partitiondb + drive, 'wb')
-        pickle.dump(sl, saveps)
-        saveps.close()
-        if "p" in part:
-            pfile = open(Part_label, 'w')
-            for partlist in partition_query(drive):
-                if partlist[2] != '':
-                    partition = f'{partlist[3]} {partlist[1]} {partlist[2]}\n'
-                    pfile.writelines(partition)
-            pfile.close()
+            main_delete_list = pickle.load(df)
+            if partition not in main_delete_list:
+                main_delete_list.append(partition)
+        else:
+            main_delete_list = [partition]
+        cf = open(tmp + 'delete', 'wb')
+        pickle.dump(main_delete_list, cf)
+        cf.close()
+
+        if "p" in partition:
+            new_partitions = open(Part_label, 'w')
+            for part in partition_list:
+                partitions_info = disk_data[drive]['partitions']
+                size = partitions_info[part]['size']
+                mount_point = partitions_info[part]['mount_point']
+                file_system = partitions_info[part]['file_system']
+                stat = partitions_info[part]['stat']
+                if stat == 'new':
+                    new_partitions.writelines(f'{file_system} {size} {mount_point}\n')
+            new_partitions.close()
 
 
 class autoDiskPartition():
@@ -904,16 +1015,15 @@ class modifyPartition():
 class rDeleteParttion():
     def __init__(self):
         if os.path.exists(tmp + 'delete'):
-            df = open(tmp + 'delete', 'rb')
-            dl = pickle.load(df)
-            for line in dl:
-                part = line[0]
-                num = slice_number(part)
-                hd = get_disk_from_partition(part)
-                call(f"zpool labelclear -f {part}", shell=True)
+            delete_file = open(tmp + 'delete', 'rb')
+            delete_list = pickle.load(delete_file)
+            for partition in delete_list:
+                num = slice_number(partition)
+                drive = get_disk_from_partition(partition)
+                call(f"zpool labelclear -f {partition}", shell=True)
                 sleep(1)
-                call(f'gpart delete -i {num} {hd}', shell=True)
-                sleep(2)
+                call(f'gpart delete -i {num} {drive}', shell=True)
+                sleep(1)
 
 
 class destroyParttion():
