@@ -326,7 +326,7 @@ class Partitions():
     def get_value(self, widget, entry):
         psize = int(entry.get_value_as_int())
         rs = int(self.size) - psize
-        createSlice(psize, rs, self.path)
+        createSlice(psize, rs, self.path, self.disk)
         self.update()
         self.window.hide()
 
@@ -410,14 +410,14 @@ class Partitions():
 
     def modify_partition(self, widget):
         if len(self.path) == 3:
-            if self.slice != 'freespace':
+            if 'freespace' not in self.slice:
                 self.labelEditor(self.path, self.slice, self.size, 'MBR', True)
-        elif len(self.path) == 2 and self.slice != 'freespace':
+        elif len(self.path) == 2 and 'freespace' not in self.slice:
             if self.scheme == "GPT":
                 self.labelEditor(self.path, self.slice, self.size, 'GPT', True)
 
     def autoPartition(self, widget):
-        if self.slice == 'freespace':
+        if 'freespace' in self.slice:
             self.choose_fs()
         else:
             print('wrong utilization')
@@ -447,12 +447,12 @@ class Partitions():
         self.modify_bt.set_sensitive(False)
         self.auto_bt.set_sensitive(False)
         self.revert_bt.set_sensitive(False)
-        if len(self.path) == 2 and how_partition(self.disk) == 1 and self.slice == 'freespace':
+        if len(self.path) == 2 and how_partition(self.disk) == 1 and 'freespace' in self.slice:
             self.schemeEditor(False)
         elif len(self.path) == 3:
-            if self.slice == 'freespace':
+            if 'freespace' in self.slice:
                 self.labelEditor(self.path, self.slice, self.size, 'MBR', False)
-        elif len(self.path) == 2 and self.slice == 'freespace':
+        elif len(self.path) == 2 and 'freespace' in self.slice:
             if self.scheme == "MBR" and self.path[1] < 4:
                 self.sliceEditor()
             elif self.scheme == "GPT":
