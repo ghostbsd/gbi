@@ -628,20 +628,20 @@ class autoDiskPartition():
         slice_file.writelines('all\n')
         slice_file.writelines('%s\n' % number)
         slice_file.close()
-        swap = 2048
-        rootNum = int(number - swap)
+        swap_size = 2048
+        root_size = int(number - swap_size)
         llist = []
         mllist = []
         plf = open(partitiondb + disk + 's1', 'wb')
-        llist.extend(([disk + 's1a', rootNum, '/', 'UFS+SUJ']))
+        llist.extend(([disk + 's1a', root_size, '/', 'UFS+SUJ']))
         mllist.append(llist)
         llist = []
-        llist.extend(([disk + 's1b', swap, 'none', 'SWAP']))
+        llist.extend(([disk + 's1b', swap_size, 'none', 'SWAP']))
         mllist.append(llist)
         pickle.dump(mllist, plf)
         plf.close()
         pfile = open(Part_label, 'w')
-        pfile.writelines('UFS+SUJ %s /\n' % rootNum)
+        pfile.writelines('UFS+SUJ %s /\n' % root_size)
         pfile.writelines('SWAP 0 none\n')
         pfile.close()
 
@@ -666,13 +666,13 @@ class autoDiskPartition():
         slice_file.writelines('all\n')
         slice_file.writelines('%s\n' % number)
         slice_file.close()
-        swap = 2048
+        swap_size = 2048
         if self.bios_type == "UEFI":
             bnum = 256
         else:
             bnum = 1
-        rootNum = int(number - swap)
-        rnum = int(rootNum - bnum)
+        root_size = int(number - swap_size)
+        rnum = int(root_size - bnum)
         plist = []
         mplist = []
         plf = open(partitiondb + disk, 'wb')
@@ -685,7 +685,7 @@ class autoDiskPartition():
         plist.extend(([disk + 'p2', rnum, '/', 'UFS+SUJ']))
         mplist.append(plist)
         plist = []
-        plist.extend(([disk + 'p3', swap, 'none', 'SWAP']))
+        plist.extend(([disk + 'p3', swap_size, 'none', 'SWAP']))
         mplist.append(plist)
         pickle.dump(mplist, plf)
         plf.close()
@@ -701,30 +701,42 @@ class autoDiskPartition():
 
 class autoFreeSpace():
 
-    def create_mbr_partiton(self, disk, size, sl, path, fs):
+    def create_mbr_partiton(self, drive, size, path, fs):
         file_disk = open(disk_file, 'w')
-        file_disk.writelines('%s\n' % disk)
+        file_disk.writelines(f'{drive}\n')
         file_disk.close()
+
         sfile = open(part_schem, 'w')
         sfile.writelines('partscheme=MBR')
         sfile.close()
-        plist = []
-        mplist = partition_query(disk)
-        dpsf = open(partitiondb + disk, 'wb')
-        plist.extend((disk + "s%s" % sl, size, '', 'freebsd'))
-        mplist[path] = plist
-        pickle.dump(mplist, dpsf)
-        dpsf.close()
-        number = int(size)
+
+        disk_data = disk_database()
+        slice_list = disk_data[drive]['partition_list']
+        store_list_number = path[1]
+        main_slice = find_next_partition(f'{drive}s', slice_list)
+        slice_list[store_list_number] = main_slice
+        disk_data[drive]['partitions'][main_slice] = {
+            'name': main_slice,
+            'size': size,
+            'mount_point': 'none',
+            'file_system': 'BSD',
+            'stat': None,
+            'partitions': {},
+            'partition_list': []
+        }
+        disk_data[drive]['partition_list'] = slice_list
+        
         slice_file = open(dslice, 'w')
-        slice_file.writelines('s%s\n' % sl)
-        slice_file.writelines('%s\n' % number)
+        slice_file.writelines(f'{main_slice.replace(drive, "")}\n')
+        slice_file.writelines(f'{size}\n')
         slice_file.close()
-        swap = 2048
-        rootNum = int(number - swap)
-        llist = []
-        mllist = []
-        plf = open(partitiondb + disk + 's%s' % sl, 'wb')
+
+        root_size = int(size)
+        swap_size = 2048
+        root_size -= swap_size
+
+        partition_list = disk_data[drive]['partitions'][main_slice]['partition_list']
+
         if fs == "ZFS":
             layout = "/(compress=lz4|atime=off),/root(compress=lz4)," \
                 "/tmp(compress=lz4),/usr(canmount=off|mountpoint=none)," \
@@ -736,23 +748,48 @@ class autoFreeSpace():
                 "/var/mail(compress=lz4),/var/tmp(compress=lz4)"
         else:
             layout = '/'
-        llist.extend(([disk + 's%sa' % sl, rootNum, layout, fs]))
-        mllist.append(llist)
-        llist = []
-        llist.extend(([disk + 's%sb' % sl, swap, 'none', 'SWAP']))
-        mllist.append(llist)
-        pickle.dump(mllist, plf)
-        plf.close()
+
+        root_partition = f'{main_slice}a'
+        partition_list.append(root_partition)
+        disk_data[drive]['partitions'][main_slice]['partitions'][root_partition] = {
+            'name': root_partition,
+            'size': root_size,
+            'mount_point': layout,
+            'file_system': fs,
+            'stat': None,
+            'partitions': None,
+            'partition_list': []
+        }
+
+        swap_partition = f'{main_slice}b'
+        partition_list.append(swap_partition)
+        disk_data[drive]['partitions'][main_slice]['partitions'][swap_partition]  = {
+            'name': swap_partition,
+            'size': swap_size,
+            'mount_point': 'none',
+            'file_system': 'SWAP',
+            'stat': None,
+            'partitions': None,
+            'partition_list': []
+        }
+
+        disk_data[drive]['partitions'][main_slice]['partition_list'] = partition_list
+
+        disk_db = open(disk_db_file, 'wb')
+        pickle.dump(disk_data, disk_db)
+        disk_db.close()
+
         pfile = open(Part_label, 'w')
-        pfile.writelines(f'{fs} {rootNum} {layout}\n')
-        pfile.writelines('SWAP %s none\n' % int(swap - 1))
+        pfile.writelines(f'{fs} {root_size} {layout}\n')
+        pfile.writelines(f'SWAP {swap_size} none\n')
         pfile.close()
+
         pl = []
         mpl = []
         if os.path.exists(tmp + 'create'):
             pf = open(tmp + 'create', 'rb')
             mpl = pickle.load(pf)
-        pl.extend(([disk + "s%s" % sl, size]))
+        pl.extend(([main_slice, size]))
         mpl.append(pl)
         cf = open(tmp + 'create', 'wb')
         pickle.dump(mpl, cf)
@@ -760,51 +797,54 @@ class autoFreeSpace():
 
     def __init__(self, path, size, fs, efi_exist, disk, scheme):
         self.bios_type = bios_or_uefi()
-        sl = path[1] + 1
-        lv = path[1]
         if scheme == "GPT":
-            self.create_gpt_partiton(disk, size, sl, lv, fs, efi_exist)
+            self.create_gpt_partiton(disk, size, path, fs, efi_exist)
         elif scheme == "MBR":
-            self.create_mbr_partiton(disk, size, sl, lv, fs)
+            self.create_mbr_partiton(disk, size, path, fs)
 
-    def create_gpt_partiton(self, disk, size, sl, path, fs, efi_exist):
+    def create_gpt_partiton(self, drive, size, path, fs, efi_exist):
         file_disk = open(disk_file, 'w')
-        file_disk.writelines('%s\n' % disk)
+        file_disk.writelines(f'{drive}\n')
         file_disk.close()
         sfile = open(part_schem, 'w')
         sfile.writelines('partscheme=GPT')
         sfile.close()
-        number = int(size.partition('M')[0])
-        # number = number - 512
-        swap = 2048
-        rootNum = int(number - swap)
+        
+        root_size = int(size)
+        swap_size = 2048
+        root_size -= int(swap_size)
         if self.bios_type == "UEFI" and efi_exist is False:
-            bs = 256
-        elif self.bios_type == "BOOT":
-            bs = 1
+            boot_size = 256
         else:
-            bs = 0
-        rootNum = int(rootNum - bs)
-        plist = []
-        mplist = partition_query(disk)
-        plf = open(partitiondb + disk, 'wb')
-        done = False
-        if self.bios_type == "UEFI" and efi_exist is False:
-            plist.extend(([disk + 'p%s' % sl, bs, 'none', 'UEFI']))
-            rsl = int(sl + 1)
-            swsl = int(rsl + 1)
-        elif self.bios_type == "BOOT":
-            plist.extend(([disk + 'p%s' % sl, bs, 'none', 'BOOT']))
-            rsl = int(sl + 1)
-            swsl = int(rsl + 1)
-        else:
-            rsl = int(sl)
-            swsl = int(rsl + 1)
-
-        if len(plist) != 0:
-            done = True
-            mplist[path] = plist
-            plist = []
+            boot_size = 1 if self.bios_type == "BIOS" else 0
+        
+        boot_name = 'UEFI' if self.bios_type == "UEFI" else 'BOOT'
+        
+        root_size -= boot_size
+        
+        disk_data = disk_database()
+        partition_list = disk_data[drive]['partition_list']
+        store_list_number = path[1]
+        if boot_size != 0:
+            boot_partition = find_next_partition(f'{drive}p', partition_list)
+            partition_list[store_list_number] = boot_partition
+            store_list_number += 1
+            disk_data[drive]['partitions'][boot_partition] = {
+                'name': boot_partition,
+                'size': boot_size,
+                'mount_point': 'none',
+                'file_system': boot_name,
+                'stat': None,
+                'partitions': None,
+                'partition_list': []
+            }
+            part_list = []
+            main_list = []
+            part_list.extend(([boot_partition, boot_size]))
+            main_list.append(partition_list)
+            cf = open(tmp + 'create', 'wb')
+            pickle.dump(main_list, cf)
+            cf.close()
 
         if fs == "ZFS":
             layout = "/(compress=lz4|atime=off),/root(compress=lz4)," \
@@ -817,42 +857,52 @@ class autoFreeSpace():
                 "/var/mail(compress=lz4),/var/tmp(compress=lz4)"
         else:
             layout = '/'
-        plist.extend(([disk + 'p%s' % rsl, rootNum, layout, fs]))
-        if done is False:
-            mplist[path] = plist
+        
+        root_partition = find_next_partition(f'{drive}p', partition_list)
+        if store_list_number == path[1]:
+            partition_list[store_list_number] = root_partition
         else:
-            mplist.insert(rsl - 1, plist)
-        plist = []
-        plist.extend(([disk + 'p%s' % swsl, swap, 'none', 'SWAP']))
-        mplist.insert(swsl - 1, plist)
-        pickle.dump(mplist, plf)
-        plf.close()
+            partition_list.insert(store_list_number, root_partition)
+        store_list_number += 1
+        disk_data[drive]['partitions'][root_partition] = {
+            'name': root_partition,
+            'size': root_size,
+            'mount_point': layout,
+            'file_system': fs,
+            'stat': None,
+            'partitions': None,
+            'partition_list': []
+        }
+
         slice_file = open(dslice, 'w')
-        slice_file.writelines(f'p{rsl}')
+        slice_file.writelines(root_partition.replace(drive, ''))
         slice_file.close()
+
+        swap_partition = find_next_partition(f'{drive}p', partition_list)
+        partition_list.insert(store_list_number, swap_partition)
+        disk_data[drive]['partitions'][swap_partition] = {
+            'name': swap_partition,
+            'size': swap_size,
+            'mount_point': 'none',
+            'file_system': 'SWAP',
+            'stat': None,
+            'partitions': None,
+            'partition_list': []
+        }
+
+        disk_data[drive]['partition_list'] = partition_list
+        disk_db = open(disk_db_file, 'wb')
+        pickle.dump(disk_data, disk_db)
+        disk_db.close()
+
         pfile = open(Part_label, 'w')
         if self.bios_type == "UEFI" and efi_exist is False:
-            pfile.writelines('UEFI %s none\n' % bs)
+            pfile.writelines(f'UEFI {boot_size} none\n')
         elif self.bios_type == "BIOS":
-            pfile.writelines('BOOT %s none\n' % bs)
-        pfile.writelines(f'{fs} {rootNum} {layout}\n')
-        pfile.writelines('SWAP %s none\n' % int(swap - 1))
+            pfile.writelines(f'BOOT {boot_size} none\n')
+        pfile.writelines(f'{fs} {root_size} {layout}\n')
+        pfile.writelines(f'SWAP {swap_size} none\n')
         pfile.close()
-        pl = []
-        mpl = []
-        if self.bios_type == "UEFI" and efi_exist is False:
-            if not os.path.exists(tmp + 'create'):
-                pl.extend(([disk + "p%s" % sl, bs]))
-                mpl.append(pl)
-                cf = open(tmp + 'create', 'wb')
-                pickle.dump(mpl, cf)
-                cf.close()
-        elif self.bios_type == "BOOT":
-            pl.extend(([disk + "p%s" % sl, bs]))
-            mpl.append(pl)
-            cf = open(tmp + 'create', 'wb')
-            pickle.dump(mpl, cf)
-            cf.close()
 
 
 class createLabel():

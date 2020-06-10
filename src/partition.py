@@ -263,7 +263,7 @@ class Partitions():
         self.scheme = value
 
     def add_gpt_mbr(self, widget, data):
-        diskSchemeChanger(self.scheme, self.path, self.slice, self.size)
+        diskSchemeChanger(self.scheme, self.path, self.disk, self.size)
         self.update()
         self.window.hide()
         if data is False:
@@ -273,7 +273,7 @@ class Partitions():
                 self.labelEditor(self.path, self.slice, self.size, 'GPT', False)
 
     def autoSchemePartition(self, widget):
-        diskSchemeChanger(self.scheme, self.path, self.slice, self.size)
+        diskSchemeChanger(self.scheme, self.path, self.disk, self.size)
         self.update()
         autoDiskPartition(self.slice, self.size, self.scheme)
         self.update()
