@@ -599,106 +599,6 @@ class Delete_partition():
             new_partitions.close()
 
 
-class autoDiskPartition():
-
-    def delete_mbr_partition(self, disk):
-        plist = partition_query(disk)
-        for part in plist:
-            if part[0] == 'freespace':
-                pass
-            else:
-                os.remove(partitiondb + part[0])
-
-    def create_mbr_partiton(self, disk, size):
-        file_disk = open(disk_file, 'w')
-        file_disk.writelines('%s\n' % disk)
-        file_disk.close()
-        sfile = open(part_schem, 'w')
-        sfile.writelines('partscheme=MBR')
-        sfile.close()
-        plist = []
-        mplist = []
-        dpsf = open(partitiondb + disk, 'wb')
-        plist.extend((disk + "s1", size, '', 'freebsd'))
-        mplist.append(plist)
-        pickle.dump(mplist, dpsf)
-        dpsf.close()
-        number = int(size.partition('M')[0])
-        slice_file = open(dslice, 'w')
-        slice_file.writelines('all\n')
-        slice_file.writelines('%s\n' % number)
-        slice_file.close()
-        swap_size = 2048
-        root_size = int(number - swap_size)
-        llist = []
-        mllist = []
-        plf = open(partitiondb + disk + 's1', 'wb')
-        llist.extend(([disk + 's1a', root_size, '/', 'UFS+SUJ']))
-        mllist.append(llist)
-        llist = []
-        llist.extend(([disk + 's1b', swap_size, 'none', 'SWAP']))
-        mllist.append(llist)
-        pickle.dump(mllist, plf)
-        plf.close()
-        pfile = open(Part_label, 'w')
-        pfile.writelines('UFS+SUJ %s /\n' % root_size)
-        pfile.writelines('SWAP 0 none\n')
-        pfile.close()
-
-    def __init__(self, disk, size, scheme):
-        self.bios_type = bios_or_uefi()
-        if scheme == 'GPT':
-            self.create_gpt_partiton(disk, size)
-        elif scheme == 'MBR':
-            if os.path.exists(partitiondb + disk):
-                self.delete_mbr_partition(disk)
-            self.create_mbr_partiton(disk, size)
-
-    def create_gpt_partiton(self, disk, size):
-        file_disk = open(disk_file, 'w')
-        file_disk.writelines('%s\n' % disk)
-        file_disk.close()
-        sfile = open(part_schem, 'w')
-        sfile.writelines('partscheme=GPT')
-        sfile.close()
-        number = int(size.partition('M')[0])
-        slice_file = open(dslice, 'w')
-        slice_file.writelines('all\n')
-        slice_file.writelines('%s\n' % number)
-        slice_file.close()
-        swap_size = 2048
-        if self.bios_type == "UEFI":
-            bnum = 256
-        else:
-            bnum = 1
-        root_size = int(number - swap_size)
-        rnum = int(root_size - bnum)
-        plist = []
-        mplist = []
-        plf = open(partitiondb + disk, 'wb')
-        if self.bios_type == "UEFI":
-            plist.extend(([disk + 'p1', bnum, 'none', 'UEFI']))
-        else:
-            plist.extend(([disk + 'p1', bnum, 'none', 'BOOT']))
-        mplist.append(plist)
-        plist = []
-        plist.extend(([disk + 'p2', rnum, '/', 'UFS+SUJ']))
-        mplist.append(plist)
-        plist = []
-        plist.extend(([disk + 'p3', swap_size, 'none', 'SWAP']))
-        mplist.append(plist)
-        pickle.dump(mplist, plf)
-        plf.close()
-        pfile = open(Part_label, 'w')
-        if self.bios_type == "UEFI":
-            pfile.writelines('UEFI %s none\n' % bnum)
-        else:
-            pfile.writelines('BOOT %s none\n' % bnum)
-        pfile.writelines('UFS+SUJ %s /\n' % rnum)
-        pfile.writelines('SWAP 0 none\n')
-        pfile.close()
-
-
 class autoFreeSpace():
 
     def create_mbr_partiton(self, drive, size, path, fs):
@@ -725,7 +625,7 @@ class autoFreeSpace():
             'partition_list': []
         }
         disk_data[drive]['partition_list'] = slice_list
-        
+
         slice_file = open(dslice, 'w')
         slice_file.writelines(f'{main_slice.replace(drive, "")}\n')
         slice_file.writelines(f'{size}\n')
@@ -763,7 +663,7 @@ class autoFreeSpace():
 
         swap_partition = f'{main_slice}b'
         partition_list.append(swap_partition)
-        disk_data[drive]['partitions'][main_slice]['partitions'][swap_partition]  = {
+        disk_data[drive]['partitions'][main_slice]['partitions'][swap_partition] = {
             'name': swap_partition,
             'size': swap_size,
             'mount_point': 'none',
@@ -809,7 +709,6 @@ class autoFreeSpace():
         sfile = open(part_schem, 'w')
         sfile.writelines('partscheme=GPT')
         sfile.close()
-        
         root_size = int(size)
         swap_size = 2048
         root_size -= int(swap_size)
@@ -817,11 +716,8 @@ class autoFreeSpace():
             boot_size = 256
         else:
             boot_size = 1 if self.bios_type == "BIOS" else 0
-        
         boot_name = 'UEFI' if self.bios_type == "UEFI" else 'BOOT'
-        
         root_size -= boot_size
-        
         disk_data = disk_database()
         partition_list = disk_data[drive]['partition_list']
         store_list_number = path[1]
@@ -857,7 +753,7 @@ class autoFreeSpace():
                 "/var/mail(compress=lz4),/var/tmp(compress=lz4)"
         else:
             layout = '/'
-        
+
         root_partition = find_next_partition(f'{drive}p', partition_list)
         if store_list_number == path[1]:
             partition_list[store_list_number] = root_partition

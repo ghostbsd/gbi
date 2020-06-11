@@ -1,29 +1,26 @@
 #!/usr/local/bin/python
 
 import os
-import shutil
 import re
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from partition_handler import create_disk_partition_db, disk_database, Delete_partition
 from partition_handler import bios_or_uefi, how_partition, createSlice
-from partition_handler import autoDiskPartition, autoFreeSpace, createPartition
+from partition_handler import autoFreeSpace, createPartition
 from partition_handler import createLabel, diskSchemeChanger
 
 # Folder use pr the installer.
-tmp = "/tmp/.gbi/"
-installer = "/usr/local/lib/gbi/"
+tmp = "/tmp/.gbi"
 if not os.path.exists(tmp):
     os.makedirs(tmp)
-
-disk_schem = '%sscheme' % tmp
-disk_file = '%sdisk' % tmp
-psize = '%spart_size' % tmp
+disk_scheme = f'{tmp}/scheme'
+disk_file = f'{tmp}/disk'
+part_size_file = f'{tmp}/part_size'
 logo = "/usr/local/lib/gbi/logo.png"
-Part_label = '%spartlabel' % tmp
+Part_label = f'{tmp}/partlabel'
 
-disk_db_file = f'{tmp}disk.db'
+disk_db_file = f'{tmp}/disk.db'
 ufs_Partiton_list = []
 bios_type = bios_or_uefi()
 
@@ -275,7 +272,7 @@ class Partitions():
     def autoSchemePartition(self, widget):
         diskSchemeChanger(self.scheme, self.path, self.disk, self.size)
         self.update()
-        autoDiskPartition(self.slice, self.size, self.scheme)
+        autoFreeSpace(self.path, self.size, self.fs, self.efi_exist, self.disk, self.scheme)
         self.update()
         self.window.hide()
 
@@ -324,9 +321,9 @@ class Partitions():
         self.window.show_all()
 
     def get_value(self, widget, entry):
-        psize = int(entry.get_value_as_int())
-        rs = int(self.size) - psize
-        createSlice(psize, rs, self.path, self.disk)
+        partition_size = int(entry.get_value_as_int())
+        rs = int(self.size) - partition_size
+        createSlice(partition_size, rs, self.path, self.disk)
         self.update()
         self.window.hide()
 
@@ -425,12 +422,12 @@ class Partitions():
     def revertChange(self, widget):
         if os.path.exists(tmp + 'create'):
             os.remove(tmp + 'create')
-        if os.path.exists(disk_schem):
-            os.remove(disk_schem)
+        if os.path.exists(disk_scheme):
+            os.remove(disk_scheme)
         if os.path.exists(disk_file):
             os.remove(disk_file)
-        if os.path.exists(psize):
-            os.remove(psize)
+        if os.path.exists(part_size_file):
+            os.remove(part_size_file)
         if os.path.exists(tmp + 'delete'):
             os.remove(tmp + 'delete')
         if os.path.exists(tmp + 'destroy'):
@@ -567,8 +564,8 @@ class Partitions():
             self.prttn = rd.readlines()
             print(self.prttn)
             # Find if GPT scheme.
-            if os.path.exists(disk_schem):
-                rschm = open(disk_schem, 'r')
+            if os.path.exists(disk_scheme):
+                rschm = open(disk_scheme, 'r')
                 schm = rschm.readlines()[0]
                 if 'GPT' in schm:
                     if os.path.exists(disk_file):
@@ -667,9 +664,9 @@ class Partitions():
             self.button3.set_sensitive(False)
         path_exist = [
             os.path.exists(tmp + 'create'),
-            os.path.exists(disk_schem),
+            os.path.exists(disk_scheme),
             os.path.exists(disk_file),
-            os.path.exists(psize),
+            os.path.exists(part_size_file),
             os.path.exists(tmp + 'delete'),
             os.path.exists(tmp + 'destroy'),
             os.path.exists(Part_label)
@@ -767,12 +764,12 @@ class Partitions():
             print(disk)
             print(disk_db[disk])
             disk_info = disk_db[disk]
-            disk_scheme = disk_info['scheme']
+            disk_schemee = disk_info['scheme']
             mount_point = ''
             disk_size = str(disk_info['size'])
             disk_partitions = disk_info['partitions']
             partition_list = disk_info['partition_list']
-            pinter1 = self.store.append(None, [disk, disk_size, mount_point, disk_scheme, True])
+            pinter1 = self.store.append(None, [disk, disk_size, mount_point, disk_schemee, True])
             for partition in partition_list:
                 partition_info = disk_partitions[partition]
                 file_system = partition_info['file_system']
