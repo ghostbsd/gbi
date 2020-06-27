@@ -175,7 +175,7 @@ class create_disk_partition_db():
                 'mount_point': '',
                 'file_system': info[2],
                 'stat': None,
-                'partitions': None,
+                'partitions': {},
                 'partition_list': []
             }
             partition_db[slice_name] = partitions
@@ -233,7 +233,7 @@ def diskSchemeChanger(scheme, path, disk, size):
                 'mount_point': '',
                 'file_system': 'none',
                 'stat': None,
-                'partitions': None,
+                'partitions': {},
                 'partition_list': []
             }
         }
@@ -277,7 +277,7 @@ class Delete_partition():
                     'mount_point': '',
                     'file_system': 'none',
                     'stat': None,
-                    'partitions': None,
+                    'partitions': {},
                     'partition_list': []
                 }
                 disk_data[drive]['partitions'][partition]['partition_list'] = partition_list
@@ -291,7 +291,7 @@ class Delete_partition():
                     'mount_point': '',
                     'file_system': 'none',
                     'stat': None,
-                    'partitions': None,
+                    'partitions': {},
                     'partition_list': []
                 }
                 disk_data[drive]['partitions'][partition]['partition_list'] = partition_list
@@ -307,7 +307,7 @@ class Delete_partition():
                     'mount_point': '',
                     'file_system': 'none',
                     'stat': None,
-                    'partitions': None,
+                    'partitions': {},
                     'partition_list': []
                 }
                 disk_data[drive]['partitions'][partition]['partition_list'] = partition_list
@@ -321,7 +321,7 @@ class Delete_partition():
                     'mount_point': '',
                     'file_system': 'none',
                     'stat': None,
-                    'partitions': None,
+                    'partitions': {},
                     'partition_list': []
                 }
                 disk_data[drive]['partitions'][partition]['partition_list'] = partition_list
@@ -341,7 +341,7 @@ class Delete_partition():
                     'mount_point': '',
                     'file_system': 'none',
                     'stat': None,
-                    'partitions': None,
+                    'partitions': {},
                     'partition_list': []
                 }
                 disk_data[drive]['partitions'][partition]['partition_list'] = partition_list
@@ -355,7 +355,7 @@ class Delete_partition():
                     'mount_point': '',
                     'file_system': 'none',
                     'stat': None,
-                    'partitions': None,
+                    'partitions': {},
                     'partition_list': []
                 }
                 disk_data[drive]['partitions'][partition]['partition_list'] = partition_list
@@ -369,7 +369,7 @@ class Delete_partition():
                     'mount_point': '',
                     'file_system': 'none',
                     'stat': None,
-                    'partitions': None,
+                    'partitions': {},
                     'partition_list': []
                 }
                 disk_data[drive]['partitions'][partition]['partition_list'] = partition_list
@@ -383,7 +383,7 @@ class Delete_partition():
                     'mount_point': '',
                     'file_system': 'none',
                     'stat': None,
-                    'partitions': None,
+                    'partitions': {},
                     'partition_list': []
                 }
                 disk_data[drive]['partitions'][partition]['partition_list'] = partition_list
@@ -397,7 +397,7 @@ class Delete_partition():
                 'mount_point': '',
                 'file_system': 'none',
                 'stat': None,
-                'partitions': None,
+                'partitions': {},
                 'partition_list': []
             }
             disk_data[drive]['partitions'][partition]['partition_list'] = partition_list
@@ -445,7 +445,7 @@ class Delete_partition():
                     'mount_point': '',
                     'file_system': 'none',
                     'stat': None,
-                    'partitions': None,
+                    'partitions': {},
                     'partition_list': []
                 }
                 disk_data[drive]['partition_list'] = partition_list
@@ -459,7 +459,7 @@ class Delete_partition():
                     'mount_point': '',
                     'file_system': 'none',
                     'stat': None,
-                    'partitions': None,
+                    'partitions': {},
                     'partition_list': []
                 }
                 disk_data[drive]['partition_list'] = partition_list
@@ -475,7 +475,7 @@ class Delete_partition():
                     'mount_point': '',
                     'file_system': 'none',
                     'stat': None,
-                    'partitions': None,
+                    'partitions': {},
                     'partition_list': []
                 }
                 disk_data[drive]['partition_list'] = partition_list
@@ -489,7 +489,7 @@ class Delete_partition():
                     'mount_point': '',
                     'file_system': 'none',
                     'stat': None,
-                    'partitions': None,
+                    'partitions': {},
                     'partition_list': []
                 }
                 disk_data[drive]['partition_list'] = partition_list
@@ -509,7 +509,7 @@ class Delete_partition():
                     'mount_point': '',
                     'file_system': 'none',
                     'stat': None,
-                    'partitions': None,
+                    'partitions': {},
                     'partition_list': []
                 }
                 disk_data[drive]['partition_list'] = partition_list
@@ -523,7 +523,7 @@ class Delete_partition():
                     'mount_point': '',
                     'file_system': 'none',
                     'stat': None,
-                    'partitions': None,
+                    'partitions': {},
                     'partition_list': []
                 }
                 disk_data[drive]['partition_list'] = partition_list
@@ -537,7 +537,7 @@ class Delete_partition():
                     'mount_point': '',
                     'file_system': 'none',
                     'stat': None,
-                    'partitions': None,
+                    'partitions': {},
                     'partition_list': []
                 }
                 disk_data[drive]['partition_list'] = partition_list
@@ -551,7 +551,7 @@ class Delete_partition():
                     'mount_point': '',
                     'file_system': 'none',
                     'stat': None,
-                    'partitions': None,
+                    'partitions': {},
                     'partition_list': []
                 }
                 disk_data[drive]['partition_list'] = partition_list
@@ -565,7 +565,7 @@ class Delete_partition():
                 'mount_point': '',
                 'file_system': 'none',
                 'stat': None,
-                'partitions': None,
+                'partitions': {},
                 'partition_list': []
             }
             disk_data[drive]['partition_list'] = partition_list
@@ -656,7 +656,7 @@ class autoFreeSpace():
             'mount_point': layout,
             'file_system': fs,
             'stat': None,
-            'partitions': None,
+            'partitions': {},
             'partition_list': []
         }
 
@@ -668,7 +668,7 @@ class autoFreeSpace():
             'mount_point': 'none',
             'file_system': 'SWAP',
             'stat': None,
-            'partitions': None,
+            'partitions': {},
             'partition_list': []
         }
 
@@ -730,7 +730,7 @@ class autoFreeSpace():
                 'mount_point': 'none',
                 'file_system': boot_name,
                 'stat': None,
-                'partitions': None,
+                'partitions': {},
                 'partition_list': []
             }
             part_list = []
@@ -765,7 +765,7 @@ class autoFreeSpace():
             'mount_point': layout,
             'file_system': fs,
             'stat': None,
-            'partitions': None,
+            'partitions': {},
             'partition_list': []
         }
 
@@ -781,7 +781,7 @@ class autoFreeSpace():
             'mount_point': 'none',
             'file_system': 'SWAP',
             'stat': None,
-            'partitions': None,
+            'partitions': {},
             'partition_list': []
         }
 
@@ -836,7 +836,7 @@ class createLabel():
             'mount_point': mountpoint,
             'file_system': fs,
             'stat': None,
-            'partitions': None,
+            'partitions': {},
             'partition_list': []
         }
         if size_left != 0:
@@ -848,7 +848,7 @@ class createLabel():
                 'mount_point': '',
                 'file_system': 'none',
                 'stat': None,
-                'partitions': None,
+                'partitions': {},
                 'partition_list': []
             }
 
@@ -922,32 +922,44 @@ class createSlice():
         slice_file.close()
 
         disk_data = disk_database()
-        store_list_number = path[2]
+        store_list_number = path[1]
         partition_list = disk_data[drive]['partition_list']
 
         partition = find_next_partition(f'{drive}s', partition_list)
 
         partition_list[store_list_number] = partition
+        # Store slice partition
         disk_data[drive]['partitions'][partition] = {
             'name': partition,
             'size': create_size,
             'mount_point': 'none',
             'file_system': 'BSD',
             'stat': None,
-            'partitions': None,
+            'partitions': {},
+            'partition_list': ['freespace1']
+        }
+        # Store freespace for partition partition
+        disk_data[drive]['partitions'][partition]['partitions']['freespace1'] = {
+            'name': 'freespace1',
+            'size': create_size,
+            'mount_point': '',
+            'file_system': 'none',
+            'stat': None,
+            'partitions': {},
             'partition_list': []
         }
+        # Store freespace if some left
         if size_left != 0:
             free_name = find_next_partition('freespace', partition_list)
             partition_list.append(free_name)
-            disk_data[drive]['partitions'][partition] = {
+            disk_data[drive]['partitions'][free_name] = {
                 'name': free_name,
                 'size': size_left,
                 'mount_point': '',
                 'file_system': 'none',
                 'stat': None,
-                'partitions': None,
-                'partition_list': None
+                'partitions': {},
+                'partition_list': []
             }
 
         disk_data[drive]['partition_list'] = partition_list

@@ -50,7 +50,7 @@ class Partitions():
     def on_add_partition(self, widget, entry, free_space, path, create):
         create_size = entry.get_value_as_int()
         left_size = int(free_space - create_size)
-        createPartition(path, self.disk, self.slicebehind, left_size, create_size, self.mountpoint, self.fs)
+        createPartition(path, self.disk, left_size, create_size, self.mountpoint, self.fs)
         self.window.hide()
         self.update()
 
@@ -91,7 +91,7 @@ class Partitions():
                 if self.efi_exist is False:
                     self.fs_type.set_active(6)
                     self.fs = "UEFI"
-                elif self.mountpoint_behind == "/" or self.fsbehind == "ZFS":
+                elif self.mountpoint_behind == "/" or self.fs_behind == "ZFS":
                     self.fs_type.set_active(5)
                     self.fs = "SWAP"
                 else:
@@ -105,13 +105,13 @@ class Partitions():
                 elif len(self.partitions) == 0:
                     self.fs_type.set_active(5)
                     self.fs = "BOOT"
-                elif self.mountpoint_behind == "/" or self.fsbehind == "ZFS":
+                elif self.mountpoint_behind == "/" or self.fs_behind == "ZFS":
                     self.fs_type.set_active(4)
                     self.fs = "SWAP"
                 else:
                     self.fs_type.set_active(0)
                     self.fs = "ZSF"
-        elif self.mountpoint_behind == "/" or self.fsbehind == "ZFS":
+        elif self.mountpoint_behind == "/" or self.fs_behind == "ZFS":
             self.fs_type.set_active(4)
             self.fs = "SWAP"
         else:
@@ -249,15 +249,10 @@ class Partitions():
         value = data.partition(':')[0]
         self.scheme = value
 
-    def add_gpt_mbr(self, widget, data):
+    def add_gpt_mbr(self, widget):
         diskSchemeChanger(self.scheme, self.path, self.disk, self.size)
         self.update()
         self.window.hide()
-        if data is False:
-            if self.scheme == "MBR" and self.path[1] < 4:
-                self.sliceEditor()
-            elif self.scheme == "GPT":
-                self.labelEditor(self.path, self.slice, self.size, 'GPT', False)
 
     def autoSchemePartition(self, widget):
         diskSchemeChanger(self.scheme, self.path, self.disk, self.size)
@@ -266,7 +261,7 @@ class Partitions():
         self.update()
         self.window.hide()
 
-    def schemeEditor(self, data):
+    def schemeEditor(self):
         self.window = Gtk.Window()
         self.window.set_title("Partition Scheme")
         self.window.set_border_width(0)
@@ -302,10 +297,7 @@ class Partitions():
         bbox.set_border_width(5)
         bbox.set_spacing(10)
         button = Gtk.Button(stock=Gtk.STOCK_ADD)
-        if data is None:
-            button.connect("clicked", self.autoSchemePartition)
-        else:
-            button.connect("clicked", self.add_gpt_mbr, data)
+        button.connect("clicked", self.add_gpt_mbr)
         bbox.add(button)
         box2.pack_end(bbox, True, True, 5)
         self.window.show_all()
@@ -369,7 +361,7 @@ class Partitions():
         self.treeview.set_cursor(oldpath)
 
     def delete_partition(self, widget):
-        part = self.slice
+        part = self.slice if self.label == "Not selected" else self.label
         Delete_partition(part, self.path)
         self.update()
 
@@ -434,22 +426,15 @@ class Partitions():
         self.modify_bt.set_sensitive(False)
         self.auto_bt.set_sensitive(False)
         self.revert_bt.set_sensitive(False)
-        if 'freespace' in self.label:
+        if self.change_schemes is True:
+            self.schemeEditor()
+        elif 'freespace' in self.label:
             self.labelEditor(self.path, self.slice, self.size, 'MBR', False)
         elif 'freespace' in self.slice:
             if self.scheme == "MBR" and self.path[1] < 4:
                 self.sliceEditor()
             elif self.scheme == "GPT":
                 self.labelEditor(self.path, self.slice, self.size, 'GPT', False)
-        else:
-            if how_partition(self.disk) == 1 and 'freespace' in self.slice:
-                self.schemeEditor(False)
-            if how_partition(self.disk) == 1:
-                self.schemeEditor(True)
-            elif how_partition(self.disk) == 0:
-                self.schemeEditor(True)
-            else:
-                pass
 
     def partition_selection(self, widget):
         model, self.iter, = widget.get_selected()
@@ -460,74 +445,48 @@ class Partitions():
             tree_iter1 = model.get_iter(self.path[0])
             self.scheme = model.get_value(tree_iter1, 3)
             self.disk = model.get_value(tree_iter1, 0)
-            if len(self.path) == 2:
+            if len(self.path) >= 2:
                 tree_iter2 = model.get_iter(self.path[:2])
                 self.slice = model.get_value(tree_iter2, 0)
+                self.change_schemes = False
             else:
-                self.slice = 'Not selected'
+                if len(self.path) == 1:
+                    if how_partition(self.disk) == 1:
+                        slice_path = f'{self.path[0]}:0'
+                        tree_iter2 = model.get_iter(slice_path)
+                        if 'freespace' in model.get_value(tree_iter2, 0):
+                            self.change_schemes = True
+                        else:
+                            self.change_schemes = False
+                    else:
+                        self.change_schemes = False
+                    self.slice = 'Not selected'
+                else:
+                    self.slice = 'Not selected'
+                    self.change_schemes = False
             if len(self.path) == 3:
                 tree_iter3 = model.get_iter(self.path[:3])
                 self.label = model.get_value(tree_iter3, 0)
             else:
                 self.label = 'Not selected'
-            if len(self.path) == 2 and self.path[1] > 0 and self.scheme == "MBR":
-                pathbehind = str(self.path[0]) + ":" + str(int(self.path[1] - 1))
+            if len(self.path) == 2 and self.path[1] > 0 and self.scheme == "GPT":
+                pathbehind = f'{self.path[0]}:{str(int(self.path[1] - 1))}'
                 tree_iter4 = model.get_iter(pathbehind)
-                self.slicebehind = model.get_value(tree_iter4, 0)
-                sl = int(self.path[1]) + 1
-                if 'freespace' in self.slicebehind:
-                    slbehind = self.path[1]
-                else:
-                    slbehind = int(self.slicebehind.partition('s')[2])
-            elif len(self.path) == 2 and self.path[1] > 0 and self.scheme == "GPT":
-                pathbehind = str(self.path[0]) + ":" + str(int(self.path[1] - 1))
-                tree_iter4 = model.get_iter(pathbehind)
-                self.slicebehind = model.get_value(tree_iter4, 0)
                 self.mountpoint_behind = model.get_value(tree_iter4, 2)
-                self.fsbehind = model.get_value(tree_iter4, 3)
-
-                sl = int(self.path[1]) + 1
-                if 'freespace' in self.slicebehind:
-                    slbehind = self.path[1]
-                else:
-                    slbehind = int(self.slicebehind.partition('p')[2])
+                self.fs_behind = model.get_value(tree_iter4, 3)
             elif len(self.path) == 3 and self.path[2] > 0 and self.scheme == "MBR":
-                if self.path[2] > 0:
-                    pathbehind1 = str(self.path[0]) + ":" + str(self.path[1]) + ":" + str(int(self.path[2] - 1))
-                    tree_iter4 = model.get_iter(pathbehind1)
-                    self.slicebehind = model.get_value(tree_iter4, 0)
-                else:
-                    self.slicebehind = None
-                pathbehind2 = str(self.path[0]) + ":" + str(self.path[1]) + ":" + str(int(self.path[2] - 1))
+                pathbehind2 = f'{self.path[0]}:{str(self.path[1])}:{str(int(self.path[2] - 1))}'
                 tree_iter1 = model.get_iter(pathbehind2)
                 self.mountpoint_behind = model.get_value(tree_iter1, 2)
-                self.fsbehind = model.get_value(tree_iter1, 3)
-                sl = int(self.path[1]) + 1
-                if self.slicebehind is None:
-                    slbehind = self.path[1]
-                elif 'freespace' in self.slicebehind:
-                    slbehind = self.path[1]
-                else:
-                    slbehind = int(self.slicebehind.partition('s')[2])
+                self.fs_behind = model.get_value(tree_iter1, 3)
             else:
-                self.slicebehind = None
                 self.mountpoint_behind = None
-                self.fsbehind = None
-                sl = 1
-                slbehind = 0
+                self.fs_behind = None
             if 'freespace' in self.slice:
-                if self.path[1] > 3 and self.scheme == "MBR":
-                    self.create_bt.set_sensitive(False)
-                elif self.slicebehind is None:
-                    self.create_bt.set_sensitive(True)
-                elif sl == slbehind:
-                    self.create_bt.set_sensitive(False)
-                # elif slbehind > 4:
-                #     self.create_bt.set_sensitive(False)
-                else:
-                    self.create_bt.set_sensitive(True)
+                self.create_bt.set_sensitive(True)
                 self.delete_bt.set_sensitive(False)
                 self.modify_bt.set_sensitive(False)
+                self.auto_bt.set_sensitive(True)
                 # scan for efi partition
                 for num in range(self.path[1]):
                     partition_path = f"{self.path[0]}:{num}"
@@ -538,13 +497,20 @@ class Partitions():
                         break
                 else:
                     self.efi_exist = False
-                self.auto_bt.set_sensitive(True)
-            elif 's' in self.slice:
+            elif 'freespace' in self.label:
+                if self.path[1] > 3:
+                    self.create_bt.set_sensitive(False)
+                else:
+                    self.create_bt.set_sensitive(True)
+                    self.auto_bt.set_sensitive(True)
+                self.delete_bt.set_sensitive(False)
+                self.modify_bt.set_sensitive(False)
+            elif 's' in self.slice and len(self.path) > 1:
                 self.create_bt.set_sensitive(False)
                 self.delete_bt.set_sensitive(True)
                 # self.modify_bt.set_sensitive(True)
                 self.auto_bt.set_sensitive(False)
-            elif 'p' in self.slice:
+            elif 'p' in self.slice and len(self.path) > 1:
                 self.create_bt.set_sensitive(False)
                 self.delete_bt.set_sensitive(True)
                 # self.modify_bt.set_sensitive(True)
@@ -555,12 +521,13 @@ class Partitions():
                 self.auto_bt.set_sensitive(False)
                 if how_partition(self.disk) == 0:
                     self.create_bt.set_sensitive(True)
+                elif self.change_schemes is True:
+                    self.create_bt.set_sensitive(True)
                 else:
                     self.create_bt.set_sensitive(False)
         if os.path.exists(Part_label):
             rd = open(Part_label, 'r')
             self.partitions = rd.readlines()
-            print(self.partitions)
             # Find if GPT scheme.
             if os.path.exists(disk_scheme):
                 rschm = open(disk_scheme, 'r')
