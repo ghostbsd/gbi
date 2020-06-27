@@ -628,7 +628,6 @@ class autoFreeSpace():
 
         slice_file = open(dslice, 'w')
         slice_file.writelines(f'{main_slice.replace(drive, "")}\n')
-        slice_file.writelines(f'{size}\n')
         slice_file.close()
 
         root_size = int(size)
@@ -802,29 +801,25 @@ class autoFreeSpace():
 
 
 class createLabel():
-    def __init__(self, path, disk, partition_behind, left_size, create_size, label, fs, data):
+    def __init__(self, path, drive, main_slice, size_left, create_size, mountpoint, fs):
         if not os.path.exists(disk_file):
             file_disk = open(disk_file, 'w')
-            file_disk.writelines('%s\n' % disk)
+            file_disk.writelines('%s\n' % drive)
             file_disk.close()
-        sl = path[1] + 1
-        lv = path[2]
         sfile = open(part_schem, 'w')
         sfile.writelines('partscheme=MBR')
         sfile.close()
         slice_file = open(dslice, 'w')
-        slice_file.writelines('s%s\n' % sl)
+        slice_file.writelines(f'{main_slice.replace(drive, "")}\n')
         slice_file.close()
-        alph = ord('a')
-        alph += lv
-        letter = chr(alph)
-        llist = []
-        mllist = label_query(disk + 's%s' % sl)
-        plf = open(partitiondb + disk + 's%s' % sl, 'wb')
-        if left_size == 0:
-            create_size -= 1
+        disk_data = disk_database()
+        store_list_number = path[2]
+        partition_list = disk_data[drive]['partitions'][main_slice]['partition_list']
+        alpha_num = ord('a')
+        alpha_num += store_list_number
+        letter = chr(alpha_num)
         if fs == "ZFS":
-            label = "/(compress=lz4|atime=off),/root(compress=lz4)," \
+            mountpoint = "/(compress=lz4|atime=off),/root(compress=lz4)," \
                 "/tmp(compress=lz4),/usr(canmount=off|mountpoint=none)," \
                 "/usr/home(compress=lz4),/usr/jails(compress=lz4)," \
                 "/usr/obj(compress=lz4),/usr/ports(compress=lz4)," \
@@ -832,27 +827,45 @@ class createLabel():
                 "/var(canmount=off|atime=on|mountpoint=none)," \
                 "/var/audit(compress=lz4),/var/log(compress=lz4)," \
                 "/var/mail(compress=lz4),/var/tmp(compress=lz4)"
-        llist.extend(([disk + 's%s' % sl + letter, create_size, label, fs]))
-        mllist[lv] = llist
-        llist = []
-        if left_size > 0:
-            llist.extend((['freespace', left_size, '', '']))
-            mllist.insert(lv + 1, llist)
-        pickle.dump(mllist, plf)
-        plf.close()
-        llist = open(partitiondb + disk + 's%s' % sl, 'rb')
-        labellist = pickle.load(llist)
-        pfile = open(Part_label, 'w')
-        for partlist in labellist:
-            if partlist[2] != '':
-                pfile.writelines('%s %s %s\n' % (partlist[3], partlist[1],
-                                                 partlist[2]))
+
+        partition = f'{main_slice}{letter}'
+        partition_list[store_list_number] = partition
+        disk_data[drive]['partitions'][main_slice]['partitions'][partition] = {
+            'name': partition,
+            'size': create_size,
+            'mount_point': mountpoint,
+            'file_system': fs,
+            'stat': None,
+            'partitions': None,
+            'partition_list': []
+        }
+        if size_left != 0:
+            free_name = find_next_partition('freespace', partition_list)
+            partition_list.append(free_name)
+            disk_data[drive]['partitions'][main_slice]['partitions'][free_name] = {
+                'name': free_name,
+                'size': size_left,
+                'mount_point': '',
+                'file_system': 'none',
+                'stat': None,
+                'partitions': None,
+                'partition_list': []
+            }
+
+        disk_data[drive]['partitions'][main_slice]['partition_list'] = partition_list
+
+        disk_db = open(disk_db_file, 'wb')
+        pickle.dump(disk_data, disk_db)
+        disk_db.close()
+
+        pfile = open(Part_label, 'a')
+        pfile.writelines(f'{fs} {create_size} {mountpoint}\n')
         pfile.close()
 
 
 class modifyLabel():
 
-    def __init__(self, path, left_size, create_size, label, fs, data, disk):
+    def __init__(self, path, size_left, create_size, label, fs, data, disk):
         if not os.path.exists(disk_file):
             file_disk = open(disk_file, 'w')
             file_disk.writelines('%s\n' % disk)
@@ -871,13 +884,13 @@ class modifyLabel():
         llist = []
         mllist = label_query(disk + 's%s' % sl)
         plf = open(partitiondb + disk + 's%s' % sl, 'wb')
-        if left_size == 0:
+        if size_left == 0:
             create_size -= 1
         llist.extend(([disk + 's%s' % sl + letter, create_size, label, fs]))
         mllist[lv] = llist
         llist = []
-        if left_size > 0:
-            llist.extend((['freespace', left_size, '', '']))
+        if size_left > 0:
+            llist.extend((['freespace', size_left, '', '']))
             mllist.append(llist)
         pickle.dump(mllist, plf)
         plf.close()
@@ -893,9 +906,9 @@ class modifyLabel():
 
 class createSlice():
 
-    def __init__(self, size, rs, path, disk):
+    def __init__(self, create_size, size_left, path, drive):
         file_disk = open(disk_file, 'w')
-        file_disk.writelines('%s\n' % disk)
+        file_disk.writelines(f'{drive}\n')
         file_disk.close()
         if len(path) == 1:
             sl = 1
@@ -907,40 +920,59 @@ class createSlice():
         slice_file = open(dslice, 'w')
         slice_file.writelines('s%s\n' % sl)
         slice_file.close()
-        plist = partition_query(disk)
-        pslice = '%ss%s' % (disk, path[1] + 1)
-        if rs == 0:
-            size -= 1
-        plist[path[1]] = [pslice, size, '', 'freebsd']
-        if rs > 0:
-            plist.append(['freespace', rs, '', ''])
-        psf = open(partitiondb + disk, 'wb')
-        pickle.dump(plist, psf)
-        psf.close()
-        llist = []
-        mllist = []
-        llist.extend((['freespace', size, '', '']))
-        mllist.append(llist)
-        plf = open(partitiondb + pslice, 'wb')
-        pickle.dump(mllist, plf)
-        plf.close()
+
+        disk_data = disk_database()
+        store_list_number = path[2]
+        partition_list = disk_data[drive]['partition_list']
+
+        partition = find_next_partition(f'{drive}s', partition_list)
+
+        partition_list[store_list_number] = partition
+        disk_data[drive]['partitions'][partition] = {
+            'name': partition,
+            'size': create_size,
+            'mount_point': 'none',
+            'file_system': 'BSD',
+            'stat': None,
+            'partitions': None,
+            'partition_list': []
+        }
+        if size_left != 0:
+            free_name = find_next_partition('freespace', partition_list)
+            partition_list.append(free_name)
+            disk_data[drive]['partitions'][partition] = {
+                'name': free_name,
+                'size': size_left,
+                'mount_point': '',
+                'file_system': 'none',
+                'stat': None,
+                'partitions': None,
+                'partition_list': None
+            }
+
+        disk_data[drive]['partition_list'] = partition_list
+        disk_db = open(disk_db_file, 'wb')
+        pickle.dump(disk_data, disk_db)
+        disk_db.close()
+
         slice_file = open(dslice, 'w')
-        slice_file.writelines('s%s\n' % pslice)
+        slice_file.writelines(partition.replace(drive, ''))
         slice_file.close()
-        pl = []
-        mpl = []
-        if os.path.exists(tmp + 'create'):
-            pf = open(tmp + 'create', 'rb')
-            mpl = pickle.load(pf)
-        pl.extend(([pslice, size]))
-        mpl.append(pl)
-        cf = open(tmp + 'create', 'wb')
-        pickle.dump(mpl, cf)
+
+        part_list = []
+        main_list = []
+        if os.path.exists(f'{tmp}create'):
+            read_file = open(f'{tmp}create', 'rb')
+            main_list = pickle.load(read_file)
+        part_list.extend(([partition, create_size]))
+        main_list.append(partition_list)
+        cf = open(f'{tmp}create', 'wb')
+        pickle.dump(main_list, cf)
         cf.close()
 
 
 class createPartition():
-    def __init__(self, path, disk, partition_behind, left_size, create_size, label, fs, create):
+    def __init__(self, path, disk, partition_behind, size_left, create_size, label, fs):
         if not os.path.exists(disk_file):
             file_disk = open(disk_file, 'w')
             file_disk.writelines('%s\n' % disk)
@@ -964,7 +996,7 @@ class createPartition():
         plist = []
         pslice = '%sp%s' % (disk, pl)
         mplist = partition_query(disk)
-        if left_size == 0 and create_size > 1:
+        if size_left == 0 and create_size > 1:
             create_size -= 1
         if fs == "ZFS":
             label = "/(compress=lz4|atime=off),/root(compress=lz4)," \
@@ -979,8 +1011,8 @@ class createPartition():
         plist.extend(([disk + 'p%s' % pl, create_size, label, fs]))
         mplist[lv] = plist
         plist = []
-        if left_size > 0:
-            plist.extend((['freespace', left_size, '', '']))
+        if size_left > 0:
+            plist.extend((['freespace', size_left, '', '']))
             mplist.insert(lv + 1, plist)
         pickle.dump(mplist, pf)
         pf.close()
@@ -1003,7 +1035,7 @@ class createPartition():
 
 class modifyPartition():
 
-    def __init__(self, path, left_size, inumb, create_size, label, fs, data, disk):
+    def __init__(self, path, size_left, inumb, create_size, label, fs, data, disk):
         if not os.path.exists(disk_file):
             file_disk = open(disk_file, 'w')
             file_disk.writelines('%s\n' % disk)
@@ -1025,14 +1057,14 @@ class modifyPartition():
         plist = []
         pslice = '%sp%s' % (disk, pl)
         mplist = partition_query(disk)
-        if left_size == 0:
+        if size_left == 0:
             create_size -= 1
         pf = open(partitiondb + disk, 'wb')
         plist.extend(([disk + 'p%s' % pl, create_size, label, fs]))
         mplist[lv] = plist
         plist = []
-        if left_size > 0:
-            plist.extend((['freespace', left_size, '', '']))
+        if size_left > 0:
+            plist.extend((['freespace', size_left, '', '']))
             mplist.append(plist)
         pickle.dump(mplist, pf)
         pf.close()
