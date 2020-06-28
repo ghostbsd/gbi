@@ -6,27 +6,23 @@ import pickle
 from time import sleep
 from subprocess import Popen, PIPE, STDOUT, call
 
-tmp = "/tmp/.gbi/"
+tmp = "/tmp/.gbi"
 if not os.path.exists(tmp):
     os.makedirs(tmp)
-installer = "/usr/local/lib/gbi/"
-sysinstall = "/usr/local/sbin/pc-sysinstall"
-partitiondb = "%spartitiondb/" % tmp
-query = "sh /usr/local/lib/gbi/backend-query/"
-query_disk = '%sdisk-list.sh' % query
-detect_sheme = '%sdetect-sheme.sh' % query
-diskdb = "%sdisk" % partitiondb
-query_partition = '%sdisk-part.sh' % query
-query_label = '%sdisk-label.sh' % query
-disk_info = '%sdisk-info.sh' % query
-nl = "\n"
+pc_sysinstall = "/usr/local/sbin/pc-sysinstall"
+query = "sh /usr/local/lib/gbi/backend-query"
+query_disk = f'{query}/disk-list.sh'
+detect_scheme = f'{query}/detect-sheme.sh'
+query_partition = f'{query}/disk-part.sh'
+query_label = f'{query}/disk-label.sh'
+disk_info = f'{query}/disk-info.sh'
 memory = 'sysctl hw.physmem'
-disk_file = '%sdisk' % tmp
-dslice = '%sslice' % tmp
-Part_label = '%spartlabel' % tmp
-part_schem = '%sscheme' % tmp
-boot_file = '%sboot' % tmp
-disk_db_file = f'{tmp}disk.db'
+disk_file = f'{tmp}/disk'
+slice_file = f'{tmp}/slice'
+partition_label_file = f'{tmp}/partlabel'
+scheme_file = f'{tmp}/scheme'
+boot_file = f'{tmp}/boot'
+disk_db_file = f'{tmp}/disk.db'
 
 
 def disk_database():
@@ -36,13 +32,13 @@ def disk_database():
 
 
 def zfs_disk_query():
-    disk_output = Popen(sysinstall + " disk-list", shell=True, stdin=PIPE,
+    disk_output = Popen(pc_sysinstall + " disk-list", shell=True, stdin=PIPE,
                         stdout=PIPE, universal_newlines=True, close_fds=True)
     return disk_output.stdout.readlines()
 
 
 def zfs_disk_size_query(disk):
-    disk_info_output = Popen(sysinstall + " disk-info " + disk, shell=True,
+    disk_info_output = Popen(pc_sysinstall + " disk-info " + disk, shell=True,
                              stdin=PIPE, stdout=PIPE, universal_newlines=True,
                              close_fds=True)
     return disk_info_output.stdout.readlines()[3].partition('=')[2]
@@ -94,7 +90,7 @@ class create_disk_partition_db():
         return diskSize
 
     def find_Scheme(self, disk):
-        cmd = "%s %s" % (detect_sheme, disk)
+        cmd = "%s %s" % (detect_scheme, disk)
         shm_out = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE,
                         universal_newlines=True, stderr=STDOUT, close_fds=True)
         scheme = shm_out.stdout.readlines()[0].rstrip()
@@ -217,12 +213,12 @@ def diskSchemeChanger(scheme, path, disk, size):
         disk_data[disk]['scheme'] = scheme
     dsl = []
     mdsl = []
-    if os.path.exists(tmp + 'destroy'):
-        df = open(tmp + 'destroy', 'rb')
+    if os.path.exists(f'{tmp}/destroy'):
+        df = open(f'{tmp}/destroy', 'rb')
         mdsl = pickle.load(df)
     dsl.extend(([disk, scheme]))
     mdsl.append(dsl)
-    cf = open(tmp + 'destroy', 'wb')
+    cf = open(f'{tmp}/destroy', 'wb')
     pickle.dump(mdsl, cf)
     cf.close()
     if disk_data[disk]['partitions'] is None:
@@ -405,7 +401,7 @@ class Delete_partition():
         pickle.dump(disk_data, disk_db)
         disk_db.close()
 
-        new_partitions = open(Part_label, 'w')
+        new_partitions = open(partition_label_file, 'w')
         for part in partition_list:
             partitions_info = disk_data[drive]['partitions'][partition]['partitions']
             size = partitions_info[part]['size']
@@ -575,19 +571,19 @@ class Delete_partition():
         disk_db.close()
 
         # if delete file exist check if slice is in the list
-        if os.path.exists(tmp + 'delete'):
-            df = open(tmp + 'delete', 'rb')
+        if os.path.exists(f'{tmp}/delete'):
+            df = open(f'{tmp}/delete', 'rb')
             main_delete_list = pickle.load(df)
             if partition not in main_delete_list:
                 main_delete_list.append(partition)
         else:
             main_delete_list = [partition]
-        cf = open(tmp + 'delete', 'wb')
+        cf = open(f'{tmp}/delete', 'wb')
         pickle.dump(main_delete_list, cf)
         cf.close()
 
         if "p" in partition:
-            new_partitions = open(Part_label, 'w')
+            new_partitions = open(partition_label_file, 'w')
             for part in partition_list:
                 partitions_info = disk_data[drive]['partitions']
                 size = partitions_info[part]['size']
@@ -606,9 +602,9 @@ class autoFreeSpace():
         file_disk.writelines(f'{drive}\n')
         file_disk.close()
 
-        sfile = open(part_schem, 'w')
-        sfile.writelines('partscheme=MBR')
-        sfile.close()
+        write_scheme = open(scheme_file, 'w')
+        write_scheme.writelines('partscheme=MBR')
+        write_scheme.close()
 
         disk_data = disk_database()
         slice_list = disk_data[drive]['partition_list']
@@ -620,15 +616,15 @@ class autoFreeSpace():
             'size': size,
             'mount_point': 'none',
             'file_system': 'BSD',
-            'stat': None,
+            'stat': 'New',
             'partitions': {},
             'partition_list': []
         }
         disk_data[drive]['partition_list'] = slice_list
 
-        slice_file = open(dslice, 'w')
-        slice_file.writelines(f'{main_slice.replace(drive, "")}\n')
-        slice_file.close()
+        write_slice = open(slice_file, 'w')
+        write_slice.writelines(f'{main_slice.replace(drive, "")}\n')
+        write_slice.close()
 
         root_size = int(size)
         swap_size = 2048
@@ -655,7 +651,7 @@ class autoFreeSpace():
             'size': root_size,
             'mount_point': layout,
             'file_system': fs,
-            'stat': None,
+            'stat': 'New',
             'partitions': {},
             'partition_list': []
         }
@@ -667,7 +663,7 @@ class autoFreeSpace():
             'size': swap_size,
             'mount_point': 'none',
             'file_system': 'SWAP',
-            'stat': None,
+            'stat': 'New',
             'partitions': {},
             'partition_list': []
         }
@@ -678,19 +674,19 @@ class autoFreeSpace():
         pickle.dump(disk_data, disk_db)
         disk_db.close()
 
-        pfile = open(Part_label, 'w')
-        pfile.writelines(f'{fs} {root_size} {layout}\n')
-        pfile.writelines(f'SWAP {swap_size} none\n')
-        pfile.close()
+        write_partition = open(partition_label_file, 'w')
+        write_partition.writelines(f'{fs} {root_size} {layout}\n')
+        write_partition.writelines(f'SWAP {swap_size} none\n')
+        write_partition.close()
 
         pl = []
         mpl = []
-        if os.path.exists(tmp + 'create'):
-            pf = open(tmp + 'create', 'rb')
+        if os.path.exists(f'{tmp}/create'):
+            pf = open(f'{tmp}/create', 'rb')
             mpl = pickle.load(pf)
         pl.extend(([main_slice, size]))
         mpl.append(pl)
-        cf = open(tmp + 'create', 'wb')
+        cf = open(f'{tmp}/create', 'wb')
         pickle.dump(mpl, cf)
         cf.close()
 
@@ -705,9 +701,9 @@ class autoFreeSpace():
         file_disk = open(disk_file, 'w')
         file_disk.writelines(f'{drive}\n')
         file_disk.close()
-        sfile = open(part_schem, 'w')
-        sfile.writelines('partscheme=GPT')
-        sfile.close()
+        write_scheme = open(scheme_file, 'w')
+        write_scheme.writelines('partscheme=GPT')
+        write_scheme.close()
         root_size = int(size)
         swap_size = 2048
         root_size -= int(swap_size)
@@ -729,7 +725,7 @@ class autoFreeSpace():
                 'size': boot_size,
                 'mount_point': 'none',
                 'file_system': boot_name,
-                'stat': None,
+                'stat': 'New',
                 'partitions': {},
                 'partition_list': []
             }
@@ -737,7 +733,7 @@ class autoFreeSpace():
             main_list = []
             part_list.extend(([boot_partition, boot_size]))
             main_list.append(partition_list)
-            cf = open(tmp + 'create', 'wb')
+            cf = open(f'{tmp}/create', 'wb')
             pickle.dump(main_list, cf)
             cf.close()
 
@@ -764,14 +760,14 @@ class autoFreeSpace():
             'size': root_size,
             'mount_point': layout,
             'file_system': fs,
-            'stat': None,
+            'stat': 'New',
             'partitions': {},
             'partition_list': []
         }
 
-        slice_file = open(dslice, 'w')
-        slice_file.writelines(root_partition.replace(drive, ''))
-        slice_file.close()
+        write_slice = open(slice_file, 'w')
+        write_slice.writelines(root_partition.replace(drive, ''))
+        write_slice.close()
 
         swap_partition = find_next_partition(f'{drive}p', partition_list)
         partition_list.insert(store_list_number, swap_partition)
@@ -780,7 +776,7 @@ class autoFreeSpace():
             'size': swap_size,
             'mount_point': 'none',
             'file_system': 'SWAP',
-            'stat': None,
+            'stat': 'New',
             'partitions': {},
             'partition_list': []
         }
@@ -790,14 +786,14 @@ class autoFreeSpace():
         pickle.dump(disk_data, disk_db)
         disk_db.close()
 
-        pfile = open(Part_label, 'w')
+        write_partition = open(partition_label_file, 'w')
         if self.bios_type == "UEFI" and efi_exist is False:
-            pfile.writelines(f'UEFI {boot_size} none\n')
+            write_partition.writelines(f'UEFI {boot_size} none\n')
         elif self.bios_type == "BIOS":
-            pfile.writelines(f'BOOT {boot_size} none\n')
-        pfile.writelines(f'{fs} {root_size} {layout}\n')
-        pfile.writelines(f'SWAP {swap_size} none\n')
-        pfile.close()
+            write_partition.writelines(f'BOOT {boot_size} none\n')
+        write_partition.writelines(f'{fs} {root_size} {layout}\n')
+        write_partition.writelines(f'SWAP {swap_size} none\n')
+        write_partition.close()
 
 
 class createLabel():
@@ -806,12 +802,12 @@ class createLabel():
             file_disk = open(disk_file, 'w')
             file_disk.writelines('%s\n' % drive)
             file_disk.close()
-        sfile = open(part_schem, 'w')
-        sfile.writelines('partscheme=MBR')
-        sfile.close()
-        slice_file = open(dslice, 'w')
-        slice_file.writelines(f'{main_slice.replace(drive, "")}\n')
-        slice_file.close()
+        write_scheme = open(scheme_file, 'w')
+        write_scheme.writelines('partscheme=MBR')
+        write_scheme.close()
+        write_slice = open(slice_file, 'w')
+        write_slice.writelines(f'{main_slice.replace(drive, "")}\n')
+        write_slice.close()
         disk_data = disk_database()
         store_list_number = path[2]
         partition_list = disk_data[drive]['partitions'][main_slice]['partition_list']
@@ -835,7 +831,7 @@ class createLabel():
             'size': create_size,
             'mount_point': mountpoint,
             'file_system': fs,
-            'stat': None,
+            'stat': 'New',
             'partitions': {},
             'partition_list': []
         }
@@ -858,26 +854,29 @@ class createLabel():
         pickle.dump(disk_data, disk_db)
         disk_db.close()
 
-        pfile = open(Part_label, 'a')
-        pfile.writelines(f'{fs} {create_size} {mountpoint}\n')
-        pfile.close()
+        write_partition = open(partition_label_file, 'w')
+        for partition in partition_list:
+            partition_info = disk_data[drive]['partitions'][main_slice]['partitions'][partition]
+            if partition_info['stat'] == 'New':
+                write_partition.writelines(f'{partition_info["file_system"]} {partition_info["size"]} {partition_info["mount_point"]}\n')
+        write_partition.close()
 
 
 class modifyLabel():
 
-    def __init__(self, path, size_left, create_size, label, fs, data, disk):
+    def __init__(self, path, size_left, create_size, mount_point, fs, data, disk):
         if not os.path.exists(disk_file):
             file_disk = open(disk_file, 'w')
             file_disk.writelines('%s\n' % disk)
             file_disk.close()
         sl = path[1] + 1
         lv = path[2]
-        sfile = open(part_schem, 'w')
-        sfile.writelines('partscheme=MBR')
-        sfile.close()
-        slice_file = open(dslice, 'w')
-        slice_file.writelines('s%s\n' % sl)
-        slice_file.close()
+        write_scheme = open(scheme_file, 'w')
+        write_scheme.writelines('partscheme=MBR')
+        write_scheme.close()
+        write_slice = open(slice_file, 'w')
+        write_slice.writelines('s%s\n' % sl)
+        write_slice.close()
         alph = ord('a')
         alph += lv
         letter = chr(alph)
@@ -886,7 +885,7 @@ class modifyLabel():
         plf = open(partitiondb + disk + 's%s' % sl, 'wb')
         if size_left == 0:
             create_size -= 1
-        llist.extend(([disk + 's%s' % sl + letter, create_size, label, fs]))
+        llist.extend(([disk + 's%s' % sl + letter, create_size, mount_point, fs]))
         mllist[lv] = llist
         llist = []
         if size_left > 0:
@@ -895,13 +894,13 @@ class modifyLabel():
         pickle.dump(mllist, plf)
         plf.close()
         llist = open(partitiondb + disk + 's%s' % sl, 'rb')
-        labellist = pickle.load(llist)
-        pfile = open(Part_label, 'w')
-        for partlist in labellist:
+        sabeltlist = pickle.load(llist)
+        write_partition = open(partition_label_file, 'w')
+        for partlist in sabeltlist:
             if partlist[2] != '':
-                pfile.writelines('%s %s %s\n' % (partlist[3], partlist[1],
+                write_partition.writelines('%s %s %s\n' % (partlist[3], partlist[1],
                                                  partlist[2]))
-        pfile.close()
+        write_partition.close()
 
 
 class createSlice():
@@ -910,16 +909,9 @@ class createSlice():
         file_disk = open(disk_file, 'w')
         file_disk.writelines(f'{drive}\n')
         file_disk.close()
-        if len(path) == 1:
-            sl = 1
-        else:
-            sl = path[1] + 1
-        sfile = open(part_schem, 'w')
-        sfile.writelines('partscheme=MBR')
-        sfile.close()
-        slice_file = open(dslice, 'w')
-        slice_file.writelines('s%s\n' % sl)
-        slice_file.close()
+        write_scheme = open(scheme_file, 'w')
+        write_scheme.writelines('partscheme=MBR')
+        write_scheme.close()
 
         disk_data = disk_database()
         store_list_number = path[1]
@@ -934,7 +926,7 @@ class createSlice():
             'size': create_size,
             'mount_point': 'none',
             'file_system': 'BSD',
-            'stat': None,
+            'stat': 'New',
             'partitions': {},
             'partition_list': ['freespace1']
         }
@@ -967,51 +959,36 @@ class createSlice():
         pickle.dump(disk_data, disk_db)
         disk_db.close()
 
-        slice_file = open(dslice, 'w')
-        slice_file.writelines(partition.replace(drive, ''))
-        slice_file.close()
+        write_slice = open(slice_file, 'w')
+        write_slice.writelines(partition.replace(drive, ''))
+        write_slice.close()
 
         part_list = []
         main_list = []
-        if os.path.exists(f'{tmp}create'):
-            read_file = open(f'{tmp}create', 'rb')
+        if os.path.exists(f'{tmp}/create'):
+            read_file = open(f'{tmp}/create', 'rb')
             main_list = pickle.load(read_file)
         part_list.extend(([partition, create_size]))
         main_list.append(partition_list)
-        cf = open(f'{tmp}create', 'wb')
+        cf = open(f'{tmp}/create', 'wb')
         pickle.dump(main_list, cf)
         cf.close()
 
 
 class createPartition():
-    def __init__(self, path, disk, partition_behind, size_left, create_size, label, fs):
+    def __init__(self, path, drive, size_left, create_size, mount_point, fs):
         if not os.path.exists(disk_file):
             file_disk = open(disk_file, 'w')
-            file_disk.writelines('%s\n' % disk)
+            file_disk.writelines('%s\n' % drive)
             file_disk.close()
-        if partition_behind is None:
-            pl = 1
-            lv = 0
-        else:
-            p_behind = int(partition_behind.partition('p')[2])
-            pl = p_behind + 1
-            lv = path[1]
-        if not os.path.exists(part_schem):
-            sfile = open(part_schem, 'w')
-            sfile.writelines('partscheme=GPT')
-            sfile.close()
-        if label == '/' or fs == "ZFS" or fs == "UEFI" or fs == "BOOT":
-            slice_file = open(dslice, 'w')
-            slice_file.writelines('p%s\n' % pl)
-            # slice_file.writelines('%s\n' % number)
-            slice_file.close()
-        plist = []
-        pslice = '%sp%s' % (disk, pl)
-        mplist = partition_query(disk)
-        if size_left == 0 and create_size > 1:
-            create_size -= 1
+
+        if not os.path.exists(scheme_file):
+            write_scheme = open(scheme_file, 'w')
+            write_scheme.writelines('partscheme=GPT')
+            write_scheme.close()
+
         if fs == "ZFS":
-            label = "/(compress=lz4|atime=off),/root(compress=lz4)," \
+            mount_point = "/(compress=lz4|atime=off),/root(compress=lz4)," \
                 "/tmp(compress=lz4),/usr(canmount=off|mountpoint=none)," \
                 "/usr/home(compress=lz4),/usr/jails(compress=lz4)," \
                 "/usr/obj(compress=lz4),/usr/ports(compress=lz4)," \
@@ -1019,35 +996,70 @@ class createPartition():
                 "/var(canmount=off|atime=on|mountpoint=none)," \
                 "/var/audit(compress=lz4),/var/log(compress=lz4)," \
                 "/var/mail(compress=lz4),/var/tmp(compress=lz4)"
-        pf = open(partitiondb + disk, 'wb')
-        plist.extend(([disk + 'p%s' % pl, create_size, label, fs]))
-        mplist[lv] = plist
-        plist = []
-        if size_left > 0:
-            plist.extend((['freespace', size_left, '', '']))
-            mplist.insert(lv + 1, plist)
-        pickle.dump(mplist, pf)
-        pf.close()
-        pfile = open(Part_label, 'w')
-        for partlist in partition_query(disk):
-            if partlist[2] != '':
-                pfile.writelines('%s %s %s\n' % (partlist[3], partlist[1],
-                                                 partlist[2]))
-        pfile.close()
-        if create is True:
-            plst = []
-            mplst = []
-            if not os.path.exists(tmp + 'create'):
-                plst.extend(([pslice, create_size]))
-                mplst.append(plst)
-                cf = open(tmp + 'create', 'wb')
-                pickle.dump(mplst, cf)
-                cf.close()
+
+        disk_data = disk_database()
+        store_list_number = path[1]
+        partition_list = disk_data[drive]['partition_list']
+
+        partition = find_next_partition(f'{drive}p', partition_list)
+
+        partition_list[store_list_number] = partition
+        # Store slice partition
+        disk_data[drive]['partitions'][partition] = {
+            'name': partition,
+            'size': create_size,
+            'mount_point': mount_point,
+            'file_system': fs,
+            'stat': 'New',
+            'partitions': {},
+            'partition_list': []
+        }
+        # Store freespace if some left
+        if size_left != 0:
+            free_name = find_next_partition('freespace', partition_list)
+            partition_list.append(free_name)
+            disk_data[drive]['partitions'][free_name] = {
+                'name': free_name,
+                'size': size_left,
+                'mount_point': '',
+                'file_system': 'none',
+                'stat': None,
+                'partitions': {},
+                'partition_list': []
+            }
+
+        disk_data[drive]['partition_list'] = partition_list
+        disk_db = open(disk_db_file, 'wb')
+        pickle.dump(disk_data, disk_db)
+        disk_db.close()
+        if mount_point == '/' or fs == "ZFS":
+            write_slice = open(slice_file, 'w')
+            write_slice.writelines(partition.replace(drive, ''))
+            write_slice.close()
+
+        if fs == "UEFI" or fs == "BOOT":
+            part_list = []
+            main_list = []
+            if os.path.exists(f'{tmp}/create'):
+                read_file = open(f'{tmp}/create', 'rb')
+                main_list = pickle.load(read_file)
+            part_list.extend(([partition, create_size]))
+            main_list.append(partition_list)
+            cf = open(f'{tmp}/create', 'wb')
+            pickle.dump(main_list, cf)
+            cf.close()
+
+        write_partition = open(partition_label_file, 'w')
+        for partition in partition_list:
+            partition_info = disk_data[drive]['partitions'][partition]
+            if partition_info['stat'] == 'New':
+                write_partition.writelines(f'{partition_info["file_system"]} {partition_info["size"]} {partition_info["mount_point"]}\n')
+        write_partition.close()
 
 
 class modifyPartition():
 
-    def __init__(self, path, size_left, inumb, create_size, label, fs, data, disk):
+    def __init__(self, path, size_left, inumb, create_size, mount_point, fs, data, disk):
         if not os.path.exists(disk_file):
             file_disk = open(disk_file, 'w')
             file_disk.writelines('%s\n' % disk)
@@ -1058,21 +1070,21 @@ class modifyPartition():
         else:
             pl = path[1] + 1
             lv = path[1]
-        if not os.path.exists(part_schem):
-            sfile = open(part_schem, 'w')
-            sfile.writelines('partscheme=GPT')
-            sfile.close()
-        if label == '/':
-            slice_file = open(dslice, 'w')
-            slice_file.writelines('p%s\n' % pl)
-            slice_file.close()
+        if not os.path.exists(scheme_file):
+            write_scheme = open(scheme_file, 'w')
+            write_scheme.writelines('partscheme=GPT')
+            write_scheme.close()
+        if mount_point == '/':
+            write_slice = open(slice_file, 'w')
+            write_slice.writelines('p%s\n' % pl)
+            write_slice.close()
         plist = []
         pslice = '%sp%s' % (disk, pl)
         mplist = partition_query(disk)
         if size_left == 0:
             create_size -= 1
         pf = open(partitiondb + disk, 'wb')
-        plist.extend(([disk + 'p%s' % pl, create_size, label, fs]))
+        plist.extend(([disk + 'p%s' % pl, create_size, mount_point, fs]))
         mplist[lv] = plist
         plist = []
         if size_left > 0:
@@ -1080,27 +1092,27 @@ class modifyPartition():
             mplist.append(plist)
         pickle.dump(mplist, pf)
         pf.close()
-        pfile = open(Part_label, 'w')
+        write_partition = open(partition_label_file, 'w')
         for partlist in partition_query(disk):
             if partlist[2] != '':
-                pfile.writelines('%s %s %s\n' % (partlist[3], partlist[1],
+                write_partition.writelines('%s %s %s\n' % (partlist[3], partlist[1],
                                  partlist[2]))
-        pfile.close()
+        write_partition.close()
         if data is True:
             plst = []
             mplst = []
-            if not os.path.exists(tmp + 'create'):
+            if not os.path.exists(f'{tmp}/create'):
                 plst.extend(([pslice, create_size]))
                 mplst.append(plst)
-                cf = open(tmp + 'create', 'wb')
+                cf = open(f'{tmp}/create', 'wb')
                 pickle.dump(mplst, cf)
                 cf.close()
 
 
-class rDeleteParttion():
+class deletePartition():
     def __init__(self):
-        if os.path.exists(tmp + 'delete'):
-            delete_file = open(tmp + 'delete', 'rb')
+        if os.path.exists(f'{tmp}/delete'):
+            delete_file = open(f'{tmp}/delete', 'rb')
             delete_list = pickle.load(delete_file)
             for partition in delete_list:
                 num = slice_number(partition)
@@ -1111,10 +1123,10 @@ class rDeleteParttion():
                 sleep(1)
 
 
-class destroyParttion():
+class destroyPartition():
     def __init__(self):
-        if os.path.exists(tmp + 'destroy'):
-            dsf = open(tmp + 'destroy', 'rb')
+        if os.path.exists(f'{tmp}/destroy'):
+            dsf = open(f'{tmp}/destroy', 'rb')
             ds = pickle.load(dsf)
             for line in ds:
                 drive = line[0]
@@ -1143,11 +1155,11 @@ def bios_or_uefi():
     return output1.stdout.readlines()[0].rstrip()
 
 
-class makingParttion():
+class addPartition():
 
     def __init__(self):
-        if os.path.exists(tmp + 'create'):
-            pf = open(tmp + 'create', 'rb')
+        if os.path.exists(f'{tmp}/create'):
+            pf = open(f'{tmp}/create', 'rb')
             pl = pickle.load(pf)
             read = open(boot_file, 'r')
             boot = read.readlines()[0].strip()

@@ -16,9 +16,9 @@ if not os.path.exists(tmp):
     os.makedirs(tmp)
 disk_scheme = f'{tmp}/scheme'
 disk_file = f'{tmp}/disk'
-part_size_file = f'{tmp}/part_size'
+slice_file = f'{tmp}/slice'
 logo = "/usr/local/lib/gbi/logo.png"
-Part_label = f'{tmp}/partlabel'
+partition_label_file = f'{tmp}/partlabel'
 
 disk_db_file = f'{tmp}/disk.db'
 ufs_Partiton_list = []
@@ -99,7 +99,7 @@ class Partitions():
                     self.fs = "ZFS"
             else:
                 self.fs_type.append_text("BOOT")
-                if not os.path.exists(Part_label):
+                if not os.path.exists(partition_label_file):
                     self.fs_type.set_active(5)
                     self.fs = "BOOT"
                 elif len(self.partitions) == 0:
@@ -130,12 +130,12 @@ class Partitions():
         self.mountpoint_box.append_text('none')
         # The space for root '/ ' is to recognise / from the file.
         self.mountpoint_box.append_text('/')
-        if os.path.exists(Part_label):
+        if os.path.exists(partition_label_file):
             if scheme == 'GPT' and len(self.partitions) == 1:
                 self.mountpoint_box.append_text('/boot')
             elif scheme == 'MBR' and len(self.partitions) == 0:
                 self.mountpoint_box.append_text('/boot')
-        elif scheme == 'MBR' and not os.path.exists(Part_label):
+        elif scheme == 'MBR' and not os.path.exists(partition_label_file):
             self.mountpoint_box.append_text('/boot')
         self.mountpoint_box.append_text('/etc')
         self.mountpoint_box.append_text('/root')
@@ -254,19 +254,12 @@ class Partitions():
         self.update()
         self.window.hide()
 
-    def autoSchemePartition(self, widget):
-        diskSchemeChanger(self.scheme, self.path, self.disk, self.size)
-        self.update()
-        autoFreeSpace(self.path, self.size, self.fs, self.efi_exist, self.disk, self.scheme)
-        self.update()
-        self.window.hide()
-
     def schemeEditor(self):
         self.window = Gtk.Window()
         self.window.set_title("Partition Scheme")
         self.window.set_border_width(0)
         self.window.set_size_request(400, 150)
-        self.window.set_icon_from_file("/usr/local/lib/gbi/logo.png")
+        self.window.set_icon_from_file(logo)
         box1 = Gtk.VBox(False, 0)
         self.window.add(box1)
         box1.show()
@@ -315,7 +308,7 @@ class Partitions():
         self.window.set_title("Add Partition")
         self.window.set_border_width(0)
         self.window.set_size_request(400, 150)
-        self.window.set_icon_from_file("/usr/local/lib/gbi/logo.png")
+        self.window.set_icon_from_file(logo)
         box1 = Gtk.VBox(False, 0)
         self.window.add(box1)
         box1.show()
@@ -396,26 +389,31 @@ class Partitions():
                 self.labelEditor(self.path, self.slice, self.size, 'GPT', True)
 
     def autoPartition(self, widget):
+        self.create_bt.set_sensitive(False)
+        self.delete_bt.set_sensitive(False)
+        self.modify_bt.set_sensitive(False)
+        self.auto_bt.set_sensitive(False)
+        self.revert_bt.set_sensitive(False)
         if 'freespace' in self.slice:
             self.choose_fs()
         else:
             print('wrong utilization')
 
     def revertChange(self, widget):
-        if os.path.exists(tmp + 'create'):
-            os.remove(tmp + 'create')
+        if os.path.exists(f'{tmp}create'):
+            os.remove(f'{tmp}create')
         if os.path.exists(disk_scheme):
             os.remove(disk_scheme)
         if os.path.exists(disk_file):
             os.remove(disk_file)
-        if os.path.exists(part_size_file):
-            os.remove(part_size_file)
-        if os.path.exists(tmp + 'delete'):
-            os.remove(tmp + 'delete')
-        if os.path.exists(tmp + 'destroy'):
-            os.remove(tmp + 'destroy')
-        if os.path.exists(Part_label):
-            os.remove(Part_label)
+        if os.path.exists(slice_file):
+            os.remove(slice_file)
+        if os.path.exists(f'{tmp}delete'):
+            os.remove(f'{tmp}delete')
+        if os.path.exists(f'{tmp}destroy'):
+            os.remove(f'{tmp}destroy')
+        if os.path.exists(partition_label_file):
+            os.remove(partition_label_file)
         create_disk_partition_db()
         self.Tree_Store()
         self.treeview.expand_all()
@@ -525,8 +523,8 @@ class Partitions():
                     self.create_bt.set_sensitive(True)
                 else:
                     self.create_bt.set_sensitive(False)
-        if os.path.exists(Part_label):
-            rd = open(Part_label, 'r')
+        if os.path.exists(partition_label_file):
+            rd = open(partition_label_file, 'r')
             self.partitions = rd.readlines()
             # Find if GPT scheme.
             if os.path.exists(disk_scheme):
@@ -602,7 +600,7 @@ class Partitions():
                     else:
                         self.button3.set_sensitive(False)
                 else:
-                    # to be changed when MBR UEFI will be supported in the backend.
+                    # to be changed when MBR UEFI will be supported by pc-sysinstall.
                     self.efi_exist = False
                     if len(self.partitions) >= 1:
                         if "/boot\n" in self.partitions[0]:
@@ -628,13 +626,13 @@ class Partitions():
         else:
             self.button3.set_sensitive(False)
         path_exist = [
-            os.path.exists(tmp + 'create'),
+            os.path.exists(f'{tmp}create'),
             os.path.exists(disk_scheme),
             os.path.exists(disk_file),
-            os.path.exists(part_size_file),
-            os.path.exists(tmp + 'delete'),
-            os.path.exists(tmp + 'destroy'),
-            os.path.exists(Part_label)
+            os.path.exists(slice_file),
+            os.path.exists(f'{tmp}delete'),
+            os.path.exists(f'{tmp}destroy'),
+            os.path.exists(partition_label_file)
         ]
         if any(path_exist):
             self.revert_bt.set_sensitive(True)
