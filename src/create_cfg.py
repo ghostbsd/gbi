@@ -45,7 +45,7 @@ class gbsd_cfg():
         # System Language
         langfile = open(language, 'r')
         lang = langfile.readlines()[0].rstrip()
-        f.writelines('\n# System Language\n\n')
+        f.writelines('\n# System Language\n')
         f.writelines('localizeLang=%s\n' % lang)
         os.remove(language)
         # Keyboard Setting
@@ -134,7 +134,7 @@ class gbsd_cfg():
                 f.writelines('bootManager=%s\n' % boot)
                 f.writelines('efiLoader=none\n')
             # os.remove(boot_file)
-            # Sheme sheme
+            # Scheme
             read = open(disk_schem, 'r')
             shem = read.readlines()[0]
             f.writelines(shem + '\n')
@@ -163,7 +163,6 @@ class gbsd_cfg():
         readr = open('%sroot' % tmp, 'rb')
         rf = pickle.load(readr)
         root = rf[0]
-        f.writelines('\n# Set the root pass\n')
         f.writelines('rootPass=%s\n' % root)
         # Setup our users
         user = uf[0]
@@ -180,6 +179,7 @@ class gbsd_cfg():
         f.writelines('defaultGroup=wheel\n')
         f.writelines('userGroups=operator\n')
         f.writelines('commitUser\n')
+        f.writelines('\n# Run command and script\n')
         nv = Popen('pciconf -lv | grep -B 4 VGA', shell=True,
                    stdout=PIPE, close_fds=True, universal_newlines=True)
         if "NVIDIA" not in nv.stdout.read():

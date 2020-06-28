@@ -732,7 +732,7 @@ class autoFreeSpace():
             part_list = []
             main_list = []
             part_list.extend(([boot_partition, boot_size]))
-            main_list.append(partition_list)
+            main_list.append(part_list)
             cf = open(f'{tmp}/create', 'wb')
             pickle.dump(main_list, cf)
             cf.close()
@@ -969,7 +969,7 @@ class createSlice():
             read_file = open(f'{tmp}/create', 'rb')
             main_list = pickle.load(read_file)
         part_list.extend(([partition, create_size]))
-        main_list.append(partition_list)
+        main_list.append(part_list)
         cf = open(f'{tmp}/create', 'wb')
         pickle.dump(main_list, cf)
         cf.close()
@@ -1044,7 +1044,7 @@ class createPartition():
                 read_file = open(f'{tmp}/create', 'rb')
                 main_list = pickle.load(read_file)
             part_list.extend(([partition, create_size]))
-            main_list.append(partition_list)
+            main_list.append(part_list)
             cf = open(f'{tmp}/create', 'wb')
             pickle.dump(main_list, cf)
             cf.close()
