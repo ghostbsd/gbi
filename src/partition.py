@@ -27,7 +27,7 @@ bios_type = bios_or_uefi()
 
 class Partitions():
 
-    def on_fs(self, widget):
+    def set_fs(self, widget):
         self.fs = widget.get_active_text()
         if 'UFS' in self.fs:
             self.mountpoint_box.set_sensitive(True)
@@ -117,7 +117,7 @@ class Partitions():
         else:
             self.fs_type.set_active(0)
             self.fs = "ZFS"
-        self.fs_type.connect("changed", self.on_fs)
+        self.fs_type.connect("changed", self.set_fs)
         adj = Gtk.Adjustment(free_space, 0, free_space, 1, 100, 0)
         self.entry = Gtk.SpinButton(adjustment=adj, numeric=True)
         if modify is True:
@@ -128,7 +128,7 @@ class Partitions():
         # self.mountpoint_box.append_text('select labels')
         self.mountpoint = "none"
         self.mountpoint_box.append_text('none')
-        # The space for root '/ ' is to recognise / from the file.
+        # The space for root '/ ' is to recognize / from the file.
         self.mountpoint_box.append_text('/')
         if os.path.exists(partition_label_file):
             if scheme == 'GPT' and len(self.partitions) == 1:
@@ -192,6 +192,9 @@ class Partitions():
         bbox.add(button)
         box2.pack_end(bbox, True, True, 5)
         self.window.show_all()
+
+    def on_fs(self, widget):
+        self.fs = widget.get_active_text()
 
     def choose_fs(self):
         self.window = Gtk.Window()
