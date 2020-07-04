@@ -403,18 +403,18 @@ class Partitions():
             print('wrong utilization')
 
     def revertChange(self, widget):
-        if os.path.exists(f'{tmp}create'):
-            os.remove(f'{tmp}create')
+        if os.path.exists(f'{tmp}/create'):
+            os.remove(f'{tmp}/create')
         if os.path.exists(disk_scheme):
             os.remove(disk_scheme)
         if os.path.exists(disk_file):
             os.remove(disk_file)
         if os.path.exists(slice_file):
             os.remove(slice_file)
-        if os.path.exists(f'{tmp}delete'):
-            os.remove(f'{tmp}delete')
-        if os.path.exists(f'{tmp}destroy'):
-            os.remove(f'{tmp}destroy')
+        if os.path.exists(f'{tmp}/delete'):
+            os.remove(f'{tmp}/delete')
+        if os.path.exists(f'{tmp}/destroy'):
+            os.remove(f'{tmp}/destroy')
         if os.path.exists(partition_label_file):
             os.remove(partition_label_file)
         create_disk_partition_db()
@@ -629,12 +629,12 @@ class Partitions():
         else:
             self.button3.set_sensitive(False)
         path_exist = [
-            os.path.exists(f'{tmp}create'),
+            os.path.exists(f'{tmp}/create'),
             os.path.exists(disk_scheme),
             os.path.exists(disk_file),
             os.path.exists(slice_file),
-            os.path.exists(f'{tmp}delete'),
-            os.path.exists(f'{tmp}destroy'),
+            os.path.exists(f'{tmp}/delete'),
+            os.path.exists(f'{tmp}/destroy'),
             os.path.exists(partition_label_file)
         ]
         if any(path_exist):
