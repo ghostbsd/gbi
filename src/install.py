@@ -40,8 +40,7 @@ def update_progess(probar, bartext):
 def read_output(command, probar):
     GLib.idle_add(update_progess, probar, "Creating pcinstall.cfg")
     gbsd_cfg()
-    call('umount /media/GhostBSD', shell=True)
-    sleep(2)
+    sleep(1)
     if os.path.exists(tmp + 'delete'):
         GLib.idle_add(update_progess, probar, "Deleting partition")
         deletePartition()
@@ -71,7 +70,6 @@ def read_output(command, probar):
         print(bartext)
     if bartext.rstrip() == "Installation finished!":
         Popen(f'python {gbi_path}end.py', shell=True, close_fds=True)
-        call("rm -rf /tmp/.gbi/", shell=True, close_fds=True)
         Gtk.main_quit()
     else:
         Popen(f'python {gbi_path}error.py', shell=True, close_fds=True)
