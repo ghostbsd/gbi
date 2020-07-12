@@ -11,17 +11,17 @@ from partition_handler import bios_or_uefi
 
 
 # Folder use pr the installer.
-tmp = "/tmp/.gbi/"
+tmp = "/tmp/.gbi"
 installer = "/usr/local/lib/gbi/"
 query = "sh /usr/local/etc/lib/backend-query/"
 if not os.path.exists(tmp):
     os.makedirs(tmp)
 
 logo = "/usr/local/lib/gbi/logo.png"
-boot_file = '%sboot' % tmp
-disk_schem = '%sscheme' % tmp
-zfs_config = '%szfs_config' % tmp
-ufs_config = tmp + 'ufs_config'
+boot_file = f'{tmp}/boot'
+disk_scheme = f'{tmp}/scheme'
+zfs_config = f'{tmp}/zfs_config'
+ufs_config = f'{tmp}/ufs_config'
 
 
 class bootManager():
@@ -49,20 +49,16 @@ class bootManager():
         if os.path.exists(zfs_config):
             # Disk Setup
             read = open(zfs_config, 'r')
-            schem = read.read()
-            # os.remove(zfs_config)
+            read_scheme = read.read()
         elif os.path.exists(ufs_config):
             # Disk Setup
             read = open(ufs_config, 'r')
-            schem = read.readlines()
+            read_scheme = read.read()
         else:
-            # Sheme sheme
-            read = open(disk_schem, 'r')
-            schem = read.read()
-        if 'GPT' in schem:
-            scheme = 'GPT'
-        else:
-            scheme = 'MBR'
+            # Scheme file
+            read = open(disk_scheme, 'r')
+            read_scheme = read.read()
+        scheme = 'GPT' if 'GPT' in read_scheme else 'MBR'
         label = Gtk.Label('<b><span size="x-large">Boot Option</span></b>')
         label.set_use_markup(True)
         box2.pack_start(label, False, False, 10)

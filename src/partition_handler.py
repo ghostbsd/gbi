@@ -2,169 +2,85 @@
 
 import os
 import re
-from subprocess import Popen, PIPE, STDOUT, call
 import pickle
 from time import sleep
+from subprocess import Popen, PIPE, STDOUT, call
 
-tmp = "/tmp/.gbi/"
+tmp = "/tmp/.gbi"
 if not os.path.exists(tmp):
     os.makedirs(tmp)
-installer = "/usr/local/lib/gbi/"
-sysinstall = "/usr/local/sbin/pc-sysinstall"
-partitiondb = "%spartitiondb/" % tmp
-query = "sh /usr/local/lib/gbi/backend-query/"
-query_disk = '%sdisk-list.sh' % query
-detect_sheme = '%sdetect-sheme.sh' % query
-diskdb = "%sdisk" % partitiondb
-query_partition = '%sdisk-part.sh' % query
-query_label = '%sdisk-label.sh' % query
-disk_info = '%sdisk-info.sh' % query
-nl = "\n"
+pc_sysinstall = "/usr/local/sbin/pc-sysinstall"
+query = "sh /usr/local/lib/gbi/backend-query"
+query_disk = f'{query}/disk-list.sh'
+detect_scheme = f'{query}/detect-sheme.sh'
+query_partition = f'{query}/disk-part.sh'
+query_label = f'{query}/disk-label.sh'
+disk_info = f'{query}/disk-info.sh'
 memory = 'sysctl hw.physmem'
-disk_file = '%sdisk' % tmp
-dslice = '%sslice' % tmp
-Part_label = '%spartlabel' % tmp
-part_schem = '%sscheme' % tmp
-boot_file = '%sboot' % tmp
+disk_file = f'{tmp}/disk'
+slice_file = f'{tmp}/slice'
+partition_label_file = f'{tmp}/partlabel'
+scheme_file = f'{tmp}/scheme'
+boot_file = f'{tmp}/boot'
+disk_db_file = f'{tmp}/disk.db'
 
 
-def disk_query():
-    df = open(diskdb, 'rb')
+def disk_database():
+    df = open(disk_db_file, 'rb')
     dl = pickle.load(df)
     return dl
 
 
 def zfs_disk_query():
-    disk_output = Popen(sysinstall + " disk-list", shell=True, stdin=PIPE,
+    disk_output = Popen(pc_sysinstall + " disk-list", shell=True, stdin=PIPE,
                         stdout=PIPE, universal_newlines=True, close_fds=True)
     return disk_output.stdout.readlines()
 
 
 def zfs_disk_size_query(disk):
-    disk_info_output = Popen(sysinstall + " disk-info " + disk, shell=True,
+    disk_info_output = Popen(pc_sysinstall + " disk-info " + disk, shell=True,
                              stdin=PIPE, stdout=PIPE, universal_newlines=True,
                              close_fds=True)
     return disk_info_output.stdout.readlines()[3].partition('=')[2]
 
 
-def how_partition(path):
-    disk = disk_query()[path[0]][0]
-    if os.path.exists(partitiondb + disk):
-        part = partition_query(disk)
-        return len(part)
-    else:
+def how_partition(disk):
+    partitions = disk_database()[disk]['partitions']
+    if partitions is None:
         return 0
-
-
-def first_is_free(path):
-    disk = disk_query()[path[0]][0]
-    if os.path.exists(partitiondb + disk):
-        part = partition_query(disk)
-        return part[0][0]
     else:
-        return None
+        return len(partitions)
 
 
-def partition_query(disk):
-    plist = open(partitiondb + disk, 'rb')
-    pl = pickle.load(plist)
-    return pl
+def get_disk_from_partition(part):
+    if set("p") & set(part):
+        return part.partition('p')[0]
+    else:
+        return part.partition('s')[0]
 
 
-def label_query(pslice):
-    llist = open(partitiondb + pslice, 'rb')
-    ll = pickle.load(llist)
-    return ll
+def slice_number(part):
+    if set("p") & set(part):
+        return int(part.partition('p')[2])
+    else:
+        return int(part.partition('s')[2])
 
 
-def scheme_query(path):
-    disk = disk_query()[path[0]]
-    return disk[-1]
-
-
-def find_scheme(disk):
-    cmd = "%s %s" % (detect_sheme, disk)
-    shm_out = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE,
-                    universal_newlines=True, close_fds=True)
-    scheme = shm_out.stdout.readlines()[0].rstrip()
-    return scheme
-
-
-def rpartslice(part):
-    item = part
-    p = set("p")
-    s = set("s")
-    if p & set(item):
-        drive = item.partition('p')[0]
-    elif s & set(item):
-        drive = item.partition('s')[0]
-    return drive
-
-
-def sliceNum(part):
-    item = part
-    p = set("p")
-    s = set("s")
-    if p & set(item):
-        num = int(item.partition('p')[2])
-    elif s & set(item):
-        num = int(item.partition('s')[2])
-    return num
-
-
-def slicePartition(part):
-    item = part
-    p = set("p")
-    s = set("s")
-    if p & set(item):
-        return 'p'
-    elif s & set(item):
-        return 's'
-
-
-class diskSchemeChanger():
-
-    def __init__(self, schm, path, disk, size):
-        dlist = disk_query()
-        dselected = dlist[path[0]]
-        if schm is None:
-            dselected[-1] = 'GPT'
-        else:
-            dselected[-1] = schm
-        dlist[path[0]] = dselected
-        disk = dselected[0]
-        df = open(diskdb, 'wb')
-        pickle.dump(dlist, df)
-        df.close()
-        dsl = []
-        mdsl = []
-        if os.path.exists(tmp + 'destroy'):
-            df = open(tmp + 'destroy', 'rb')
-            mdsl = pickle.load(df)
-        dsl.extend(([disk, schm]))
-        mdsl.append(dsl)
-        cf = open(tmp + 'destroy', 'wb')
-        pickle.dump(mdsl, cf)
-        cf.close()
-        if not os.path.exists(partitiondb + disk):
-            plist = []
-            mplist = []
-            psf = open(partitiondb + disk, 'wb')
-            plist.extend((['freespace', size, '', '']))
-            mplist.append(plist)
-            pickle.dump(mplist, psf)
-            psf.close()
-
-
-class partition_repos():
+class create_disk_partition_db():
 
     def disk_list(self):
-        disk_output = Popen(query_disk, shell=True, stdin=PIPE, stdout=PIPE,
-                            universal_newlines=True, close_fds=True)
-        dlist = []
-        for disk in disk_output.stdout:
-            dlist.append(disk.split())
-        return dlist
+        cmd = 'sysctl -n kern.disks'
+        disk_Popen = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE,
+                           universal_newlines=True, close_fds=True)
+        disks = disk_Popen.stdout.read()
+        cleaned_disk = re.sub(r'acd[0-9]*|cd[0-9]*|scd[0-9]*', '', disks)
+        return sorted(cleaned_disk.split())
+
+    def device_model(self, disk):
+        cmd = f"diskinfo -v {disk} 2>/dev/null | grep 'Disk descr' | cut -d '#' -f1 | tr -d '\t'"
+        disk_Popen = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE,
+                           universal_newlines=True, close_fds=True)
+        return disk_Popen.stdout.read().strip()
 
     def disk_size(self, disk):
         cmd = "%s %s" % (disk_info, disk)
@@ -174,91 +90,161 @@ class partition_repos():
         return diskSize
 
     def find_Scheme(self, disk):
-        cmd = "%s %s" % (detect_sheme, disk)
+        cmd = "%s %s" % (detect_scheme, disk)
         shm_out = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE,
                         universal_newlines=True, stderr=STDOUT, close_fds=True)
         scheme = shm_out.stdout.readlines()[0].rstrip()
         return scheme
 
-    def mbr_partition_slice_list(self, disk):
+    def mbr_partition_slice_db(self, disk):
         partition_output = Popen('%s %s' % (query_partition, disk),
                                  shell=True, stdin=PIPE, stdout=PIPE,
-                                 universal_newlines=True, close_fds=True)
-        plist = []
-        mplist = []
-        dpsf = open(partitiondb + disk, 'wb')
+                                 universal_newlines=True)
+        slice_db = {}
+        free_num = 1
         for line in partition_output.stdout:
-            info = line.split()
-            plist.extend((info[0], info[1].partition('M')[0], '', info[2]))
-            mplist.append(plist)
-            plist = []
-            self.mbr_partition_list(info[0])
-        pickle.dump(mplist, dpsf)
-        dpsf.close()
+            info = line.strip().split()
+            slice_name = info[0]
+            if 'freespace' in line:
+                slice_name = f'freespace{free_num}'
+                free_num += 1
+            partition_db = self.mbr_partition_db(info[0])
+            # partition_list = [] if partition_db is None else list(partition_db.keys())
+            partitions = {
+                'name': slice_name,
+                'size': info[1].partition('M')[0],
+                'mount_point': '',
+                'file_system': info[2],
+                'stat': None,
+                'partitions': partition_db,
+                'partition_list': [] if partition_db is None else list(partition_db.keys())
+            }
+            slice_db[slice_name] = partitions
+        return slice_db
 
-    def mbr_partition_list(self, pslice):
-        slice_outpput = Popen('%s %s' % (query_label, pslice), shell=True,
-                              stdin=PIPE, stdout=PIPE,
-                              universal_newlines=True, close_fds=True)
-        alph = ord('a')
-        if pslice == 'freespace':
-            pass
+    def mbr_partition_db(self, pslice):
+        if 'freespace' in pslice:
+            return None
         else:
-            llist = []
-            mllist = []
-            plf = open(partitiondb + pslice, 'wb')
-            for line in slice_outpput.stdout:
-                info = line.split()
-                letter = chr(alph)
-                alph = alph + 1
-                if info[0] == 'freespace':
-                    llist.extend(([info[0], info[1].partition('M')[0], '', ''])
-                                 )
+            slice_output = Popen('%s %s' % (query_label, pslice), shell=True,
+                                 stdin=PIPE, stdout=PIPE,
+                                 universal_newlines=True)
+            partition_db = {}
+            alph = ord('a')
+            free_num = 1
+            for line in slice_output.stdout:
+                info = line.strip().split()
+                if 'freespace' in line:
+                    partition_name = f'freespace{free_num}'
+                    free_num += 1
                 else:
-                    llist.extend((
-                                 [pslice + letter, info[0].partition('M')[0],
-                                  '', info[1]]))
-                mllist.append(llist)
-                llist = []
-            pickle.dump(mllist, plf)
-            plf.close()
+                    letter = chr(alph)
+                    partition_name = f'{info[0]}{letter}'
+                    alph += 1
+                partitions = {
+                    'name': partition_name,
+                    'size': info[1].partition('M')[0],
+                    'mount_point': '',
+                    'file_system': info[2],
+                    'stat': None,
+                }
+                partition_db[partition_name] = partitions
+            if not partition_db:
+                return None
+            return partition_db
 
-    def gpt_partition_list(self, disk):
+    def gpt_partition_db(self, disk):
         partition_output = Popen('%s %s' % (query_partition, disk),
                                  shell=True, stdin=PIPE, stdout=PIPE,
-                                 universal_newlines=True, close_fds=True)
-        plist = []
-        mplist = []
-        psf = open(partitiondb + disk, 'wb')
+                                 universal_newlines=True)
+        partition_db = {}
+        free_num = 1
         for line in partition_output.stdout:
-            info = line.split()
-            plist.extend((info[0], info[1].partition('M')[0], '', info[2]))
-            mplist.append(plist)
-            plist = []
-        pickle.dump(mplist, psf)
-        psf.close()
+            info = line.strip().split()
+            slice_name = info[0]
+            if 'freespace' in line:
+                slice_name = f'freespace{free_num}'
+                free_num += 1
+            partitions = {
+                'name': info[0],
+                'size': info[1].partition('M')[0],
+                'mount_point': '',
+                'file_system': info[2],
+                'stat': None,
+                'partitions': {},
+                'partition_list': []
+            }
+            partition_db[slice_name] = partitions
+        return partition_db
 
     def __init__(self):
-        if not os.path.exists(partitiondb):
-            os.makedirs(partitiondb)
-        df = open(diskdb, 'wb')
-        dlist = []
-        mdlist = []
+        if os.path.exists(disk_db_file):
+            os.remove(disk_db_file)
+        df = open(disk_db_file, 'wb')
+        disk_db = {}
         for disk in self.disk_list():
-            if self.find_Scheme(disk[0]) == "GPT":
-                dlist.extend(([disk[0], self.disk_size(disk[0]), '', 'GPT']))
-                self.gpt_partition_list(disk[0])
-                mdlist.append(dlist)
-            elif self.find_Scheme(disk[0]) == "MBR":
-                dlist.extend(([disk[0], self.disk_size(disk[0]), '', 'MBR']))
-                self.mbr_partition_slice_list(disk[0])
-                mdlist.append(dlist)
+            disk_info_db = {}
+            if self.find_Scheme(disk) == "GPT":
+                disk_info_db['scheme'] = 'GPT'
+                partition_db = []
+                partition_db = self.gpt_partition_db(disk)
+            elif self.find_Scheme(disk) == "MBR":
+                disk_info_db['scheme'] = 'MBR'
+                partition_db = self.mbr_partition_slice_db(disk)
             else:
-                dlist.extend(([disk[0], self.disk_size(disk[0]), '', None]))
-                mdlist.append(dlist)
-            dlist = []
-        pickle.dump(mdlist, df)
+                disk_info_db['scheme'] = None
+                partition_db = None
+            disk_info_db['size'] = self.disk_size(disk)
+            disk_info_db['device_model'] = self.device_model(disk)
+            disk_info_db['partitions'] = partition_db
+            disk_info_db['partition_list'] = [] if partition_db is None else list(partition_db.keys())
+            disk_info_db['stat'] = None
+            disk_db[disk] = disk_info_db
+        # print(json.dumps(disk_db, indent=4))
+        pickle.dump(disk_db, df)
         df.close()
+
+
+def diskSchemeChanger(scheme, path, disk, size):
+    disk_data = disk_database()
+    if scheme is None:
+        disk_data[disk]['scheme'] = 'GPT'
+    else:
+        disk_data[disk]['scheme'] = scheme
+    dsl = []
+    mdsl = []
+    if os.path.exists(f'{tmp}/destroy'):
+        df = open(f'{tmp}/destroy', 'rb')
+        mdsl = pickle.load(df)
+    dsl.extend(([disk, scheme]))
+    mdsl.append(dsl)
+    cf = open(f'{tmp}/destroy', 'wb')
+    pickle.dump(mdsl, cf)
+    cf.close()
+    if disk_data[disk]['partitions'] is None:
+        disk_data[disk]['partitions'] = {
+            'freespace1': {
+                'name': 'freespace1',
+                'size': size,
+                'mount_point': '',
+                'file_system': 'none',
+                'stat': None,
+                'partitions': {},
+                'partition_list': []
+            }
+        }
+        disk_data[disk]['partition_list'] = [
+            'freespace1'
+        ]
+    df = open(disk_db_file, 'wb')
+    pickle.dump(disk_data, df)
+    df.close()
+
+
+def find_next_partition(partition_name, partition_list):
+    for num in range(1, 10000):
+        if f'{partition_name}{num}' not in partition_list:
+            return f'{partition_name}{num}'
 
 
 class Delete_partition():
@@ -268,278 +254,384 @@ class Delete_partition():
         if re.search('[a-z]', last):
             return True
 
-    def delete_label(self, part, spart, path):
-        llist = open(partitiondb + spart, 'rb')
-        ll = pickle.load(llist)
-        last_num = len(ll) - 1
-        lnum = path[2]
-        if last_num == lnum:
-            free = int(ll[last_num][1])
-            if lnum != 0 and ll[lnum - 1][0] == 'freespace':
-                free = free + int(ll[lnum - 1][1])
-                ll[lnum] = ['freespace', free, '', '']
-                ll.remove(ll[lnum - 1])
+    def delete_label(self, drive, label_partition, partition, path):
+        disk_data = disk_database()
+        partitions_info = disk_data[drive]['partitions'][partition]['partitions']
+        partition_list = disk_data[drive]['partitions'][partition]['partition_list']
+        last_list_number = len(partition_list) - 1
+        store_list_number = path[1]
+        size_free = int(partitions_info[partition]['size'])
+        if last_list_number == store_list_number and len(partition_list) > 1:
+            partition_behind = partition_list[store_list_number - 1]
+            if 'freespace' in partition_behind:
+                size_free += int(partitions_info[partition_behind]['size'])
+                partition_list.remove(partition)
+                disk_data[drive]['partitions'][partition]['partitions'].pop(partition, None)
+                disk_data[drive]['partitions'][partition]['partitions'][partition_behind] = {
+                    'name': partition_behind,
+                    'size': size_free,
+                    'mount_point': '',
+                    'file_system': 'none',
+                    'stat': None,
+                    'partitions': {},
+                    'partition_list': []
+                }
+                disk_data[drive]['partitions'][partition]['partition_list'] = partition_list
             else:
-                ll[lnum] = ['freespace', free, '', '']
-        elif lnum == 0:
-            free = int(ll[lnum][1])
-            if ll[lnum + 1][0] == 'freespace':
-                free = free + int(ll[lnum + 1][1])
-                ll.remove(ll[lnum + 1])
-            ll[lnum] = ['freespace', free, '', '']
+                free_name = find_next_partition('freespace', partition_list)
+                partition_list[store_list_number] = free_name
+                disk_data[drive]['partitions'][partition]['partitions'].pop(partition, None)
+                disk_data[drive]['partitions'][partition]['partitions'][free_name] = {
+                    'name': free_name,
+                    'size': size_free,
+                    'mount_point': '',
+                    'file_system': 'none',
+                    'stat': None,
+                    'partitions': {},
+                    'partition_list': []
+                }
+                disk_data[drive]['partitions'][partition]['partition_list'] = partition_list
+        elif store_list_number == 0 and len(partition_list) > 1:
+            partition_after = partition_list[store_list_number + 1]
+            if 'freespace' in partition_after:
+                size_free += int(partitions_info[partition_after]['size'])
+                partition_list.remove(partition)
+                disk_data[drive]['partitions'][partition]['partitions'].pop(partition, None)
+                disk_data[drive]['partitions'][partition]['partitions'][partition_after] = {
+                    'name': partition_after,
+                    'size': size_free,
+                    'mount_point': '',
+                    'file_system': 'none',
+                    'stat': None,
+                    'partitions': {},
+                    'partition_list': []
+                }
+                disk_data[drive]['partitions'][partition]['partition_list'] = partition_list
+            else:
+                free_name = find_next_partition('freespace', partition_list)
+                partition_list[store_list_number] = free_name
+                disk_data[drive]['partitions'][partition]['partitions'].pop(partition, None)
+                disk_data[drive]['partitions'][partition]['partitions'][free_name] = {
+                    'name': free_name,
+                    'size': size_free,
+                    'mount_point': '',
+                    'file_system': 'none',
+                    'stat': None,
+                    'partitions': {},
+                    'partition_list': []
+                }
+                disk_data[drive]['partitions'][partition]['partition_list'] = partition_list
+        elif len(partition_list) > 2:
+            partition_behind = partition_list[store_list_number - 1]
+            partition_after = partition_list[store_list_number + 1]
+            size_behind = int(partitions_info[partition_behind]['size'])
+            size_after = int(partitions_info[partition_after]['size'])
+            if 'freespace' in partition_behind and 'freespace' in partition_after:
+                size_free += size_behind + size_after
+                partition_list.remove(partition)
+                partition_list.remove(partition_after)
+                disk_data[drive]['partitions'][partition]['partitions'].pop(partition, None)
+                disk_data[drive]['partitions'][partition]['partitions'][partition_behind] = {
+                    'name': partition_behind,
+                    'size': size_free,
+                    'mount_point': '',
+                    'file_system': 'none',
+                    'stat': None,
+                    'partitions': {},
+                    'partition_list': []
+                }
+                disk_data[drive]['partitions'][partition]['partition_list'] = partition_list
+            elif 'freespace' in partition_behind:
+                size_free += size_behind
+                partition_list.remove(partition)
+                disk_data[drive]['partitions'][partition]['partitions'].pop(partition, None)
+                disk_data[drive]['partitions'][partition]['partitions'][partition_behind] = {
+                    'name': partition_behind,
+                    'size': size_free,
+                    'mount_point': '',
+                    'file_system': 'none',
+                    'stat': None,
+                    'partitions': {},
+                    'partition_list': []
+                }
+                disk_data[drive]['partitions'][partition]['partition_list'] = partition_list
+            elif 'freespace' in partition_after:
+                size_free += size_after
+                partition_list.remove(partition)
+                disk_data[drive]['partitions'][partition]['partitions'].pop(partition, None)
+                disk_data[drive]['partitions'][partition]['partitions'][partition_after] = {
+                    'name': partition_after,
+                    'size': size_free,
+                    'mount_point': '',
+                    'file_system': 'none',
+                    'stat': None,
+                    'partitions': {},
+                    'partition_list': []
+                }
+                disk_data[drive]['partitions'][partition]['partition_list'] = partition_list
+            else:
+                free_name = find_next_partition('freespace', partition_list)
+                partition_list[store_list_number] = free_name
+                disk_data[drive]['partitions'][partition]['partitions'].pop(partition, None)
+                disk_data[drive]['partitions'][partition]['partitions'][free_name] = {
+                    'name': free_name,
+                    'size': size_free,
+                    'mount_point': '',
+                    'file_system': 'none',
+                    'stat': None,
+                    'partitions': {},
+                    'partition_list': []
+                }
+                disk_data[drive]['partitions'][partition]['partition_list'] = partition_list
         else:
-            free = int(ll[lnum][1])
-            if ll[lnum + 1][0] == 'freespace':
-                free = free + int(ll[lnum + 1][1])
-                ll.remove(ll[lnum + 1])
-            if lnum != 0 and ll[lnum - 1][0] == 'freespace':
-                free = free + int(ll[lnum - 1][1])
-                ll[lnum] = ['freespace', free, '', '']
-                ll.remove(ll[lnum - 1])
-            else:
-                ll[lnum] = ['freespace', free, '', '']
-        savepl = open(partitiondb + spart, 'wb')
-        pickle.dump(ll, savepl)
-        savepl.close()
+            free_name = find_next_partition('freespace', partition_list)
+            partition_list[store_list_number] = free_name
+            disk_data[drive]['partitions'][partition]['partitions'].pop(partition, None)
+            disk_data[drive]['partitions'][partition]['partitions'][free_name] = {
+                'name': free_name,
+                'size': size_free,
+                'mount_point': '',
+                'file_system': 'none',
+                'stat': None,
+                'partitions': {},
+                'partition_list': []
+            }
+            disk_data[drive]['partitions'][partition]['partition_list'] = partition_list
+        disk_db = open(disk_db_file, 'wb')
+        pickle.dump(disk_data, disk_db)
+        disk_db.close()
 
-        llist = open(partitiondb + spart, 'rb')
-        lablelist = pickle.load(llist)
-        pfile = open(Part_label, 'w')
-        for partlist in lablelist:
-            if partlist[2] != '':
-                pfile.writelines('%s %s %s\n' % (partlist[3], partlist[1],
-                                                 partlist[2]))
-        pfile.close()
+        new_partitions = open(partition_label_file, 'w')
+        for part in partition_list:
+            partitions_info = disk_data[drive]['partitions'][partition]['partitions']
+            size = partitions_info[part]['size']
+            mount_point = partitions_info[part]['mount_point']
+            file_system = partitions_info[part]['file_system']
+            stat = partitions_info[part]['stat']
+            if stat == 'new':
+                new_partitions.writelines(f'{file_system} {size} {mount_point}\n')
+        new_partitions.close()
 
     def __init__(self, part, path):
+        drive = get_disk_from_partition(part)
         if part == "freespace":
             pass
         elif self.find_if_label(part) is True:
             spart = part[:-1]
-            self.delete_label(part, spart, path)
+            self.delete_label(drive, part, spart, path)
         else:
-            drive = rpartslice(part)
             self.delete_slice(drive, part, path)
 
-    def delete_slice(self, drive, part, path):
-        slist = open(partitiondb + drive, 'rb')
-        sl = pickle.load(slist)
-        last_num = len(sl) - 1
-        snum = path[1]
-        # if os.path.exists(dslice):
-        #     sfile = open(dslice, 'r')
-        #     slf = sfile.readlines()[0].rstrip()
-        #     if slf == 'all':
-        #         ptnum = snum - 1
-        #     else:
-        #         slnum = int(re.sub("[^0-9]", "", slf))
-        if last_num == snum:
-            free = int(sl[last_num][1])
-            if snum != 0 and sl[snum - 1][0] == 'freespace':
-                free = free + int(sl[snum - 1][1])
-                sl[snum] = ['freespace', free, '', '']
-                sl.remove(sl[snum - 1])
+    def delete_slice(self, drive, partition, path):
+        disk_data = disk_database()
+        partitions_info = disk_data[drive]['partitions']
+        partition_list = disk_data[drive]['partition_list']
+        last_list_number = len(partition_list) - 1
+        store_list_number = path[1]
+        size_free = int(partitions_info[partition]['size'])
+        if last_list_number == store_list_number and len(partition_list) > 1:
+            partition_behind = partition_list[store_list_number - 1]
+            if 'freespace' in partition_behind:
+                size_free += int(partitions_info[partition_behind]['size'])
+                partition_list.remove(partition)
+                disk_data[drive]['partitions'].pop(partition, None)
+                disk_data[drive]['partitions'][partition_behind] = {
+                    'name': partition_behind,
+                    'size': size_free,
+                    'mount_point': '',
+                    'file_system': 'none',
+                    'stat': None,
+                    'partitions': {},
+                    'partition_list': []
+                }
+                disk_data[drive]['partition_list'] = partition_list
             else:
-                sl[snum] = ['freespace', free, '', '']
-        elif snum == 0:
-            free = int(sl[snum][1])
-            if sl[snum + 1][0] == 'freespace':
-                free = free + int(sl[snum + 1][1])
-                sl.remove(sl[snum + 1])
-                sl[snum] = ['freespace', free, '', '']
+                free_name = find_next_partition('freespace', partition_list)
+                partition_list[store_list_number] = free_name
+                disk_data[drive]['partitions'].pop(partition, None)
+                disk_data[drive]['partitions'][free_name] = {
+                    'name': free_name,
+                    'size': size_free,
+                    'mount_point': '',
+                    'file_system': 'none',
+                    'stat': None,
+                    'partitions': {},
+                    'partition_list': []
+                }
+                disk_data[drive]['partition_list'] = partition_list
+        elif store_list_number == 0 and len(partition_list) > 1:
+            partition_after = partition_list[store_list_number + 1]
+            if 'freespace' in partition_after:
+                size_free += int(partitions_info[partition_after]['size'])
+                partition_list.remove(partition)
+                disk_data[drive]['partitions'].pop(partition, None)
+                disk_data[drive]['partitions'][partition_after] = {
+                    'name': partition_after,
+                    'size': size_free,
+                    'mount_point': '',
+                    'file_system': 'none',
+                    'stat': None,
+                    'partitions': {},
+                    'partition_list': []
+                }
+                disk_data[drive]['partition_list'] = partition_list
             else:
-                sl[snum] = ['freespace', free, '', '']
-        else:
-            free = int(sl[snum][1])
-            slice_after = sl[snum + 1][0]
-            slice_before = sl[snum - 1][0]
-            size_after = sl[snum + 1][1]
-            size_before = sl[snum - 1][1]
-            if slice_after == 'freespace' and slice_before == 'freespace':
-                free = free + int(size_after) + int(size_before)
-                sl[snum] = ['freespace', free, '', '']
-                sl.remove(sl[snum + 1])
-                sl.remove(sl[snum - 1])
-            elif slice_after == 'freespace':
-                free = free + int(sl[snum + 1][1])
-                sl[snum] = ['freespace', free, '', '']
-                sl.remove(sl[snum + 1])
-            elif snum != 0 and sl[snum - 1][0] == 'freespace':
-                free = free + int(sl[snum - 1][1])
-                sl[snum] = ['freespace', free, '', '']
-                sl.remove(sl[snum - 1])
+                free_name = find_next_partition('freespace', partition_list)
+                partition_list[store_list_number] = free_name
+                disk_data[drive]['partitions'].pop(partition, None)
+                disk_data[drive]['partitions'][free_name] = {
+                    'name': free_name,
+                    'size': size_free,
+                    'mount_point': '',
+                    'file_system': 'none',
+                    'stat': None,
+                    'partitions': {},
+                    'partition_list': []
+                }
+                disk_data[drive]['partition_list'] = partition_list
+        elif len(partition_list) > 2:
+            partition_behind = partition_list[store_list_number - 1]
+            partition_after = partition_list[store_list_number + 1]
+            size_behind = int(partitions_info[partition_behind]['size'])
+            size_after = int(partitions_info[partition_after]['size'])
+            if 'freespace' in partition_behind and 'freespace' in partition_after:
+                size_free += size_behind + size_after
+                partition_list.remove(partition)
+                partition_list.remove(partition_after)
+                disk_data[drive]['partitions'].pop(partition, None)
+                disk_data[drive]['partitions'][partition_behind] = {
+                    'name': partition_behind,
+                    'size': size_free,
+                    'mount_point': '',
+                    'file_system': 'none',
+                    'stat': None,
+                    'partitions': {},
+                    'partition_list': []
+                }
+                disk_data[drive]['partition_list'] = partition_list
+            elif 'freespace' in partition_behind:
+                size_free += size_behind
+                partition_list.remove(partition)
+                disk_data[drive]['partitions'].pop(partition, None)
+                disk_data[drive]['partitions'][partition_behind] = {
+                    'name': partition_behind,
+                    'size': size_free,
+                    'mount_point': '',
+                    'file_system': 'none',
+                    'stat': None,
+                    'partitions': {},
+                    'partition_list': []
+                }
+                disk_data[drive]['partition_list'] = partition_list
+            elif 'freespace' in partition_after:
+                size_free += size_after
+                partition_list.remove(partition)
+                disk_data[drive]['partitions'].pop(partition, None)
+                disk_data[drive]['partitions'][partition_after] = {
+                    'name': partition_after,
+                    'size': size_free,
+                    'mount_point': '',
+                    'file_system': 'none',
+                    'stat': None,
+                    'partitions': {},
+                    'partition_list': []
+                }
+                disk_data[drive]['partition_list'] = partition_list
             else:
-                sl[snum] = ['freespace', free, '', '']
-        # Making delete file
-        dl = []
-        mdl = []
-        data = True
-        # if delete exist check if slice is in delete.
-        if os.path.exists(tmp + 'delete'):
-            df = open(tmp + 'delete', 'rb')
-            mdl = pickle.load(df)
-            for line in mdl:
-                if part in line:
-                    data = False
-                    break
-        if data is True:
-            dl.extend(([part, free]))
-            mdl.append(dl)
-            cf = open(tmp + 'delete', 'wb')
-            pickle.dump(mdl, cf)
-            cf.close()
-        if os.path.exists(partitiondb + part):
-            os.remove(partitiondb + part)
-        saveps = open(partitiondb + drive, 'wb')
-        pickle.dump(sl, saveps)
-        saveps.close()
-        if "p" in part:
-            pfile = open(Part_label, 'w')
-            for partlist in partition_query(drive):
-                if partlist[2] != '':
-                    partition = f'{partlist[3]} {partlist[1]} {partlist[2]}\n'
-                    pfile.writelines(partition)
-            pfile.close()
-
-
-class autoDiskPartition():
-
-    def delete_mbr_partition(self, disk):
-        plist = partition_query(disk)
-        for part in plist:
-            if part[0] == 'freespace':
-                pass
-            else:
-                os.remove(partitiondb + part[0])
-
-    def create_mbr_partiton(self, disk, size):
-        file_disk = open(disk_file, 'w')
-        file_disk.writelines('%s\n' % disk)
-        file_disk.close()
-        sfile = open(part_schem, 'w')
-        sfile.writelines('partscheme=MBR')
-        sfile.close()
-        plist = []
-        mplist = []
-        dpsf = open(partitiondb + disk, 'wb')
-        plist.extend((disk + "s1", size, '', 'freebsd'))
-        mplist.append(plist)
-        pickle.dump(mplist, dpsf)
-        dpsf.close()
-        number = int(size.partition('M')[0])
-        slice_file = open(dslice, 'w')
-        slice_file.writelines('all\n')
-        slice_file.writelines('%s\n' % number)
-        slice_file.close()
-        # ram = Popen(memory, shell=True, stdin=PIPE, stdout=PIPE,
-        #             universal_newlines=True, close_fds=True)
-        # mem = ram.stdout.read()
-        # swap = int(int(mem.partition(':')[2].strip()) / (1024 * 1024))
-        swap = 2048
-        rootNum = int(number - swap)
-        llist = []
-        mllist = []
-        plf = open(partitiondb + disk + 's1', 'wb')
-        llist.extend(([disk + 's1a', rootNum, '/', 'UFS+SUJ']))
-        mllist.append(llist)
-        llist = []
-        llist.extend(([disk + 's1b', swap, 'none', 'SWAP']))
-        mllist.append(llist)
-        pickle.dump(mllist, plf)
-        plf.close()
-        pfile = open(Part_label, 'w')
-        pfile.writelines('UFS+SUJ %s /\n' % rootNum)
-        pfile.writelines('SWAP 0 none\n')
-        pfile.close()
-
-    def __init__(self, disk, size, schm):
-        self.bios_type = bios_or_uefi()
-        if schm == 'GPT':
-            self.create_gpt_partiton(disk, size)
-        elif schm == 'MBR':
-            if os.path.exists(partitiondb + disk):
-                self.delete_mbr_partition(disk)
-            self.create_mbr_partiton(disk, size)
-
-    def create_gpt_partiton(self, disk, size):
-        file_disk = open(disk_file, 'w')
-        file_disk.writelines('%s\n' % disk)
-        file_disk.close()
-        sfile = open(part_schem, 'w')
-        sfile.writelines('partscheme=GPT')
-        sfile.close()
-        number = int(size.partition('M')[0])
-        slice_file = open(dslice, 'w')
-        slice_file.writelines('all\n')
-        slice_file.writelines('%s\n' % number)
-        slice_file.close()
-        # ram = Popen(memory, shell=True, stdin=PIPE, stdout=PIPE,
-        #             universal_newlines=True, close_fds=True)
-        # mem = ram.stdout.read()
-        # swap = int(int(mem.partition(':')[2].strip()) / (1024 * 1024))
-        swap = 2048
-        if self.bios_type == "UEFI":
-            bnum = 256
+                free_name = find_next_partition('freespace', partition_list)
+                partition_list[store_list_number] = free_name
+                disk_data[drive]['partitions'].pop(partition, None)
+                disk_data[drive]['partitions'][free_name] = {
+                    'name': free_name,
+                    'size': size_free,
+                    'mount_point': '',
+                    'file_system': 'none',
+                    'stat': None,
+                    'partitions': {},
+                    'partition_list': []
+                }
+                disk_data[drive]['partition_list'] = partition_list
         else:
-            bnum = 1
-        rootNum = int(number - swap)
-        rnum = int(rootNum - bnum)
-        plist = []
-        mplist = []
-        plf = open(partitiondb + disk, 'wb')
-        if self.bios_type == "UEFI":
-            plist.extend(([disk + 'p1', bnum, 'none', 'UEFI']))
+            free_name = find_next_partition('freespace', partition_list)
+            partition_list[store_list_number] = free_name
+            disk_data[drive]['partitions'].pop(partition, None)
+            disk_data[drive]['partitions'][free_name] = {
+                'name': free_name,
+                'size': size_free,
+                'mount_point': '',
+                'file_system': 'none',
+                'stat': None,
+                'partitions': {},
+                'partition_list': []
+            }
+            disk_data[drive]['partition_list'] = partition_list
+
+        disk_db = open(disk_db_file, 'wb')
+        pickle.dump(disk_data, disk_db)
+        disk_db.close()
+
+        # if delete file exist check if slice is in the list
+        if os.path.exists(f'{tmp}/delete'):
+            df = open(f'{tmp}/delete', 'rb')
+            main_delete_list = pickle.load(df)
+            if partition not in main_delete_list:
+                main_delete_list.append(partition)
         else:
-            plist.extend(([disk + 'p1', bnum, 'none', 'BOOT']))
-        mplist.append(plist)
-        plist = []
-        plist.extend(([disk + 'p2', rnum, '/', 'UFS+SUJ']))
-        mplist.append(plist)
-        plist = []
-        plist.extend(([disk + 'p3', swap, 'none', 'SWAP']))
-        mplist.append(plist)
-        pickle.dump(mplist, plf)
-        plf.close()
-        pfile = open(Part_label, 'w')
-        if self.bios_type == "UEFI":
-            pfile.writelines('UEFI %s none\n' % bnum)
-        else:
-            pfile.writelines('BOOT %s none\n' % bnum)
-        pfile.writelines('UFS+SUJ %s /\n' % rnum)
-        pfile.writelines('SWAP 0 none\n')
-        pfile.close()
+            main_delete_list = [partition]
+        cf = open(f'{tmp}/delete', 'wb')
+        pickle.dump(main_delete_list, cf)
+        cf.close()
+
+        if "p" in partition:
+            new_partitions = open(partition_label_file, 'w')
+            for part in partition_list:
+                partitions_info = disk_data[drive]['partitions']
+                size = partitions_info[part]['size']
+                mount_point = partitions_info[part]['mount_point']
+                file_system = partitions_info[part]['file_system']
+                stat = partitions_info[part]['stat']
+                if stat == 'new':
+                    new_partitions.writelines(f'{file_system} {size} {mount_point}\n')
+            new_partitions.close()
 
 
 class autoFreeSpace():
 
-    def create_mbr_partiton(self, disk, size, sl, path, fs):
+    def create_mbr_partiton(self, drive, size, path, fs):
         file_disk = open(disk_file, 'w')
-        file_disk.writelines('%s\n' % disk)
+        file_disk.writelines(f'{drive}\n')
         file_disk.close()
-        sfile = open(part_schem, 'w')
-        sfile.writelines('partscheme=MBR')
-        sfile.close()
-        plist = []
-        mplist = partition_query(disk)
-        dpsf = open(partitiondb + disk, 'wb')
-        plist.extend((disk + "s%s" % sl, size, '', 'freebsd'))
-        mplist[path] = plist
-        pickle.dump(mplist, dpsf)
-        dpsf.close()
-        number = int(size)
-        slice_file = open(dslice, 'w')
-        slice_file.writelines('s%s\n' % sl)
-        slice_file.writelines('%s\n' % number)
-        slice_file.close()
-        # ram = Popen(memory, shell=True, stdin=PIPE, stdout=PIPE,
-        #             universal_newlines=True, close_fds=True)
-        # mem = ram.stdout.read()
-        # swap = int(int(mem.partition(':')[2].strip()) / (1024 * 1024))
-        swap = 2048
-        rootNum = int(number - swap)
-        llist = []
-        mllist = []
-        plf = open(partitiondb + disk + 's%s' % sl, 'wb')
+
+        write_scheme = open(scheme_file, 'w')
+        write_scheme.writelines('partscheme=MBR')
+        write_scheme.close()
+
+        disk_data = disk_database()
+        slice_list = disk_data[drive]['partition_list']
+        store_list_number = path[1]
+        main_slice = find_next_partition(f'{drive}s', slice_list)
+        slice_list[store_list_number] = main_slice
+        disk_data[drive]['partitions'][main_slice] = {
+            'name': main_slice,
+            'size': size,
+            'mount_point': 'none',
+            'file_system': 'BSD',
+            'stat': 'New',
+            'partitions': {},
+            'partition_list': []
+        }
+        disk_data[drive]['partition_list'] = slice_list
+
+        write_slice = open(slice_file, 'w')
+        write_slice.writelines(f'{main_slice.replace(drive, "")}\n')
+        write_slice.close()
+
+        root_size = int(size)
+        swap_size = 2048
+        root_size -= swap_size
+
+        partition_list = disk_data[drive]['partitions'][main_slice]['partition_list']
+
         if fs == "ZFS":
             layout = "/(compress=lz4|atime=off),/root(compress=lz4)," \
                 "/tmp(compress=lz4),/usr(canmount=off|mountpoint=none)," \
@@ -551,81 +643,99 @@ class autoFreeSpace():
                 "/var/mail(compress=lz4),/var/tmp(compress=lz4)"
         else:
             layout = '/'
-        llist.extend(([disk + 's%sa' % sl, rootNum, layout, fs]))
-        mllist.append(llist)
-        llist = []
-        llist.extend(([disk + 's%sb' % sl, swap, 'none', 'SWAP']))
-        mllist.append(llist)
-        pickle.dump(mllist, plf)
-        plf.close()
-        pfile = open(Part_label, 'w')
-        pfile.writelines(f'{fs} {rootNum} {layout}\n')
-        pfile.writelines('SWAP %s none\n' % int(swap - 1))
-        pfile.close()
+
+        root_partition = f'{main_slice}a'
+        partition_list.append(root_partition)
+        disk_data[drive]['partitions'][main_slice]['partitions'][root_partition] = {
+            'name': root_partition,
+            'size': root_size,
+            'mount_point': layout,
+            'file_system': fs,
+            'stat': 'New',
+            'partitions': {},
+            'partition_list': []
+        }
+
+        swap_partition = f'{main_slice}b'
+        partition_list.append(swap_partition)
+        disk_data[drive]['partitions'][main_slice]['partitions'][swap_partition] = {
+            'name': swap_partition,
+            'size': swap_size,
+            'mount_point': 'none',
+            'file_system': 'SWAP',
+            'stat': 'New',
+            'partitions': {},
+            'partition_list': []
+        }
+
+        disk_data[drive]['partitions'][main_slice]['partition_list'] = partition_list
+
+        disk_db = open(disk_db_file, 'wb')
+        pickle.dump(disk_data, disk_db)
+        disk_db.close()
+
+        write_partition = open(partition_label_file, 'w')
+        write_partition.writelines(f'{fs} {root_size} {layout}\n')
+        write_partition.writelines(f'SWAP {swap_size} none\n')
+        write_partition.close()
+
         pl = []
         mpl = []
-        if os.path.exists(tmp + 'create'):
-            pf = open(tmp + 'create', 'rb')
+        if os.path.exists(f'{tmp}/create'):
+            pf = open(f'{tmp}/create', 'rb')
             mpl = pickle.load(pf)
-        pl.extend(([disk + "s%s" % sl, size]))
+        pl.extend(([main_slice, size]))
         mpl.append(pl)
-        cf = open(tmp + 'create', 'wb')
+        cf = open(f'{tmp}/create', 'wb')
         pickle.dump(mpl, cf)
         cf.close()
 
-    def __init__(self, path, size, fs, efi_exist):
+    def __init__(self, path, size, fs, efi_exist, disk, scheme):
         self.bios_type = bios_or_uefi()
-        disk = disk_query()[path[0]][0]
-        schm = disk_query()[path[0]][3]
-        sl = path[1] + 1
-        lv = path[1]
-        if schm == "GPT":
-            self.create_gpt_partiton(disk, size, sl, lv, fs, efi_exist)
-        elif schm == "MBR":
-            self.create_mbr_partiton(disk, size, sl, lv, fs)
+        if scheme == "GPT":
+            self.create_gpt_partiton(disk, size, path, fs, efi_exist)
+        elif scheme == "MBR":
+            self.create_mbr_partiton(disk, size, path, fs)
 
-    def create_gpt_partiton(self, disk, size, sl, path, fs, efi_exist):
+    def create_gpt_partiton(self, drive, size, path, fs, efi_exist):
         file_disk = open(disk_file, 'w')
-        file_disk.writelines('%s\n' % disk)
+        file_disk.writelines(f'{drive}\n')
         file_disk.close()
-        sfile = open(part_schem, 'w')
-        sfile.writelines('partscheme=GPT')
-        sfile.close()
-        number = int(size.partition('M')[0])
-        # number = number - 512
-        # ram = Popen(memory, shell=True, stdin=PIPE, stdout=PIPE,
-        #             universal_newlines=True, close_fds=True)
-        # mem = ram.stdout.read()
-        # swap = int(int(mem.partition(':')[2].strip()) / (1024 * 1024))
-        swap = 2048
-        rootNum = int(number - swap)
+        write_scheme = open(scheme_file, 'w')
+        write_scheme.writelines('partscheme=GPT')
+        write_scheme.close()
+        root_size = int(size)
+        swap_size = 2048
+        root_size -= int(swap_size)
         if self.bios_type == "UEFI" and efi_exist is False:
-            bs = 256
-        elif self.bios_type == "BOOT":
-            bs = 1
+            boot_size = 256
         else:
-            bs = 0
-        rootNum = int(rootNum - bs)
-        plist = []
-        mplist = partition_query(disk)
-        plf = open(partitiondb + disk, 'wb')
-        done = False
-        if self.bios_type == "UEFI" and efi_exist is False:
-            plist.extend(([disk + 'p%s' % sl, bs, 'none', 'UEFI']))
-            rsl = int(sl + 1)
-            swsl = int(rsl + 1)
-        elif self.bios_type == "BOOT":
-            plist.extend(([disk + 'p%s' % sl, bs, 'none', 'BOOT']))
-            rsl = int(sl + 1)
-            swsl = int(rsl + 1)
-        else:
-            rsl = int(sl)
-            swsl = int(rsl + 1)
-
-        if len(plist) != 0:
-            done = True
-            mplist[path] = plist
-            plist = []
+            boot_size = 1 if self.bios_type == "BIOS" else 0
+        boot_name = 'UEFI' if self.bios_type == "UEFI" else 'BOOT'
+        root_size -= boot_size
+        disk_data = disk_database()
+        partition_list = disk_data[drive]['partition_list']
+        store_list_number = path[1]
+        if boot_size != 0:
+            boot_partition = find_next_partition(f'{drive}p', partition_list)
+            partition_list[store_list_number] = boot_partition
+            store_list_number += 1
+            disk_data[drive]['partitions'][boot_partition] = {
+                'name': boot_partition,
+                'size': boot_size,
+                'mount_point': 'none',
+                'file_system': boot_name,
+                'stat': 'New',
+                'partitions': {},
+                'partition_list': []
+            }
+            part_list = []
+            main_list = []
+            part_list.extend(([boot_partition, boot_size]))
+            main_list.append(part_list)
+            cf = open(f'{tmp}/create', 'wb')
+            pickle.dump(main_list, cf)
+            cf.close()
 
         if fs == "ZFS":
             layout = "/(compress=lz4|atime=off),/root(compress=lz4)," \
@@ -638,68 +748,74 @@ class autoFreeSpace():
                 "/var/mail(compress=lz4),/var/tmp(compress=lz4)"
         else:
             layout = '/'
-        plist.extend(([disk + 'p%s' % rsl, rootNum, layout, fs]))
-        if done is False:
-            mplist[path] = plist
+
+        root_partition = find_next_partition(f'{drive}p', partition_list)
+        if store_list_number == path[1]:
+            partition_list[store_list_number] = root_partition
         else:
-            mplist.insert(rsl - 1, plist)
-        plist = []
-        plist.extend(([disk + 'p%s' % swsl, swap, 'none', 'SWAP']))
-        mplist.insert(swsl - 1, plist)
-        pickle.dump(mplist, plf)
-        plf.close()
-        slice_file = open(dslice, 'w')
-        slice_file.writelines(f'p{rsl}')
-        slice_file.close()
-        pfile = open(Part_label, 'w')
+            partition_list.insert(store_list_number, root_partition)
+        store_list_number += 1
+        disk_data[drive]['partitions'][root_partition] = {
+            'name': root_partition,
+            'size': root_size,
+            'mount_point': layout,
+            'file_system': fs,
+            'stat': 'New',
+            'partitions': {},
+            'partition_list': []
+        }
+
+        write_slice = open(slice_file, 'w')
+        write_slice.writelines(root_partition.replace(drive, ''))
+        write_slice.close()
+
+        swap_partition = find_next_partition(f'{drive}p', partition_list)
+        partition_list.insert(store_list_number, swap_partition)
+        disk_data[drive]['partitions'][swap_partition] = {
+            'name': swap_partition,
+            'size': swap_size,
+            'mount_point': 'none',
+            'file_system': 'SWAP',
+            'stat': 'New',
+            'partitions': {},
+            'partition_list': []
+        }
+
+        disk_data[drive]['partition_list'] = partition_list
+        disk_db = open(disk_db_file, 'wb')
+        pickle.dump(disk_data, disk_db)
+        disk_db.close()
+
+        write_partition = open(partition_label_file, 'w')
         if self.bios_type == "UEFI" and efi_exist is False:
-            pfile.writelines('UEFI %s none\n' % bs)
+            write_partition.writelines(f'UEFI {boot_size} none\n')
         elif self.bios_type == "BIOS":
-            pfile.writelines('BOOT %s none\n' % bs)
-        pfile.writelines(f'{fs} {rootNum} {layout}\n')
-        pfile.writelines('SWAP %s none\n' % int(swap - 1))
-        pfile.close()
-        pl = []
-        mpl = []
-        if self.bios_type == "UEFI" and efi_exist is False:
-            if not os.path.exists(tmp + 'create'):
-                pl.extend(([disk + "p%s" % sl, bs]))
-                mpl.append(pl)
-                cf = open(tmp + 'create', 'wb')
-                pickle.dump(mpl, cf)
-                cf.close()
-        elif self.bios_type == "BOOT":
-            pl.extend(([disk + "p%s" % sl, bs]))
-            mpl.append(pl)
-            cf = open(tmp + 'create', 'wb')
-            pickle.dump(mpl, cf)
-            cf.close()
+            write_partition.writelines(f'BOOT {boot_size} none\n')
+        write_partition.writelines(f'{fs} {root_size} {layout}\n')
+        write_partition.writelines(f'SWAP {swap_size} none\n')
+        write_partition.close()
 
 
 class createLabel():
-    def __init__(self, path, disk, partition_behind, left_size, create_size, label, fs, data):
+    def __init__(self, path, drive, main_slice, size_left, create_size, mountpoint, fs):
         if not os.path.exists(disk_file):
             file_disk = open(disk_file, 'w')
-            file_disk.writelines('%s\n' % disk)
+            file_disk.writelines('%s\n' % drive)
             file_disk.close()
-        sl = path[1] + 1
-        lv = path[2]
-        sfile = open(part_schem, 'w')
-        sfile.writelines('partscheme=MBR')
-        sfile.close()
-        slice_file = open(dslice, 'w')
-        slice_file.writelines('s%s\n' % sl)
-        slice_file.close()
-        alph = ord('a')
-        alph += lv
-        letter = chr(alph)
-        llist = []
-        mllist = label_query(disk + 's%s' % sl)
-        plf = open(partitiondb + disk + 's%s' % sl, 'wb')
-        if left_size == 0:
-            create_size -= 1
+        write_scheme = open(scheme_file, 'w')
+        write_scheme.writelines('partscheme=MBR')
+        write_scheme.close()
+        write_slice = open(slice_file, 'w')
+        write_slice.writelines(f'{main_slice.replace(drive, "")}\n')
+        write_slice.close()
+        disk_data = disk_database()
+        store_list_number = path[2]
+        partition_list = disk_data[drive]['partitions'][main_slice]['partition_list']
+        alpha_num = ord('a')
+        alpha_num += store_list_number
+        letter = chr(alpha_num)
         if fs == "ZFS":
-            label = "/(compress=lz4|atime=off),/root(compress=lz4)," \
+            mountpoint = "/(compress=lz4|atime=off),/root(compress=lz4)," \
                 "/tmp(compress=lz4),/usr(canmount=off|mountpoint=none)," \
                 "/usr/home(compress=lz4),/usr/jails(compress=lz4)," \
                 "/usr/obj(compress=lz4),/usr/ports(compress=lz4)," \
@@ -707,144 +823,172 @@ class createLabel():
                 "/var(canmount=off|atime=on|mountpoint=none)," \
                 "/var/audit(compress=lz4),/var/log(compress=lz4)," \
                 "/var/mail(compress=lz4),/var/tmp(compress=lz4)"
-        llist.extend(([disk + 's%s' % sl + letter, create_size, label, fs]))
-        mllist[lv] = llist
-        llist = []
-        if left_size > 0:
-            llist.extend((['freespace', left_size, '', '']))
-            mllist.insert(lv + 1, llist)
-        pickle.dump(mllist, plf)
-        plf.close()
-        llist = open(partitiondb + disk + 's%s' % sl, 'rb')
-        labellist = pickle.load(llist)
-        pfile = open(Part_label, 'w')
-        for partlist in labellist:
-            if partlist[2] != '':
-                pfile.writelines('%s %s %s\n' % (partlist[3], partlist[1],
-                                                 partlist[2]))
-        pfile.close()
+
+        partition = f'{main_slice}{letter}'
+        partition_list[store_list_number] = partition
+        disk_data[drive]['partitions'][main_slice]['partitions'][partition] = {
+            'name': partition,
+            'size': create_size,
+            'mount_point': mountpoint,
+            'file_system': fs,
+            'stat': 'New',
+            'partitions': {},
+            'partition_list': []
+        }
+        if size_left != 0:
+            free_name = find_next_partition('freespace', partition_list)
+            partition_list.append(free_name)
+            disk_data[drive]['partitions'][main_slice]['partitions'][free_name] = {
+                'name': free_name,
+                'size': size_left,
+                'mount_point': '',
+                'file_system': 'none',
+                'stat': None,
+                'partitions': {},
+                'partition_list': []
+            }
+
+        disk_data[drive]['partitions'][main_slice]['partition_list'] = partition_list
+
+        disk_db = open(disk_db_file, 'wb')
+        pickle.dump(disk_data, disk_db)
+        disk_db.close()
+
+        write_partition = open(partition_label_file, 'w')
+        for partition in partition_list:
+            partition_info = disk_data[drive]['partitions'][main_slice]['partitions'][partition]
+            if partition_info['stat'] == 'New':
+                write_partition.writelines(f'{partition_info["file_system"]} {partition_info["size"]} {partition_info["mount_point"]}\n')
+        write_partition.close()
 
 
 class modifyLabel():
 
-    def __init__(self, path, left_size, create_size, label, fs, data):
-        disk = disk_query()[path[0]][0]
+    def __init__(self, path, size_left, create_size, mount_point, fs, data, disk):
         if not os.path.exists(disk_file):
             file_disk = open(disk_file, 'w')
             file_disk.writelines('%s\n' % disk)
             file_disk.close()
         sl = path[1] + 1
         lv = path[2]
-        sfile = open(part_schem, 'w')
-        sfile.writelines('partscheme=MBR')
-        sfile.close()
-        slice_file = open(dslice, 'w')
-        slice_file.writelines('s%s\n' % sl)
-        slice_file.close()
+        write_scheme = open(scheme_file, 'w')
+        write_scheme.writelines('partscheme=MBR')
+        write_scheme.close()
+        write_slice = open(slice_file, 'w')
+        write_slice.writelines('s%s\n' % sl)
+        write_slice.close()
         alph = ord('a')
         alph += lv
         letter = chr(alph)
         llist = []
         mllist = label_query(disk + 's%s' % sl)
         plf = open(partitiondb + disk + 's%s' % sl, 'wb')
-        if left_size == 0:
+        if size_left == 0:
             create_size -= 1
-        llist.extend(([disk + 's%s' % sl + letter, create_size, label, fs]))
+        llist.extend(([disk + 's%s' % sl + letter, create_size, mount_point, fs]))
         mllist[lv] = llist
         llist = []
-        if left_size > 0:
-            llist.extend((['freespace', left_size, '', '']))
+        if size_left > 0:
+            llist.extend((['freespace', size_left, '', '']))
             mllist.append(llist)
         pickle.dump(mllist, plf)
         plf.close()
         llist = open(partitiondb + disk + 's%s' % sl, 'rb')
-        labellist = pickle.load(llist)
-        pfile = open(Part_label, 'w')
-        for partlist in labellist:
+        sabeltlist = pickle.load(llist)
+        write_partition = open(partition_label_file, 'w')
+        for partlist in sabeltlist:
             if partlist[2] != '':
-                pfile.writelines('%s %s %s\n' % (partlist[3], partlist[1],
+                write_partition.writelines('%s %s %s\n' % (partlist[3], partlist[1],
                                                  partlist[2]))
-        pfile.close()
+        write_partition.close()
 
 
 class createSlice():
 
-    def __init__(self, size, rs, path):
-        disk = disk_query()[path[0]][0]
+    def __init__(self, create_size, size_left, path, drive):
         file_disk = open(disk_file, 'w')
-        file_disk.writelines('%s\n' % disk)
+        file_disk.writelines(f'{drive}\n')
         file_disk.close()
-        if len(path) == 1:
-            sl = 1
-        else:
-            sl = path[1] + 1
-        sfile = open(part_schem, 'w')
-        sfile.writelines('partscheme=MBR')
-        sfile.close()
-        slice_file = open(dslice, 'w')
-        slice_file.writelines('s%s\n' % sl)
-        slice_file.close()
-        plist = partition_query(disk)
-        pslice = '%ss%s' % (disk, path[1] + 1)
-        if rs == 0:
-            size -= 1
-        plist[path[1]] = [pslice, size, '', 'freebsd']
-        if rs > 0:
-            plist.append(['freespace', rs, '', ''])
-        psf = open(partitiondb + disk, 'wb')
-        pickle.dump(plist, psf)
-        psf.close()
-        llist = []
-        mllist = []
-        llist.extend((['freespace', size, '', '']))
-        mllist.append(llist)
-        plf = open(partitiondb + pslice, 'wb')
-        pickle.dump(mllist, plf)
-        plf.close()
-        slice_file = open(dslice, 'w')
-        slice_file.writelines('s%s\n' % pslice)
-        slice_file.close()
-        pl = []
-        mpl = []
-        if os.path.exists(tmp + 'create'):
-            pf = open(tmp + 'create', 'rb')
-            mpl = pickle.load(pf)
-        pl.extend(([pslice, size]))
-        mpl.append(pl)
-        cf = open(tmp + 'create', 'wb')
-        pickle.dump(mpl, cf)
+        write_scheme = open(scheme_file, 'w')
+        write_scheme.writelines('partscheme=MBR')
+        write_scheme.close()
+
+        disk_data = disk_database()
+        store_list_number = path[1]
+        partition_list = disk_data[drive]['partition_list']
+
+        partition = find_next_partition(f'{drive}s', partition_list)
+
+        partition_list[store_list_number] = partition
+        # Store slice partition
+        disk_data[drive]['partitions'][partition] = {
+            'name': partition,
+            'size': create_size,
+            'mount_point': 'none',
+            'file_system': 'BSD',
+            'stat': 'New',
+            'partitions': {},
+            'partition_list': ['freespace1']
+        }
+        # Store freespace for partition partition
+        disk_data[drive]['partitions'][partition]['partitions']['freespace1'] = {
+            'name': 'freespace1',
+            'size': create_size,
+            'mount_point': '',
+            'file_system': 'none',
+            'stat': None,
+            'partitions': {},
+            'partition_list': []
+        }
+        # Store freespace if some left
+        if size_left != 0:
+            free_name = find_next_partition('freespace', partition_list)
+            partition_list.append(free_name)
+            disk_data[drive]['partitions'][free_name] = {
+                'name': free_name,
+                'size': size_left,
+                'mount_point': '',
+                'file_system': 'none',
+                'stat': None,
+                'partitions': {},
+                'partition_list': []
+            }
+
+        disk_data[drive]['partition_list'] = partition_list
+        disk_db = open(disk_db_file, 'wb')
+        pickle.dump(disk_data, disk_db)
+        disk_db.close()
+
+        write_slice = open(slice_file, 'w')
+        write_slice.writelines(partition.replace(drive, ''))
+        write_slice.close()
+
+        part_list = []
+        main_list = []
+        if os.path.exists(f'{tmp}/create'):
+            read_file = open(f'{tmp}/create', 'rb')
+            main_list = pickle.load(read_file)
+        part_list.extend(([partition, create_size]))
+        main_list.append(part_list)
+        cf = open(f'{tmp}/create', 'wb')
+        pickle.dump(main_list, cf)
         cf.close()
 
 
 class createPartition():
-    def __init__(self, path, disk, partition_behind, left_size, create_size, label, fs, create):
+    def __init__(self, path, drive, size_left, create_size, mount_point, fs):
         if not os.path.exists(disk_file):
             file_disk = open(disk_file, 'w')
-            file_disk.writelines('%s\n' % disk)
+            file_disk.writelines('%s\n' % drive)
             file_disk.close()
-        if partition_behind is None:
-            pl = 1
-            lv = 0
-        else:
-            p_behind = int(partition_behind.partition('p')[2])
-            pl = p_behind + 1
-            lv = path[1]
-        if not os.path.exists(part_schem):
-            sfile = open(part_schem, 'w')
-            sfile.writelines('partscheme=GPT')
-            sfile.close()
-        if label == '/' or fs == "ZFS" or fs == "UEFI" or fs == "BOOT":
-            slice_file = open(dslice, 'w')
-            slice_file.writelines('p%s\n' % pl)
-            # slice_file.writelines('%s\n' % number)
-            slice_file.close()
-        plist = []
-        pslice = '%sp%s' % (disk, pl)
-        mplist = partition_query(disk)
-        if left_size == 0 and create_size > 1:
-            create_size -= 1
+
+        if not os.path.exists(scheme_file):
+            write_scheme = open(scheme_file, 'w')
+            write_scheme.writelines('partscheme=GPT')
+            write_scheme.close()
+
         if fs == "ZFS":
-            label = "/(compress=lz4|atime=off),/root(compress=lz4)," \
+            mount_point = "/(compress=lz4|atime=off),/root(compress=lz4)," \
                 "/tmp(compress=lz4),/usr(canmount=off|mountpoint=none)," \
                 "/usr/home(compress=lz4),/usr/jails(compress=lz4)," \
                 "/usr/obj(compress=lz4),/usr/ports(compress=lz4)," \
@@ -852,36 +996,70 @@ class createPartition():
                 "/var(canmount=off|atime=on|mountpoint=none)," \
                 "/var/audit(compress=lz4),/var/log(compress=lz4)," \
                 "/var/mail(compress=lz4),/var/tmp(compress=lz4)"
-        pf = open(partitiondb + disk, 'wb')
-        plist.extend(([disk + 'p%s' % pl, create_size, label, fs]))
-        mplist[lv] = plist
-        plist = []
-        if left_size > 0:
-            plist.extend((['freespace', left_size, '', '']))
-            mplist.insert(lv + 1, plist)
-        pickle.dump(mplist, pf)
-        pf.close()
-        pfile = open(Part_label, 'w')
-        for partlist in partition_query(disk):
-            if partlist[2] != '':
-                pfile.writelines('%s %s %s\n' % (partlist[3], partlist[1],
-                                                 partlist[2]))
-        pfile.close()
-        if create is True:
-            plst = []
-            mplst = []
-            if not os.path.exists(tmp + 'create'):
-                plst.extend(([pslice, create_size]))
-                mplst.append(plst)
-                cf = open(tmp + 'create', 'wb')
-                pickle.dump(mplst, cf)
-                cf.close()
+
+        disk_data = disk_database()
+        store_list_number = path[1]
+        partition_list = disk_data[drive]['partition_list']
+
+        partition = find_next_partition(f'{drive}p', partition_list)
+
+        partition_list[store_list_number] = partition
+        # Store slice partition
+        disk_data[drive]['partitions'][partition] = {
+            'name': partition,
+            'size': create_size,
+            'mount_point': mount_point,
+            'file_system': fs,
+            'stat': 'New',
+            'partitions': {},
+            'partition_list': []
+        }
+        # Store freespace if some left
+        if size_left != 0:
+            free_name = find_next_partition('freespace', partition_list)
+            partition_list.append(free_name)
+            disk_data[drive]['partitions'][free_name] = {
+                'name': free_name,
+                'size': size_left,
+                'mount_point': '',
+                'file_system': 'none',
+                'stat': None,
+                'partitions': {},
+                'partition_list': []
+            }
+
+        disk_data[drive]['partition_list'] = partition_list
+        disk_db = open(disk_db_file, 'wb')
+        pickle.dump(disk_data, disk_db)
+        disk_db.close()
+        if mount_point == '/' or fs == "ZFS":
+            write_slice = open(slice_file, 'w')
+            write_slice.writelines(partition.replace(drive, ''))
+            write_slice.close()
+
+        if fs == "UEFI" or fs == "BOOT":
+            part_list = []
+            main_list = []
+            if os.path.exists(f'{tmp}/create'):
+                read_file = open(f'{tmp}/create', 'rb')
+                main_list = pickle.load(read_file)
+            part_list.extend(([partition, create_size]))
+            main_list.append(part_list)
+            cf = open(f'{tmp}/create', 'wb')
+            pickle.dump(main_list, cf)
+            cf.close()
+
+        write_partition = open(partition_label_file, 'w')
+        for partition in partition_list:
+            partition_info = disk_data[drive]['partitions'][partition]
+            if partition_info['stat'] == 'New':
+                write_partition.writelines(f'{partition_info["file_system"]} {partition_info["size"]} {partition_info["mount_point"]}\n')
+        write_partition.close()
 
 
 class modifyPartition():
 
-    def __init__(self, path, left_size, inumb, create_size, label, fs, data):
-        disk = disk_query()[path[0]][0]
+    def __init__(self, path, size_left, inumb, create_size, mount_point, fs, data, disk):
         if not os.path.exists(disk_file):
             file_disk = open(disk_file, 'w')
             file_disk.writelines('%s\n' % disk)
@@ -892,64 +1070,63 @@ class modifyPartition():
         else:
             pl = path[1] + 1
             lv = path[1]
-        if not os.path.exists(part_schem):
-            sfile = open(part_schem, 'w')
-            sfile.writelines('partscheme=GPT')
-            sfile.close()
-        if label == '/':
-            slice_file = open(dslice, 'w')
-            slice_file.writelines('p%s\n' % pl)
-            slice_file.close()
+        if not os.path.exists(scheme_file):
+            write_scheme = open(scheme_file, 'w')
+            write_scheme.writelines('partscheme=GPT')
+            write_scheme.close()
+        if mount_point == '/':
+            write_slice = open(slice_file, 'w')
+            write_slice.writelines('p%s\n' % pl)
+            write_slice.close()
         plist = []
         pslice = '%sp%s' % (disk, pl)
         mplist = partition_query(disk)
-        if left_size == 0:
+        if size_left == 0:
             create_size -= 1
         pf = open(partitiondb + disk, 'wb')
-        plist.extend(([disk + 'p%s' % pl, create_size, label, fs]))
+        plist.extend(([disk + 'p%s' % pl, create_size, mount_point, fs]))
         mplist[lv] = plist
         plist = []
-        if left_size > 0:
-            plist.extend((['freespace', left_size, '', '']))
+        if size_left > 0:
+            plist.extend((['freespace', size_left, '', '']))
             mplist.append(plist)
         pickle.dump(mplist, pf)
         pf.close()
-        pfile = open(Part_label, 'w')
+        write_partition = open(partition_label_file, 'w')
         for partlist in partition_query(disk):
             if partlist[2] != '':
-                pfile.writelines('%s %s %s\n' % (partlist[3], partlist[1],
+                write_partition.writelines('%s %s %s\n' % (partlist[3], partlist[1],
                                  partlist[2]))
-        pfile.close()
+        write_partition.close()
         if data is True:
             plst = []
             mplst = []
-            if not os.path.exists(tmp + 'create'):
+            if not os.path.exists(f'{tmp}/create'):
                 plst.extend(([pslice, create_size]))
                 mplst.append(plst)
-                cf = open(tmp + 'create', 'wb')
+                cf = open(f'{tmp}/create', 'wb')
                 pickle.dump(mplst, cf)
                 cf.close()
 
 
-class rDeleteParttion():
+class deletePartition():
     def __init__(self):
-        if os.path.exists(tmp + 'delete'):
-            df = open(tmp + 'delete', 'rb')
-            dl = pickle.load(df)
-            for line in dl:
-                part = line[0]
-                num = sliceNum(part)
-                hd = rpartslice(part)
-                call(f"zpool labelclear -f {part}", shell=True)
+        if os.path.exists(f'{tmp}/delete'):
+            delete_file = open(f'{tmp}/delete', 'rb')
+            delete_list = pickle.load(delete_file)
+            for partition in delete_list:
+                num = slice_number(partition)
+                drive = get_disk_from_partition(partition)
+                call(f"zpool labelclear -f {partition}", shell=True)
                 sleep(1)
-                call(f'gpart delete -i {num} {hd}', shell=True)
-                sleep(2)
+                call(f'gpart delete -i {num} {drive}', shell=True)
+                sleep(1)
 
 
-class destroyParttion():
+class destroyPartition():
     def __init__(self):
-        if os.path.exists(tmp + 'destroy'):
-            dsf = open(tmp + 'destroy', 'rb')
+        if os.path.exists(f'{tmp}/destroy'):
+            dsf = open(f'{tmp}/destroy', 'rb')
             ds = pickle.load(dsf)
             for line in ds:
                 drive = line[0]
@@ -978,21 +1155,21 @@ def bios_or_uefi():
     return output1.stdout.readlines()[0].rstrip()
 
 
-class makingParttion():
+class addPartition():
 
     def __init__(self):
-        if os.path.exists(tmp + 'create'):
-            pf = open(tmp + 'create', 'rb')
+        if os.path.exists(f'{tmp}/create'):
+            pf = open(f'{tmp}/create', 'rb')
             pl = pickle.load(pf)
             read = open(boot_file, 'r')
             boot = read.readlines()[0].strip()
             size = 0
             for line in pl:
                 part = line[0]
-                drive = rpartslice(part)
-                sl = sliceNum(part)
+                drive = get_disk_from_partition(part)
+                sl = slice_number(part)
                 size = int(line[1])
-                if slicePartition(part) == 'p':
+                if set("p") & set(part):
                     if bios_or_uefi() == 'UEFI':
                         cmd = f'gpart add -a 4k -s {size}M -t efi -i {sl} {drive}'
                         sleep(2)
@@ -1005,7 +1182,7 @@ class makingParttion():
                         else:
                             cmd = f'gpart add -a 4k -s {size}M -t freebsd-boot -i {sl} {drive}'
                         call(cmd, shell=True)
-                elif slicePartition(part) == 's':
+                elif set("s") & set(part):
                     cmd = f'gpart add -a 4k -s {size}M -t freebsd -i {sl} {drive}'
                     call(cmd, shell=True)
                 sleep(2)

@@ -6,7 +6,7 @@
 DISK="${1}"
 TMPDIR=${TMPDIR:-"/tmp"}
 # Display if this is GPT or MBR formatted
-gpart show ${1} | grep "GPT" >/dev/null 2>/dev/null
+gpart show ${DISK} | grep "GPT" >/dev/null 2>/dev/null
 if [ "$?" = "0" ] ; then
     #echo "${1}-format: GPT"
     TYPE="GPT"
@@ -25,24 +25,23 @@ fi
 gpart show ${DISK} | grep -v ${DISK} | tr -s '\t' ' ' | cut -d ' ' -f 4,3,5 >${TMPDIR}/disk-${DISK}
 while read i
 do
-
   if [ ! -z "${i}" ] ; then
     BLOCK="`echo ${i} | cut -d ' ' -f 1`"
     if [ "${BLOCK}" -ge 2048 ] ; then
-      MB="`expr ${BLOCK} / 2048`MB"
+      MB="`expr ${BLOCK} / 2048`"
     else
-      MB=1MB
+      MB="1"
     fi
   fi
-  if [ ! "${MB}" = "0MB" ] ; then
+  if [ ! "${MB}" = "0" ] ; then
     LABEL="`echo ${i} | cut -d ' ' -f 3`"
     SLICE="`echo ${i} | cut -d ' ' -f 2`"
     if [ "$SLICE" = '-' ] ; then
-	if [ ! "${MB}" = "1MB" ] ; then
-	    echo "freespace ${MB} none"
-	fi
+      if [ ! "${MB}" = "1" ] ; then
+        echo "freespace ${MB} none"
+      fi
     else
-	if [ ! -z "$SLICE" ] ; then
+      if [ ! -z "$SLICE" ] ; then
         echo "${DISK}${sp}${SLICE} ${MB} ${LABEL} "
       fi
     fi

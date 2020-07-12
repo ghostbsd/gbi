@@ -1,81 +1,56 @@
 #!/usr/local/bin/python
 
 import os
-import shutil
 import re
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
-from partition_handler import partition_repos, disk_query, Delete_partition
-from partition_handler import partition_query, label_query, bios_or_uefi
-from partition_handler import autoDiskPartition, autoFreeSpace, first_is_free
-from partition_handler import createLabel, scheme_query, how_partition
-from partition_handler import diskSchemeChanger, createSlice, createPartition
+from partition_handler import create_disk_partition_db, disk_database, Delete_partition
+from partition_handler import bios_or_uefi, how_partition, createSlice
+from partition_handler import autoFreeSpace, createPartition
+from partition_handler import createLabel, diskSchemeChanger
 
 # Folder use pr the installer.
-tmp = "/tmp/.gbi/"
-installer = "/usr/local/lib/gbi/"
-query = "sh /usr/local/lib/gbi/backend-query/"
+tmp = "/tmp/.gbi"
 if not os.path.exists(tmp):
     os.makedirs(tmp)
-
-add_part = 'gpart add'
-disk_part = '%sdisk-part.sh' % query
-disk_label = '%sdisk-label.sh' % query
-detect_sheme = '%sdetect-sheme.sh' % query
-
-part = '%sdisk-part.sh' % query
-memory = 'sysctl hw.physmem'
-disk_list = '%sdisk-list.sh' % query
-disk_info = '%sdisk-info.sh' % query
-disk_label = '%sdisk-label.sh' % query
-disk_schem = '%sscheme' % tmp
-disk_file = '%sdisk' % tmp
-psize = '%spart_size' % tmp
+disk_scheme = f'{tmp}/scheme'
+disk_file = f'{tmp}/disk'
+slice_file = f'{tmp}/slice'
 logo = "/usr/local/lib/gbi/logo.png"
-Part_label = '%spartlabel' % tmp
-part_schem = '%sscheme' % tmp
-partition_db = "%spartition_db/" % tmp
+partition_label_file = f'{tmp}/partlabel'
+
+disk_db_file = f'{tmp}/disk.db'
 ufs_Partiton_list = []
 bios_type = bios_or_uefi()
 
 
 class Partitions():
 
-    def on_fs(self, widget):
+    def set_fs(self, widget):
         self.fs = widget.get_active_text()
         if 'UFS' in self.fs:
-            self.mountpoint.set_sensitive(True)
+            self.mountpoint_box.set_sensitive(True)
         else:
-            self.mountpoint.set_sensitive(False)
+            self.mountpoint_box.set_sensitive(False)
 
-    def on_label(self, widget):
-        self.label = widget.get_active_text()
+    def get_mountpoint(self, widget):
+        self.mountpoint = widget.get_active_text()
 
     def save_selection(self):
         pass
 
     def on_add_label(self, widget, entry, free_space, path, create):
-        if self.fs == '' or self.label == '':
-            pass
-        else:
-            fs = self.fs
-            lb = self.label
-            create_size = entry.get_value_as_int()
-            left_size = free_space - create_size
-            createLabel(path, self.disk, self.slicebehind, left_size, create_size, lb, fs, create)
+        create_size = entry.get_value_as_int()
+        left_size = free_space - create_size
+        createLabel(path, self.disk, self.slice, left_size, create_size, self.mountpoint, self.fs)
         self.window.hide()
         self.update()
 
     def on_add_partition(self, widget, entry, free_space, path, create):
-        if self.fs == '' or self.label == '':
-            pass
-        else:
-            fs = self.fs
-            lb = self.label
-            create_size = entry.get_value_as_int()
-            left_size = int(free_space - create_size)
-            createPartition(path, self.disk, self.slicebehind, left_size, create_size, lb, fs, create)
+        create_size = entry.get_value_as_int()
+        left_size = int(free_space - create_size)
+        createPartition(path, self.disk, left_size, create_size, self.mountpoint, self.fs)
         self.window.hide()
         self.update()
 
@@ -103,84 +78,84 @@ class Partitions():
         label1 = Gtk.Label("Type:")
         label2 = Gtk.Label("Size(MB):")
         label3 = Gtk.Label("Mount point:")
-        self.fstype = Gtk.ComboBoxText()
-        self.fstype.append_text('ZFS')
-        self.fstype.append_text('UFS')
-        self.fstype.append_text('UFS+S')
-        self.fstype.append_text('UFS+J')
-        self.fstype.append_text('UFS+SUJ')
-        self.fstype.append_text('SWAP')
+        self.fs_type = Gtk.ComboBoxText()
+        self.fs_type.append_text('ZFS')
+        self.fs_type.append_text('UFS')
+        self.fs_type.append_text('UFS+S')
+        self.fs_type.append_text('UFS+J')
+        self.fs_type.append_text('UFS+SUJ')
+        self.fs_type.append_text('SWAP')
         if scheme == 'GPT':
             if bios_type == "UEFI":
-                self.fstype.append_text("UEFI")
+                self.fs_type.append_text("UEFI")
                 if self.efi_exist is False:
-                    self.fstype.set_active(6)
+                    self.fs_type.set_active(6)
                     self.fs = "UEFI"
-                elif self.lablebehind == "/" or self.fsbehind == "ZFS":
-                    self.fstype.set_active(5)
+                elif self.mountpoint_behind == "/" or self.fs_behind == "ZFS":
+                    self.fs_type.set_active(5)
                     self.fs = "SWAP"
                 else:
-                    self.fstype.set_active(0)
+                    self.fs_type.set_active(0)
                     self.fs = "ZFS"
             else:
-                self.fstype.append_text("BOOT")
-                if not os.path.exists(Part_label):
-                    self.fstype.set_active(5)
+                self.fs_type.append_text("BOOT")
+                if not os.path.exists(partition_label_file):
+                    self.fs_type.set_active(5)
                     self.fs = "BOOT"
-                elif len(self.prttn) == 0:
-                    self.fstype.set_active(5)
+                elif len(self.partitions) == 0:
+                    self.fs_type.set_active(5)
                     self.fs = "BOOT"
-                elif self.lablebehind == "/" or self.fsbehind == "ZFS":
-                    self.fstype.set_active(4)
+                elif self.mountpoint_behind == "/" or self.fs_behind == "ZFS":
+                    self.fs_type.set_active(4)
                     self.fs = "SWAP"
                 else:
-                    self.fstype.set_active(0)
+                    self.fs_type.set_active(0)
                     self.fs = "ZSF"
-        elif self.lablebehind == "/" or self.fsbehind == "ZFS":
-            self.fstype.set_active(4)
+        elif self.mountpoint_behind == "/" or self.fs_behind == "ZFS":
+            self.fs_type.set_active(4)
             self.fs = "SWAP"
         else:
-            self.fstype.set_active(0)
+            self.fs_type.set_active(0)
             self.fs = "ZFS"
-        self.fstype.connect("changed", self.on_fs)
+        self.fs_type.connect("changed", self.set_fs)
         adj = Gtk.Adjustment(free_space, 0, free_space, 1, 100, 0)
         self.entry = Gtk.SpinButton(adjustment=adj, numeric=True)
         if modify is True:
             self.entry.set_editable(False)
         else:
             self.entry.set_editable(True)
-        self.mountpoint = Gtk.ComboBoxText()
-        # self.mountpoint.append_text('select labels')
-        self.label = "none"
-        self.mountpoint.append_text('none')
-        # The space for root '/ ' is to recognise / from the file.
-        self.mountpoint.append_text('/')
-        if os.path.exists(Part_label):
-            if scheme == 'GPT' and len(self.prttn) == 1:
-                self.mountpoint.append_text('/boot')
-            elif scheme == 'MBR' and len(self.prttn) == 0:
-                self.mountpoint.append_text('/boot')
-        elif scheme == 'MBR' and not os.path.exists(Part_label):
-            self.mountpoint.append_text('/boot')
-        self.mountpoint.append_text('/etc')
-        self.mountpoint.append_text('/root')
-        self.mountpoint.append_text('/tmp')
-        self.mountpoint.append_text('/usr')
-        self.mountpoint.append_text('/usr/home')
-        self.mountpoint.append_text('/var')
-        self.mountpoint.set_active(0)
+        self.mountpoint_box = Gtk.ComboBoxText()
+        # self.mountpoint_box.append_text('select labels')
+        self.mountpoint = "none"
+        self.mountpoint_box.append_text('none')
+        # The space for root '/ ' is to recognize / from the file.
+        self.mountpoint_box.append_text('/')
+        if os.path.exists(partition_label_file):
+            if scheme == 'GPT' and len(self.partitions) == 1:
+                self.mountpoint_box.append_text('/boot')
+            elif scheme == 'MBR' and len(self.partitions) == 0:
+                self.mountpoint_box.append_text('/boot')
+        elif scheme == 'MBR' and not os.path.exists(partition_label_file):
+            self.mountpoint_box.append_text('/boot')
+        self.mountpoint_box.append_text('/etc')
+        self.mountpoint_box.append_text('/root')
+        self.mountpoint_box.append_text('/tmp')
+        self.mountpoint_box.append_text('/usr')
+        self.mountpoint_box.append_text('/usr/home')
+        self.mountpoint_box.append_text('/var')
+        self.mountpoint_box.set_active(0)
         if 'UFS' in self.fs:
-            self.mountpoint.set_sensitive(True)
+            self.mountpoint_box.set_sensitive(True)
         else:
-            self.mountpoint.set_sensitive(False)
-        self.mountpoint.connect("changed", self.on_label)
+            self.mountpoint_box.set_sensitive(False)
+        self.mountpoint_box.connect("changed", self.get_mountpoint)
         # table.attach(label0, 0, 2, 0, 1)
         table.attach(label1, 0, 1, 1, 2)
-        table.attach(self.fstype, 1, 2, 1, 2)
+        table.attach(self.fs_type, 1, 2, 1, 2)
         table.attach(label2, 0, 1, 2, 3)
         table.attach(self.entry, 1, 2, 2, 3)
         table.attach(label3, 0, 1, 3, 4)
-        table.attach(self.mountpoint, 1, 2, 3, 4)
+        table.attach(self.mountpoint_box, 1, 2, 3, 4)
         box2.pack_start(table, False, False, 0)
         box2 = Gtk.HBox(False, 10)
         box2.set_border_width(5)
@@ -218,6 +193,9 @@ class Partitions():
         box2.pack_end(bbox, True, True, 5)
         self.window.show_all()
 
+    def on_fs(self, widget):
+        self.fs = widget.get_active_text()
+
     def choose_fs(self):
         self.window = Gtk.Window()
         self.window.set_title("Choose file system")
@@ -233,17 +211,17 @@ class Partitions():
         box2.show()
         table = Gtk.Table(1, 2, True)
         label1 = Gtk.Label("File System:")
-        self.fstype = Gtk.ComboBoxText()
-        self.fstype.append_text('ZFS')
-        self.fstype.append_text('UFS')
-        self.fstype.append_text('UFS+S')
-        self.fstype.append_text('UFS+J')
-        self.fstype.append_text('UFS+SUJ')
-        self.fstype.set_active(0)
+        self.fs_type = Gtk.ComboBoxText()
+        self.fs_type.append_text('ZFS')
+        self.fs_type.append_text('UFS')
+        self.fs_type.append_text('UFS+S')
+        self.fs_type.append_text('UFS+J')
+        self.fs_type.append_text('UFS+SUJ')
+        self.fs_type.set_active(0)
         self.fs = "ZFS"
-        self.fstype.connect("changed", self.on_fs)
+        self.fs_type.connect("changed", self.on_fs)
         table.attach(label1, 0, 1, 1, 2)
-        table.attach(self.fstype, 1, 2, 1, 2)
+        table.attach(self.fs_type, 1, 2, 1, 2)
         box2.pack_start(table, False, False, 0)
         box2 = Gtk.HBox(False, 10)
         box2.set_border_width(5)
@@ -263,7 +241,7 @@ class Partitions():
         self.window.show_all()
 
     def set_auto_partition(self, widget):
-        autoFreeSpace(self.path, self.size, self.fs, self.efi_exist)
+        autoFreeSpace(self.path, self.size, self.fs, self.efi_exist, self.disk, self.scheme)
         self.window.hide()
         self.update()
 
@@ -274,29 +252,17 @@ class Partitions():
         value = data.partition(':')[0]
         self.scheme = value
 
-    def add_gpt_mbr(self, widget, data):
-        diskSchemeChanger(self.scheme, self.path, self.slice, self.size)
-        self.update()
-        self.window.hide()
-        if data is False:
-            if scheme_query(self.path) == "MBR" and self.path[1] < 4:
-                self.sliceEditor()
-            elif scheme_query(self.path) == "GPT":
-                self.labelEditor(self.path, self.slice, self.size, 'GPT', False)
-
-    def autoSchemePartition(self, widget):
-        diskSchemeChanger(self.scheme, self.path, self.slice, self.size)
-        self.update()
-        autoDiskPartition(self.slice, self.size, self.scheme)
+    def add_gpt_mbr(self, widget):
+        diskSchemeChanger(self.scheme, self.path, self.disk, self.size)
         self.update()
         self.window.hide()
 
-    def schemeEditor(self, data):
+    def schemeEditor(self):
         self.window = Gtk.Window()
         self.window.set_title("Partition Scheme")
         self.window.set_border_width(0)
         self.window.set_size_request(400, 150)
-        self.window.set_icon_from_file("/usr/local/lib/gbi/logo.png")
+        self.window.set_icon_from_file(logo)
         box1 = Gtk.VBox(False, 0)
         self.window.add(box1)
         box1.show()
@@ -327,18 +293,15 @@ class Partitions():
         bbox.set_border_width(5)
         bbox.set_spacing(10)
         button = Gtk.Button(stock=Gtk.STOCK_ADD)
-        if data is None:
-            button.connect("clicked", self.autoSchemePartition)
-        else:
-            button.connect("clicked", self.add_gpt_mbr, data)
+        button.connect("clicked", self.add_gpt_mbr)
         bbox.add(button)
         box2.pack_end(bbox, True, True, 5)
         self.window.show_all()
 
     def get_value(self, widget, entry):
-        psize = int(entry.get_value_as_int())
-        rs = int(self.size) - psize
-        createSlice(psize, rs, self.path)
+        partition_size = int(entry.get_value_as_int())
+        rs = int(self.size) - partition_size
+        createSlice(partition_size, rs, self.path, self.disk)
         self.update()
         self.window.hide()
 
@@ -348,7 +311,7 @@ class Partitions():
         self.window.set_title("Add Partition")
         self.window.set_border_width(0)
         self.window.set_size_request(400, 150)
-        self.window.set_icon_from_file("/usr/local/lib/gbi/logo.png")
+        self.window.set_icon_from_file(logo)
         box1 = Gtk.VBox(False, 0)
         self.window.add(box1)
         box1.show()
@@ -394,7 +357,7 @@ class Partitions():
         self.treeview.set_cursor(oldpath)
 
     def delete_partition(self, widget):
-        part = self.slice
+        part = self.slice if self.label == "Not selected" else self.label
         Delete_partition(part, self.path)
         self.update()
 
@@ -422,43 +385,39 @@ class Partitions():
 
     def modify_partition(self, widget):
         if len(self.path) == 3:
-            if self.slice != 'freespace':
+            if 'freespace' not in self.slice:
                 self.labelEditor(self.path, self.slice, self.size, 'MBR', True)
-        elif len(self.path) == 2 and self.slice != 'freespace':
-            if scheme_query(self.path) == "GPT":
+        elif len(self.path) == 2 and 'freespace' not in self.slice:
+            if self.scheme == "GPT":
                 self.labelEditor(self.path, self.slice, self.size, 'GPT', True)
 
     def autoPartition(self, widget):
-        if len(self.path) == 3:
-            pass
-        # elif len(self.path) == 1 and self.scheme is None:
-        #    self.schemeEditor(None)
-        #    self.update()
-        # elif len(self.path) == 1:
-        #    autoDiskPartition(self.slice, self.size, self.scheme)
-        #    self.Tree_Store()
-        #    self.treeview.expand_all()
-        #    self.treeview.set_cursor(self.path)
-        elif self.slice == 'freespace':
-            # autoFreeSpace(self.path, self.size, self.efi_exist)
+        self.create_bt.set_sensitive(False)
+        self.delete_bt.set_sensitive(False)
+        self.modify_bt.set_sensitive(False)
+        self.auto_bt.set_sensitive(False)
+        self.revert_bt.set_sensitive(False)
+        if 'freespace' in self.slice:
             self.choose_fs()
-        elif len(self.path) == 2:
-            pass
         else:
-            pass
+            print('wrong utilization')
 
     def revertChange(self, widget):
-        if os.path.exists(partition_db):
-            shutil.rmtree(partition_db)
-        if os.path.exists(tmp + 'create'):
-            os.remove(tmp + 'create')
-        if os.path.exists(tmp + 'delete'):
-            os.remove(tmp + 'delete')
-        if os.path.exists(tmp + 'destroy'):
-            os.remove(tmp + 'destroy')
-        if os.path.exists(Part_label):
-            os.remove(Part_label)
-        partition_repos()
+        if os.path.exists(f'{tmp}/create'):
+            os.remove(f'{tmp}/create')
+        if os.path.exists(disk_scheme):
+            os.remove(disk_scheme)
+        if os.path.exists(disk_file):
+            os.remove(disk_file)
+        if os.path.exists(slice_file):
+            os.remove(slice_file)
+        if os.path.exists(f'{tmp}/delete'):
+            os.remove(f'{tmp}/delete')
+        if os.path.exists(f'{tmp}/destroy'):
+            os.remove(f'{tmp}/destroy')
+        if os.path.exists(partition_label_file):
+            os.remove(partition_label_file)
+        create_disk_partition_db()
         self.Tree_Store()
         self.treeview.expand_all()
 
@@ -468,92 +427,67 @@ class Partitions():
         self.modify_bt.set_sensitive(False)
         self.auto_bt.set_sensitive(False)
         self.revert_bt.set_sensitive(False)
-        if len(self.path) == 2 and how_partition(self.path) == 1 and self.slice == 'freespace':
-            self.schemeEditor(False)
-        elif len(self.path) == 3:
-            if self.slice == 'freespace':
-                self.labelEditor(self.path, self.slice, self.size, 'MBR', False)
-        elif len(self.path) == 2 and self.slice == 'freespace':
-            if scheme_query(self.path) == "MBR" and self.path[1] < 4:
+        if self.change_schemes is True:
+            self.schemeEditor()
+        elif 'freespace' in self.label:
+            self.labelEditor(self.path, self.slice, self.size, 'MBR', False)
+        elif 'freespace' in self.slice:
+            if self.scheme == "MBR" and self.path[1] < 4:
                 self.sliceEditor()
-            elif scheme_query(self.path) == "GPT":
+            elif self.scheme == "GPT":
                 self.labelEditor(self.path, self.slice, self.size, 'GPT', False)
-        else:
-            if how_partition(self.path) == 1:
-                self.schemeEditor(True)
-            elif how_partition(self.path) == 0:
-                self.schemeEditor(True)
-            else:
-                pass
 
     def partition_selection(self, widget):
         model, self.iter, = widget.get_selected()
         if self.iter is not None:
             self.path = model.get_path(self.iter)
-            tree_iter3 = model.get_iter(self.path[0])
-            self.scheme = model.get_value(tree_iter3, 3)
-            self.disk = model.get_value(tree_iter3, 0)
-            tree_iter = model.get_iter(self.path)
-            self.slice = model.get_value(tree_iter, 0)
-            self.size = model.get_value(tree_iter, 1)
-            if len(self.path) == 2 and self.path[1] > 0 and self.scheme == "MBR":
-                pathbehind = str(self.path[0]) + ":" + str(int(self.path[1] - 1))
-                tree_iter2 = model.get_iter(pathbehind)
-                self.slicebehind = model.get_value(tree_iter2, 0)
-                sl = int(self.path[1]) + 1
-                if 'freespace' in self.slicebehind:
-                    slbehind = self.path[1]
-                else:
-                    slbehind = int(self.slicebehind.partition('s')[2])
-            elif len(self.path) == 2 and self.path[1] > 0 and self.scheme == "GPT":
-                pathbehind = str(self.path[0]) + ":" + str(int(self.path[1] - 1))
-                tree_iter2 = model.get_iter(pathbehind)
-                self.slicebehind = model.get_value(tree_iter2, 0)
-                self.lablebehind = model.get_value(tree_iter2, 2)
-                self.fsbehind = model.get_value(tree_iter2, 3)
-
-                sl = int(self.path[1]) + 1
-                if 'freespace' in self.slicebehind:
-                    slbehind = self.path[1]
-                else:
-                    slbehind = int(self.slicebehind.partition('p')[2])
-            elif len(self.path) == 3 and self.path[2] > 0 and self.scheme == "MBR":
-                if self.path[2] > 0:
-                    pathbehind1 = str(self.path[0]) + ":" + str(self.path[1]) + ":" + str(int(self.path[2] - 1))
-                    tree_iter2 = model.get_iter(pathbehind1)
-                    self.slicebehind = model.get_value(tree_iter2, 0)
-                else:
-                    self.slicebehind = None
-                pathbehind2 = str(self.path[0]) + ":" + str(self.path[1]) + ":" + str(int(self.path[2] - 1))
-                tree_iter3 = model.get_iter(pathbehind2)
-                self.lablebehind = model.get_value(tree_iter3, 2)
-                self.fsbehind = model.get_value(tree_iter3, 3)
-                sl = int(self.path[1]) + 1
-                if self.slicebehind is None:
-                    slbehind = self.path[1]
-                elif 'freespace' in self.slicebehind:
-                    slbehind = self.path[1]
-                else:
-                    slbehind = int(self.slicebehind.partition('s')[2])
+            main_tree_iter = model.get_iter(self.path)
+            self.size = model.get_value(main_tree_iter, 1)
+            tree_iter1 = model.get_iter(self.path[0])
+            self.scheme = model.get_value(tree_iter1, 3)
+            self.disk = model.get_value(tree_iter1, 0)
+            if len(self.path) >= 2:
+                tree_iter2 = model.get_iter(self.path[:2])
+                self.slice = model.get_value(tree_iter2, 0)
+                self.change_schemes = False
             else:
-                self.slicebehind = None
-                self.lablebehind = None
-                self.fsbehind = None
-                sl = 1
-                slbehind = 0
-            if 'freespace' in self.slice:
-                if self.path[1] > 3 and self.scheme == "MBR":
-                    self.create_bt.set_sensitive(False)
-                elif self.slicebehind is None:
-                    self.create_bt.set_sensitive(True)
-                elif sl == slbehind:
-                    self.create_bt.set_sensitive(False)
-                # elif slbehind > 4:
-                #     self.create_bt.set_sensitive(False)
+                if len(self.path) == 1:
+                    if how_partition(self.disk) == 1:
+                        slice_path = f'{self.path[0]}:0'
+                        tree_iter2 = model.get_iter(slice_path)
+                        if 'freespace' in model.get_value(tree_iter2, 0):
+                            self.change_schemes = True
+                        else:
+                            self.change_schemes = False
+                    else:
+                        self.change_schemes = False
+                    self.slice = 'Not selected'
                 else:
-                    self.create_bt.set_sensitive(True)
+                    self.slice = 'Not selected'
+                    self.change_schemes = False
+            if len(self.path) == 3:
+                tree_iter3 = model.get_iter(self.path[:3])
+                self.label = model.get_value(tree_iter3, 0)
+            else:
+                self.label = 'Not selected'
+            if len(self.path) == 2 and self.path[1] > 0 and self.scheme == "GPT":
+                pathbehind = f'{self.path[0]}:{str(int(self.path[1] - 1))}'
+                tree_iter4 = model.get_iter(pathbehind)
+                self.mountpoint_behind = model.get_value(tree_iter4, 2)
+                self.fs_behind = model.get_value(tree_iter4, 3)
+            elif len(self.path) == 3 and self.path[2] > 0 and self.scheme == "MBR":
+                pathbehind2 = f'{self.path[0]}:{str(self.path[1])}:{str(int(self.path[2] - 1))}'
+                tree_iter1 = model.get_iter(pathbehind2)
+                self.mountpoint_behind = model.get_value(tree_iter1, 2)
+                self.fs_behind = model.get_value(tree_iter1, 3)
+            else:
+                self.mountpoint_behind = None
+                self.fs_behind = None
+            if 'freespace' in self.slice:
+                self.create_bt.set_sensitive(True)
                 self.delete_bt.set_sensitive(False)
                 self.modify_bt.set_sensitive(False)
+                self.auto_bt.set_sensitive(True)
                 # scan for efi partition
                 for num in range(self.path[1]):
                     partition_path = f"{self.path[0]}:{num}"
@@ -564,13 +498,20 @@ class Partitions():
                         break
                 else:
                     self.efi_exist = False
-                self.auto_bt.set_sensitive(True)
-            elif 's' in self.slice:
+            elif 'freespace' in self.label:
+                if self.path[1] > 3:
+                    self.create_bt.set_sensitive(False)
+                else:
+                    self.create_bt.set_sensitive(True)
+                    self.auto_bt.set_sensitive(True)
+                self.delete_bt.set_sensitive(False)
+                self.modify_bt.set_sensitive(False)
+            elif 's' in self.slice and len(self.path) > 1:
                 self.create_bt.set_sensitive(False)
                 self.delete_bt.set_sensitive(True)
                 # self.modify_bt.set_sensitive(True)
                 self.auto_bt.set_sensitive(False)
-            elif 'p' in self.slice:
+            elif 'p' in self.slice and len(self.path) > 1:
                 self.create_bt.set_sensitive(False)
                 self.delete_bt.set_sensitive(True)
                 # self.modify_bt.set_sensitive(True)
@@ -579,21 +520,18 @@ class Partitions():
                 self.delete_bt.set_sensitive(False)
                 self.modify_bt.set_sensitive(False)
                 self.auto_bt.set_sensitive(False)
-                how_many_prt = how_partition(self.path)
-                firstisfree = first_is_free(self.path)
-                if how_many_prt == 1 and firstisfree == 'freespace':
-                    self.create_bt.set_sensitive(False)
-                elif how_partition(self.path) == 0:
+                if how_partition(self.disk) == 0:
+                    self.create_bt.set_sensitive(True)
+                elif self.change_schemes is True:
                     self.create_bt.set_sensitive(True)
                 else:
                     self.create_bt.set_sensitive(False)
-        if os.path.exists(Part_label):
-            rd = open(Part_label, 'r')
-            self.prttn = rd.readlines()
-            print(self.prttn)
+        if os.path.exists(partition_label_file):
+            rd = open(partition_label_file, 'r')
+            self.partitions = rd.readlines()
             # Find if GPT scheme.
-            if os.path.exists(disk_schem):
-                rschm = open(disk_schem, 'r')
+            if os.path.exists(disk_scheme):
+                rschm = open(disk_scheme, 'r')
                 schm = rschm.readlines()[0]
                 if 'GPT' in schm:
                     if os.path.exists(disk_file):
@@ -614,47 +552,47 @@ class Partitions():
                                 self.efi_exist = False
                                 break
                             num += 1
-                    if 'BOOT' in self.prttn[0] and bios_type == 'BIOS':
-                        if "/boot\n" in self.prttn[1]:
-                            if len(self.prttn) >= 3:
-                                if '/\n' in self.prttn[2]:
+                    if 'BOOT' in self.partitions[0] and bios_type == 'BIOS':
+                        if "/boot\n" in self.partitions[1]:
+                            if len(self.partitions) >= 3:
+                                if '/\n' in self.partitions[2]:
                                     self.button3.set_sensitive(True)
-                                elif 'ZFS' in self.prttn[0]:
+                                elif 'ZFS' in self.partitions[0]:
                                     self.button3.set_sensitive(True)
                                 else:
                                     self.button3.set_sensitive(False)
                             else:
                                 self.button3.set_sensitive(False)
-                        elif '/\n' in self.prttn[1]:
+                        elif '/\n' in self.partitions[1]:
                             self.button3.set_sensitive(True)
-                        elif 'ZFS' in self.prttn[0]:
+                        elif 'ZFS' in self.partitions[0]:
                             self.button3.set_sensitive(True)
                         else:
                             self.button3.set_sensitive(False)
                     elif self.efi_exist is True and bios_type == 'UEFI':
-                        if '/\n' in self.prttn[0]:
+                        if '/\n' in self.partitions[0]:
                             self.button3.set_sensitive(True)
-                        elif 'ZFS' in self.prttn[0]:
+                        elif 'ZFS' in self.partitions[0]:
                             self.button3.set_sensitive(True)
-                        elif "/boot\n" in self.prttn[0]:
-                            if len(self.prttn) >= 2:
-                                if '/\n' in self.prttn[1]:
+                        elif "/boot\n" in self.partitions[0]:
+                            if len(self.partitions) >= 2:
+                                if '/\n' in self.partitions[1]:
                                     self.button3.set_sensitive(True)
-                                elif 'ZFS' in self.prttn[0]:
+                                elif 'ZFS' in self.partitions[0]:
                                     self.button3.set_sensitive(True)
                                 else:
                                     self.button3.set_sensitive(False)
                             else:
                                 self.button3.set_sensitive(False)
-                        elif 'UEFI' in self.prttn[0] and '/\n' in self.prttn[1]:
+                        elif 'UEFI' in self.partitions[0] and '/\n' in self.partitions[1]:
                             self.button3.set_sensitive(True)
-                        elif 'UEFI' in self.prttn[0] and 'ZFS' in self.prttn[1]:
+                        elif 'UEFI' in self.partitions[0] and 'ZFS' in self.partitions[1]:
                             self.button3.set_sensitive(True)
-                        elif 'UEFI' in self.prttn[0] and "/boot\n" in self.prttn[0]:
-                            if len(self.prttn) >= 3:
-                                if '/\n' in self.prttn[2]:
+                        elif 'UEFI' in self.partitions[0] and "/boot\n" in self.partitions[0]:
+                            if len(self.partitions) >= 3:
+                                if '/\n' in self.partitions[2]:
                                     self.button3.set_sensitive(True)
-                                elif 'ZFS' in self.prttn[0]:
+                                elif 'ZFS' in self.partitions[0]:
                                     self.button3.set_sensitive(True)
                                 else:
                                     self.button3.set_sensitive(False)
@@ -665,22 +603,22 @@ class Partitions():
                     else:
                         self.button3.set_sensitive(False)
                 else:
-                    # to be changed when MBR UEFI will be supported in the backend.
+                    # to be changed when MBR UEFI will be supported by pc-sysinstall.
                     self.efi_exist = False
-                    if len(self.prttn) >= 1:
-                        if "/boot\n" in self.prttn[0]:
-                            if len(self.prttn) >= 2:
-                                if '/\n' in self.prttn[1]:
+                    if len(self.partitions) >= 1:
+                        if "/boot\n" in self.partitions[0]:
+                            if len(self.partitions) >= 2:
+                                if '/\n' in self.partitions[1]:
                                     self.button3.set_sensitive(True)
-                                elif 'ZFS' in self.prttn[0]:
+                                elif 'ZFS' in self.partitions[0]:
                                     self.button3.set_sensitive(True)
                                 else:
                                     self.button3.set_sensitive(False)
                             else:
                                 self.button3.set_sensitive(False)
-                        elif '/\n' in self.prttn[0]:
+                        elif '/\n' in self.partitions[0]:
                             self.button3.set_sensitive(True)
-                        elif 'ZFS' in self.prttn[0]:
+                        elif 'ZFS' in self.partitions[0]:
                             self.button3.set_sensitive(True)
                         else:
                             self.button3.set_sensitive(False)
@@ -691,11 +629,13 @@ class Partitions():
         else:
             self.button3.set_sensitive(False)
         path_exist = [
-            os.path.exists(Part_label),
-            os.path.exists(disk_schem),
+            os.path.exists(f'{tmp}/create'),
+            os.path.exists(disk_scheme),
             os.path.exists(disk_file),
-            os.path.exists(psize),
-            os.path.exists(part_schem)
+            os.path.exists(slice_file),
+            os.path.exists(f'{tmp}/delete'),
+            os.path.exists(f'{tmp}/destroy'),
+            os.path.exists(partition_label_file)
         ]
         if any(path_exist):
             self.revert_bt.set_sensitive(True)
@@ -785,24 +725,29 @@ class Partitions():
 
     def Tree_Store(self):
         self.store.clear()
-        for disk in disk_query():
-            schem = disk[-1]
-            pinter = self.store.append(None, [disk[0], str(disk[1]),
-                                       disk[2], disk[3], True])
-            if schem == "GPT":
-                for pi in partition_query(disk[0]):
-                    self.store.append(pinter, [pi[0], str(pi[1]), pi[2],
-                                      pi[3], True])
-            elif schem == "MBR":
-                for pi in partition_query(disk[0]):
-                    pinter1 = self.store.append(pinter, [pi[0], str(pi[1]),
-                                                pi[2], pi[3], True])
-                    if pi[0] == 'freespace':
-                        pass
-                    else:
-                        for li in label_query(pi[0]):
-                            self.store.append(pinter1, [li[0], str(li[1]),
-                                              li[2], li[3], True])
+        disk_db = disk_database()
+        for disk in disk_db:
+            disk_info = disk_db[disk]
+            disk_schemee = disk_info['scheme']
+            mount_point = ''
+            disk_size = str(disk_info['size'])
+            disk_partitions = disk_info['partitions']
+            partition_list = disk_info['partition_list']
+            pinter1 = self.store.append(None, [disk, disk_size, mount_point, disk_schemee, True])
+            for partition in partition_list:
+                partition_info = disk_partitions[partition]
+                file_system = partition_info['file_system']
+                mount_point = partition_info['mount_point']
+                partition_size = str(partition_info['size'])
+                partition_partitions = partition_info['partitions']
+                partition_list = partition_info['partition_list']
+                pinter2 = self.store.append(pinter1, [partition, partition_size, mount_point, file_system, True])
+                for partition in partition_list:
+                    partition_info = partition_partitions[partition]
+                    file_system = partition_info['file_system']
+                    mount_point = partition_info['mount_point']
+                    partition_size = str(partition_info['size'])
+                    self.store.append(pinter2, [partition, partition_size, mount_point, file_system, True])
         return self.store
 
     def get_model(self):

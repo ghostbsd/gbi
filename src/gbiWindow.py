@@ -50,7 +50,7 @@ from use_zfs import ZFS
 from boot_manager import bootManager
 from root import RootUser
 from addUser import AddUser
-from partition_handler import partition_repos
+from partition_handler import create_disk_partition_db
 from install import installProgress, installSlide
 logo = "/usr/local/lib/gbi/logo.png"
 tmp = "/tmp/.gbi/"
@@ -114,8 +114,8 @@ class MainWindow():
             self.window.show_all()
             self.notebook.next_page()
         elif page == 3:
+            create_disk_partition_db()
             if self.types.get_type() == "ufs":
-                partition_repos()
                 udbox = Gtk.VBox(False, 0)
                 udbox.show()
                 self.partition = use_ufs(self.button3)
@@ -127,7 +127,6 @@ class MainWindow():
                 self.notebook.next_page()
                 self.button3.set_sensitive(False)
             elif self.types.get_type() == "custom":
-                partition_repos()
                 Pbox = Gtk.VBox(False, 0)
                 Pbox.show()
                 self.partition = Partitions(self.button3)
