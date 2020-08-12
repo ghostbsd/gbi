@@ -31,13 +31,13 @@ do
         MB="`expr ${BLOCK} / 2048`MB"
     fi
     if [ ! "${MB}" = "0MB" ] ; then
-        LABEL="`echo ${i} | cut -d ' ' -f 3`"
+        FS="`echo ${i} | cut -d ' ' -f 3`"
         SLICE="`echo ${i} | cut -d ' ' -f 2`"
         if [ "$SLICE" = '-' ] ; then
-            echo "freespace  ${MB}"
+            echo "${MB} freespace none"
         else
             if [ ! -z "$SLICE" ] ; then
-                echo "${MB} ${LABEL}"
+                echo "${MB} ${SLICE} ${FS}"
             fi
         fi
     fi
