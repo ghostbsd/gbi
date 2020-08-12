@@ -143,7 +143,7 @@ class create_disk_partition_db():
                     alph += 1
                 partitions = {
                     'name': partition_name,
-                    'size': info[1].partition('M')[0],
+                    'size': info[0].partition('M')[0],
                     'mount_point': '',
                     'file_system': info[2],
                     'stat': None,
