@@ -408,7 +408,7 @@ class Delete_partition():
             mount_point = partitions_info[part]['mount_point']
             file_system = partitions_info[part]['file_system']
             stat = partitions_info[part]['stat']
-            if stat == 'new':
+            if stat == 'New':
                 new_partitions.writelines(f'{file_system} {size} {mount_point}\n')
         new_partitions.close()
 
@@ -590,7 +590,7 @@ class Delete_partition():
                 mount_point = partitions_info[part]['mount_point']
                 file_system = partitions_info[part]['file_system']
                 stat = partitions_info[part]['stat']
-                if stat == 'new':
+                if stat == 'New':
                     new_partitions.writelines(f'{file_system} {size} {mount_point}\n')
             new_partitions.close()
 
@@ -798,10 +798,9 @@ class autoFreeSpace():
 
 class createLabel():
     def __init__(self, path, drive, main_slice, size_left, create_size, mountpoint, fs):
-        if not os.path.exists(disk_file):
-            file_disk = open(disk_file, 'w')
-            file_disk.writelines('%s\n' % drive)
-            file_disk.close()
+        file_disk = open(disk_file, 'w')
+        file_disk.writelines('%s\n' % drive)
+        file_disk.close()
         write_scheme = open(scheme_file, 'w')
         write_scheme.writelines('partscheme=MBR')
         write_scheme.close()
@@ -977,15 +976,13 @@ class createSlice():
 
 class createPartition():
     def __init__(self, path, drive, size_left, create_size, mount_point, fs):
-        if not os.path.exists(disk_file):
-            file_disk = open(disk_file, 'w')
-            file_disk.writelines('%s\n' % drive)
-            file_disk.close()
+        file_disk = open(disk_file, 'w')
+        file_disk.writelines('%s\n' % drive)
+        file_disk.close()
 
-        if not os.path.exists(scheme_file):
-            write_scheme = open(scheme_file, 'w')
-            write_scheme.writelines('partscheme=GPT')
-            write_scheme.close()
+        write_scheme = open(scheme_file, 'w')
+        write_scheme.writelines('partscheme=GPT')
+        write_scheme.close()
 
         if fs == "ZFS":
             mount_point = "/(compress=lz4|atime=off),/root(compress=lz4)," \
