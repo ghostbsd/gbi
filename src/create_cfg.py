@@ -190,5 +190,7 @@ class gbsd_cfg():
                 zfsark = """echo 'vfs.zfs.arc_max="512M"' >> /boot/loader.conf"""
                 f.writelines(f'runCommand={zfsark}\n')
         else:
-            pass
+            # Network Configuration
+            f.writelines('\n# Network Configuration\n')
+            f.writelines('hostname=installed\n')
         f.close()
