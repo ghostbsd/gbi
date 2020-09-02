@@ -4,7 +4,7 @@ import os
 import re
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk
+from gi.repository import Gtk, Gdk
 from partition_handler import create_disk_partition_db, disk_database, Delete_partition
 from partition_handler import bios_or_uefi, how_partition, createSlice
 from partition_handler import autoFreeSpace, createPartition
@@ -23,6 +23,16 @@ partition_label_file = f'{tmp}/partlabel'
 disk_db_file = f'{tmp}/disk.db'
 ufs_Partiton_list = []
 bios_type = bios_or_uefi()
+
+cssProvider = Gtk.CssProvider()
+cssProvider.load_from_path('/usr/local/lib/gbi/ghostbsd-style.css')
+screen = Gdk.Screen.get_default()
+styleContext = Gtk.StyleContext()
+styleContext.add_provider_for_screen(
+    screen,
+    cssProvider,
+    Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+)
 
 
 class Partitions():
@@ -642,19 +652,12 @@ class Partitions():
 
     def __init__(self, button3):
         self.button3 = button3
-        self.box1 = Gtk.VBox(False, 0)
-        self.box1.show()
-        box2 = Gtk.VBox(False, 10)
-        box2.set_border_width(0)
-        self.box1.pack_start(box2, True, True, 0)
-        box2.show()
+        self.vbox1 = Gtk.VBox(False, 0)
+        self.vbox1.show()
         # Title
-        Title = Gtk.Label("<b><span size='xx-large'>Partition Editor</span></b> ")
-        Title.set_use_markup(True)
-        box2.pack_start(Title, False, False, 20)
-        # Choosing disk to Select Create, delete partition.
-        label = Gtk.Label("<b>Select a drive:</b>")
-        label.set_use_markup(True)
+        Title = Gtk.Label("Partition Editor", name="Header")
+        Title.set_property("height-request", 50)
+        self.vbox1.pack_start(Title, False, False, 0)
         sw = Gtk.ScrolledWindow(hexpand=True, vexpand=True)
         sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
         sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
@@ -711,14 +714,13 @@ class Partitions():
         self.tree_selection.connect("changed", self.partition_selection)
         sw.add(self.treeview)
         sw.show()
-        box2.pack_start(sw, True, True, 0)
-        box2 = Gtk.HBox(False, 10)
-        box2.set_border_width(10)
-        self.box1.pack_start(box2, False, False, 10)
-        box2.show()
+        self.vbox1.pack_start(sw, True, True, 0)
+        hbox1 = Gtk.HBox(False, 0)
+        hbox1.set_border_width(10)
+        self.vbox1.pack_start(hbox1, False, False, 0)
+        hbox1.show()
         self.scheme = 'GPT'
-        box2.pack_start(self.delete_create_button(),
-                        False, False, 10)
+        hbox1.pack_start(self.delete_create_button(), False, False, 10)
         return
 
     def Tree_Store(self):
@@ -750,4 +752,4 @@ class Partitions():
 
     def get_model(self):
         self.tree_selection.select_path(0)
-        return self.box1
+        return self.vbox1

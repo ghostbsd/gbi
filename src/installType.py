@@ -10,7 +10,7 @@
 
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk
+from gi.repository import Gtk, Gdk
 import os
 import os.path
 
@@ -29,6 +29,16 @@ disk_list = '%sdisk-list.sh' % query
 disk_info = '%sdisk-info.sh' % query
 part_query = '%sdisk-part.sh' % query
 
+cssProvider = Gtk.CssProvider()
+cssProvider.load_from_path('/usr/local/lib/gbi/ghostbsd-style.css')
+screen = Gdk.Screen.get_default()
+styleContext = Gtk.StyleContext()
+styleContext.add_provider_for_screen(
+    screen,
+    cssProvider,
+    Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+)
+
 
 class Types():
 
@@ -43,38 +53,32 @@ class Types():
         return self.ne
 
     def get_model(self):
-        return self.box1
+        return self.vbox1
 
     def __init__(self):
-        self.box1 = Gtk.VBox(False, 0)
-        self.box1.show()
-        box2 = Gtk.VBox(False, 10)
-        # box2.set_border_width(10)
-        self.box1.pack_start(box2, False, False, 0)
-        box2.show()
-        # auto partition or Customize Disk Partition.
-        bbox = Gtk.VBox()
-        label = Gtk.Label('<b><span size="xx-large">Installation Type</span></b>')
-        label.set_use_markup(True)
-        box2.pack_start(label, False, False, 10)
-        # create a Hbox to center the radio button.
-        hbox = Gtk.HBox()
+        self.vbox1 = Gtk.VBox(False, 0)
+        self.vbox1.show()
+        Title = Gtk.Label('Installation Type', name="Header")
+        Title.set_property("height-request", 50)
+        self.vbox1.pack_start(Title, False, False, 0)
+        vbox2 = Gtk.VBox()
+        hbox1 = Gtk.HBox()
         self.ne = 'zfs'
         pass_file = open(signal, 'w')
         pass_file.writelines(self.ne)
         pass_file.close
-        box2.pack_start(hbox, False, False, 10)
+        self.vbox1.pack_start(hbox1, False, False, 10)
         full_zfs = Gtk.RadioButton.new_with_label_from_widget(None, "ZFS full disk configuration(Recommended option for BE)")
-        bbox.pack_start(full_zfs, False, True, 10)
+        vbox2.pack_start(full_zfs, False, True, 10)
         full_zfs.connect("toggled", self.fstype, "zfs")
         full_zfs.show()
         full_ufs = Gtk.RadioButton.new_with_label_from_widget(full_zfs, "UFS full disk configuration")
-        bbox.pack_start(full_ufs, False, True, 10)
+        vbox2.pack_start(full_ufs, False, True, 10)
         full_ufs.connect("toggled", self.fstype, "ufs")
         full_ufs.show()
         custom_ufs = Gtk.RadioButton.new_with_label_from_widget(full_ufs, "Custom disk configuration for UFS and ZFS")
-        bbox.pack_start(custom_ufs, False, True, 10)
+        vbox2.pack_start(custom_ufs, False, True, 10)
         custom_ufs.connect("toggled", self.fstype, "custom")
         custom_ufs.show()
-        hbox.pack_start(bbox, False, False, 50)
+        hbox1.pack_start(vbox2, False, False, 50)
         full_zfs.set_active(True)
