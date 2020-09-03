@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from gi.repository import Gtk
+from gi.repository import Gtk, Gdk
 import os
 import re
 import pickle
@@ -12,6 +12,16 @@ query = "sh /usr/local/lib/gbi/backend-query/"
 if not os.path.exists(tmp):
     os.makedirs(tmp)
 userfile = tmp + "user"
+
+cssProvider = Gtk.CssProvider()
+cssProvider.load_from_path('/usr/local/lib/gbi/ghostbsd-style.css')
+screen = Gdk.Screen.get_default()
+styleContext = Gtk.StyleContext()
+styleContext.add_provider_for_screen(
+    screen,
+    cssProvider,
+    Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+)
 
 
 # Find if pasword contain only lower case and number
@@ -87,21 +97,18 @@ class AddUser:
         self.user.set_text(username[0].lower())
 
     def __init__(self, button3):
-        self.box1 = Gtk.VBox(False, 0)
-        self.box1.show()
+        self.vbox1 = Gtk.VBox(False, 0)
+        self.vbox1.show()
+        Title = Gtk.Label("User Setup", name="Header")
+        Title.set_property("height-request", 50)
+        self.vbox1.pack_start(Title, False, False, 0)
         box2 = Gtk.VBox(False, 0)
         box2.set_border_width(10)
-        self.box1.pack_start(box2, False, False, 0)
+        self.vbox1.pack_start(box2, False, False, 0)
         box2.show()
-        # title.
-        ttext = "User Setup"
-        Title = Gtk.Label("<b><span size='xx-large'>%s</span></b>" % ttext)
-        Title.set_use_markup(True)
-        box2.pack_start(Title, False, False, 0)
-        # password for root.
         box2 = Gtk.VBox(False, 10)
         # box2.set_border_width(10)
-        self.box1.pack_start(box2, False, False, 0)
+        self.vbox1.pack_start(box2, False, False, 0)
         box2.show()
         label = Gtk.Label('<b>User Account</b>')
         label.set_use_markup(True)
@@ -160,13 +167,13 @@ class AddUser:
         box2.pack_start(table, False, False, 0)
         self.box3 = Gtk.VBox(False, 10)
         self.box3.set_border_width(10)
-        self.box1.pack_start(self.box3, True, True, 0)
+        self.vbox1.pack_start(self.box3, True, True, 0)
         self.box3.show()
         # self.label3 = Gtk.Label()
         # self.box3.pack_start(self.label3, False, False, 0)
 
     def get_model(self):
-        return self.box1
+        return self.vbox1
 
     def passwdstrength(self, widget):
         passwd = self.password.get_text()

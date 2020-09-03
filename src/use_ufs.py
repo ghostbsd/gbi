@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from gi.repository import Gtk
+from gi.repository import Gtk, Gdk
 import os
 import os.path
 import re
@@ -23,8 +23,17 @@ dslice = '%sslice' % tmp
 Part_label = '%sufs_config' % tmp
 part_schem = '%sscheme' % tmp
 boot_file = '%sboot' % tmp
-
 ufs_dsk_list = []
+
+cssProvider = Gtk.CssProvider()
+cssProvider.load_from_path('/usr/local/lib/gbi/ghostbsd-style.css')
+screen = Gdk.Screen.get_default()
+styleContext = Gtk.StyleContext()
+styleContext.add_provider_for_screen(
+    screen,
+    cssProvider,
+    Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+)
 
 
 # Find if pasword contain only lower case and number
@@ -188,14 +197,12 @@ class use_ufs():
 
     def __init__(self, button3):
         self.button3 = button3
-        self.box1 = Gtk.VBox(False, 0)
-        self.box1.show()
-        box2 = Gtk.HBox(False, 0)
-        self.box1.pack_start(box2, True, True, 0)
-        box2.show()
+        self.vbox1 = Gtk.VBox(False, 0)
+        self.vbox1.show()
         # Title
-        Title = Gtk.Label("<b><span size='xx-large'>UFS Full Disk Configuration</span></b>")
-        Title.set_use_markup(True)
+        Title = Gtk.Label("UFS Full Disk Configuration", name="Header")
+        Title.set_property("height-request", 50)
+        self.vbox1.pack_start(Title, False, False, 0)
         # Chose disk
         sw = Gtk.ScrolledWindow(hexpand=True, vexpand=True)
         sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
@@ -274,9 +281,9 @@ class use_ufs():
         else:
             shemebox.set_sensitive(True)
         # Swap Size
-        ram = Popen(memory, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT,
-                    universal_newlines=True, close_fds=True)
-        mem = ram.stdout.read()
+        # ram = Popen(memory, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT,
+        #            universal_newlines=True, close_fds=True)
+        # mem = ram.stdout.read()
         swap = 2048
         swp_size_label = Gtk.Label('<b>Swap Size(MB)</b>')
         swp_size_label.set_use_markup(True)
@@ -343,12 +350,12 @@ class use_ufs():
         # grid.attach(self.vpasswd_label, 1, 11, 1, 1)
         # grid.attach(self.repassword, 2, 11, 2, 1)
         # grid.attach(self.img, 4, 11, 2, 1)
-        box2.pack_start(grid, True, True, 10)
+        self.vbox1.pack_start(grid, True, True, 10)
         return
 
     def get_model(self):
         del ufs_dsk_list[:]
-        return self.box1
+        return self.vbox1
 
     def digit_only(self, *args):
         text = self.swap_entry.get_text().strip()

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from gi.repository import Gtk
+from gi.repository import Gtk, Gdk
 import os
 from subprocess import call
 from sys_handler import keyboard_dictionary, keyboard_models
@@ -19,6 +19,16 @@ variant = '%svariant' % tmp
 KBFile = '%skeyboard' % tmp
 kb_dictionary = keyboard_dictionary()
 kbm_dictionary = keyboard_models()
+
+cssProvider = Gtk.CssProvider()
+cssProvider.load_from_path('/usr/local/lib/gbi/ghostbsd-style.css')
+screen = Gdk.Screen.get_default()
+styleContext = Gtk.StyleContext()
+styleContext.add_provider_for_screen(
+    screen,
+    cssProvider,
+    Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+)
 
 
 # This class is for placeholder for entry.
@@ -101,7 +111,7 @@ class Keyboard:
     def get_model(self):
         self.treeView.set_cursor(0)
         self.button3.set_sensitive(True)
-        return self.box1
+        return self.vbox1
 
     def save_selection(self):
         File = open(KBFile, 'w')
@@ -113,22 +123,21 @@ class Keyboard:
 
     def __init__(self, button3):
         self.button3 = button3
-        self.box1 = Gtk.VBox(False, 0)
-        self.box1.show()
-        box2 = Gtk.VBox(False, 10)
-        box2.set_border_width(10)
-        self.box1.pack_start(box2, True, True, 0)
-        box2.show()
+        self.vbox1 = Gtk.VBox(False, 0)
+        self.vbox1.show()
+        Title = Gtk.Label('Keyboard Setup', name="Header")
+        Title.set_property("height-request", 50)
+        self.vbox1.pack_start(Title, False, False, 0)
+        vbox2 = Gtk.VBox(False, 10)
+        vbox2.set_border_width(10)
+        self.vbox1.pack_start(vbox2, True, True, 0)
+        vbox2.show()
         table = Gtk.Table(1, 2, True)
-        label = Gtk.Label('<span size="xx-large"><b>Keyboard Setup</b></span>')
-        label.set_use_markup(True)
-        table.attach(label, 0, 2, 0, 1)
-
-        box2.pack_start(table, False, False, 0)
-        hbox = Gtk.HBox(False, 10)
-        hbox.set_border_width(5)
-        box2.pack_start(hbox, True, True, 5)
-        hbox.show()
+        vbox2.pack_start(table, False, False, 0)
+        hbox1 = Gtk.HBox(False, 10)
+        hbox1.set_border_width(5)
+        vbox2.pack_start(hbox1, True, True, 5)
+        hbox1.show()
 
         sw = Gtk.ScrolledWindow()
         sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
@@ -148,7 +157,7 @@ class Keyboard:
         self.tree_selection.connect("changed", self.Selection_Layout, button3)
         sw.add(self.treeView)
         sw.show()
-        hbox.pack_start(sw, True, True, 5)
+        hbox1.pack_start(sw, True, True, 5)
 
         sw = Gtk.ScrolledWindow()
         sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
@@ -166,11 +175,10 @@ class Keyboard:
         tree_selection.connect("changed", self.Selection_Model)
         sw.add(treeView)
         sw.show()
-        # self.kb_variant = None
-        hbox.pack_start(sw, True, True, 5)
+        hbox1.pack_start(sw, True, True, 5)
 
-        box2 = Gtk.HBox(False, 10)
-        box2.set_border_width(5)
-        self.box1.pack_start(box2, False, False, 0)
-        box2.show()
-        box2.pack_start(PlaceholderEntry(), True, True, 10)
+        vbox3 = Gtk.HBox(False, 10)
+        vbox3.set_border_width(5)
+        self.vbox1.pack_start(vbox3, False, False, 0)
+        vbox3.show()
+        vbox3.pack_start(PlaceholderEntry(), True, True, 10)

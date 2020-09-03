@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from gi.repository import Gtk
+from gi.repository import Gtk, Gdk
 import os.path
 import os
 from sys_handler import timezone_dictionary
@@ -13,6 +13,16 @@ if not os.path.exists(tmp):
 logo = "/usr/local/lib/gbi/logo.png"
 time = '%stimezone' % tmp
 tzdictionary = timezone_dictionary()
+
+cssProvider = Gtk.CssProvider()
+cssProvider.load_from_path('/usr/local/lib/gbi/ghostbsd-style.css')
+screen = Gdk.Screen.get_default()
+styleContext = Gtk.StyleContext()
+styleContext.add_provider_for_screen(
+    screen,
+    cssProvider,
+    Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+)
 
 
 class TimeZone:
@@ -64,17 +74,16 @@ class TimeZone:
         return
 
     def __init__(self, button3):
-        self.box1 = Gtk.VBox(False, 0)
-        self.box1.show()
+        self.vbox1 = Gtk.VBox(False, 0)
+        self.vbox1.show()
+        Title = Gtk.Label('Time Zone Selection', name="Header")
+        Title.set_property("height-request", 50)
+        self.vbox1.pack_start(Title, False, False, 0)
         box2 = Gtk.VBox(False, 10)
         box2.set_border_width(10)
-        self.box1.pack_start(box2, True, True, 0)
+        self.vbox1.pack_start(box2, True, True, 0)
         box2.show()
         table = Gtk.Table(1, 2, True)
-        tzTitle = '<b><span size="xx-large">Time Zone Selection</span></b>'
-        label = Gtk.Label(tzTitle)
-        label.set_use_markup(True)
-        table.attach(label, 0, 2, 0, 1)
         box2.pack_start(table, False, False, 0)
         hbox = Gtk.HBox(False, 10)
         hbox.set_border_width(5)
@@ -117,4 +126,4 @@ class TimeZone:
 
     def get_model(self):
         self.continenttreeView.set_cursor(1)
-        return self.box1
+        return self.vbox1
