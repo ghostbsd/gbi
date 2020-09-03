@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from gi.repository import Gtk
+from gi.repository import Gtk, Gdk
 import os
 import os.path
 from sys_handler import language_dictionary
@@ -15,8 +15,17 @@ logo = "/usr/local/lib/gbi/logo.png"
 langfile = '%slanguage' % tmp
 lang_dictionary = language_dictionary()
 # Text to be replace be multiple language file.
-title = "Welcome To GhostBSD!"
 welltext = """Select the language you want to use with GhostBSD."""
+
+cssProvider = Gtk.CssProvider()
+cssProvider.load_from_path('/usr/local/lib/gbi/ghostbsd-style.css')
+screen = Gdk.Screen.get_default()
+styleContext = Gtk.StyleContext()
+styleContext.add_provider_for_screen(
+    screen,
+    cssProvider,
+    Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+)
 
 
 class Language:
@@ -53,6 +62,9 @@ class Language:
         self.vbox1.show()
         # Add a second vertical box
         grid = Gtk.Grid()
+        Title = Gtk.Label('Welcome To GhostBSD!', name="Header")
+        Title.set_property("height-request", 50)
+        self.vbox1.pack_start(Title, False, False, 0)
         self.vbox1.pack_start(grid, True, True, 0)
         grid.set_row_spacing(10)
         grid.set_column_spacing(3)
@@ -81,25 +93,22 @@ class Language:
         sw.show()
         grid.attach(sw, 1, 2, 1, 9)
         # add text in a label.
-        vhbox = Gtk.VBox(False, 0)
-        vhbox.set_border_width(10)
-        vhbox.show()
-        self.wellcome = Gtk.Label('<span size="xx-large"><b>' + title + '</b></span>')
-        self.wellcome.set_use_markup(True)
+        vbox2 = Gtk.VBox(False, 0)
+        vbox2.set_border_width(10)
+        vbox2.show()
         self.wellcometext = Gtk.Label(welltext)
         self.wellcometext.set_use_markup(True)
         table = Gtk.Table()
-        # table.attach(self.wellcome, 0, 1, 1, 2)
         # wall = Gtk.Label()
         # table.attach(wall, 0, 1, 2, 3)
         table.attach(self.wellcometext, 0, 1, 3, 4)
-        vhbox.pack_start(table, False, False, 5)
+        vbox2.pack_start(table, False, False, 5)
         image = Gtk.Image()
         image.set_from_file(logo)
         image.show()
-        grid.attach(self.wellcome, 1, 1, 3, 1)
-        vhbox.pack_start(image, True, True, 5)
-        grid.attach(vhbox, 2, 2, 2, 9)
+        # grid.attach(self.wellcome, 1, 1, 3, 1)
+        vbox2.pack_start(image, True, True, 5)
+        grid.attach(vbox2, 2, 2, 2, 9)
         grid.show()
         return
 

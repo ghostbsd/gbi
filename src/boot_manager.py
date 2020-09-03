@@ -4,7 +4,7 @@
 
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk
+from gi.repository import Gtk, Gdk
 import os
 import os.path
 from partition_handler import bios_or_uefi
@@ -23,11 +23,21 @@ disk_scheme = f'{tmp}/scheme'
 zfs_config = f'{tmp}/zfs_config'
 ufs_config = f'{tmp}/ufs_config'
 
+cssProvider = Gtk.CssProvider()
+cssProvider.load_from_path('/usr/local/lib/gbi/ghostbsd-style.css')
+screen = Gdk.Screen.get_default()
+styleContext = Gtk.StyleContext()
+styleContext.add_provider_for_screen(
+    screen,
+    cssProvider,
+    Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+)
+
 
 class bootManager():
 
     def get_model(self):
-        return self.box1
+        return self.vbox1
 
     def boot_manager(self, radiobutton, val):
         self.boot = val
@@ -36,12 +46,8 @@ class bootManager():
         boot.close()
 
     def __init__(self):
-        self.box1 = Gtk.VBox(False, 0)
-        self.box1.show()
-        box2 = Gtk.VBox(False, 10)
-        # box2.set_border_width(10)
-        self.box1.pack_start(box2, False, False, 0)
-        box2.show()
+        self.vbox1 = Gtk.VBox(False, 0)
+        self.vbox1.show()
         if bios_or_uefi() == "UEFI":
             loader = "UEFI"
         else:
@@ -59,12 +65,12 @@ class bootManager():
             read = open(disk_scheme, 'r')
             read_scheme = read.read()
         scheme = 'GPT' if 'GPT' in read_scheme else 'MBR'
-        label = Gtk.Label('<b><span size="x-large">Boot Option</span></b>')
-        label.set_use_markup(True)
-        box2.pack_start(label, False, False, 10)
-        hbox = Gtk.HBox()
-        hbox.show()
-        box2.pack_start(hbox, True, True, 0)
+        Title = Gtk.Label('Boot Option', name="Header")
+        Title.set_property("height-request", 50)
+        self.vbox1.pack_start(Title, False, False, 0)
+        hbox1 = Gtk.HBox()
+        hbox1.show()
+        self.vbox1.pack_start(hbox1, True, True, 10)
         bbox1 = Gtk.VBox()
         bbox1.show()
         self.refind = Gtk.RadioButton.new_with_label_from_widget(None, "Setup rEFInd boot manager")
@@ -87,7 +93,7 @@ class bootManager():
         bbox1.pack_start(self.none, False, True, 10)
         self.none.connect("toggled", self.boot_manager, "none")
         self.none.show()
-        hbox.pack_start(bbox1, False, False, 50)
+        hbox1.pack_start(bbox1, False, False, 50)
         self.none.set_active(True)
         self.boot = "none"
         boot = open(boot_file, 'w')
@@ -95,5 +101,5 @@ class bootManager():
         boot.close()
         self.box3 = Gtk.VBox(False, 0)
         self.box3.set_border_width(0)
-        self.box1.pack_start(self.box3, True, True, 0)
+        self.vbox1.pack_start(self.box3, True, True, 0)
         return

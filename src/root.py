@@ -2,10 +2,9 @@
 
 # root.py set root password.
 
-from gi.repository import Gtk
+from gi.repository import Gtk, Gdk
 import os
 import re
-from subprocess import Popen
 import pickle
 
 # Directory use from the installer.
@@ -13,6 +12,16 @@ tmp = "/tmp/.gbi/"
 installer = "/usr/local/lib/gbi/"
 if not os.path.exists(tmp):
     os.makedirs(tmp)
+
+cssProvider = Gtk.CssProvider()
+cssProvider.load_from_path('/usr/local/lib/gbi/ghostbsd-style.css')
+screen = Gdk.Screen.get_default()
+styleContext = Gtk.StyleContext()
+styleContext.add_provider_for_screen(
+    screen,
+    cssProvider,
+    Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+)
 
 
 # Find if pasword contain only lower case and number
@@ -60,17 +69,15 @@ class RootUser:
             f.close()
 
     def __init__(self, button3):
-        self.box1 = Gtk.VBox(False, 0)
-        self.box1.show()
+        self.vbox1 = Gtk.VBox(False, 0)
+        self.vbox1.show()
+        Title = Gtk.Label("Administrator(root) Password", name="Header")
+        Title.set_property("height-request", 50)
+        self.vbox1.pack_start(Title, False, False, 0)
         box2 = Gtk.VBox(False, 0)
         box2.set_border_width(10)
-        self.box1.pack_start(box2, False, False, 10)
+        self.vbox1.pack_start(box2, False, False, 10)
         box2.show()
-        # title.
-        ttext = "Administrator(root) Password"
-        Title = Gtk.Label("<b><span size='xx-large'>%s</span></b>" % ttext)
-        Title.set_use_markup(True)
-        box2.pack_start(Title, False, False, 10)
         # password for root.
         label = Gtk.Label('<b>Administrator (root) Password</b>')
         label.set_use_markup(True)
@@ -96,7 +103,7 @@ class RootUser:
         box2.pack_start(table, False, False, 10)
 
     def get_model(self):
-        return self.box1
+        return self.vbox1
 
     def passwdstrength(self, widget):
         passwd = self.password.get_text()
