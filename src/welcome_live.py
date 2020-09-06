@@ -99,7 +99,7 @@ class Welcome:
         vbox2.set_border_width(10)
         vbox2.show()
         pixbuf1 = GdkPixbuf.Pixbuf.new_from_file_at_scale(
-            filename='/home/ericbsd/Desktop/vippng.com-laptop-clip-art-png-3032277.png',
+            filename='/usr/local/lib/gbi/laptop.png',
             width=190,
             height=190,
             preserve_aspect_ratio=True
@@ -107,7 +107,7 @@ class Welcome:
         image1 = Gtk.Image.new_from_pixbuf(pixbuf1)
         image1.show()
         pixbuf2 = GdkPixbuf.Pixbuf.new_from_file_at_scale(
-            filename='/home/ericbsd/Desktop/CD-DVD_Drive.png',
+            filename='/usr/local/lib/gbi/disk.png',
             width=120,
             height=120,
             preserve_aspect_ratio=True)
