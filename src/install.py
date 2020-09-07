@@ -37,7 +37,7 @@ def update_progess(probar, bartext):
     probar.set_text(bartext[0:80])
 
 
-def read_output(command, probar):
+def read_output(command, probar, main_window):
     GLib.idle_add(update_progess, probar, "Creating pcinstall.cfg")
     gbsd_cfg()
     sleep(1)
@@ -70,10 +70,9 @@ def read_output(command, probar):
         print(bartext)
     if bartext.rstrip() == "Installation finished!":
         Popen(f'python {gbi_path}end.py', shell=True, close_fds=True)
-        Gtk.main_quit()
     else:
         Popen(f'python {gbi_path}error.py', shell=True, close_fds=True)
-        Gtk.main_quit()
+    main_window.hide()
 
 
 class installSlide():
@@ -97,12 +96,18 @@ class installSlide():
 
 class installProgress():
 
-    def __init__(self):
+    def __init__(self, main_window):
         self.pbar = Gtk.ProgressBar()
         self.pbar.set_show_text(True)
         command = '%s -c %spcinstall.cfg' % (sysinstall, tmp)
-        thr = threading.Thread(target=read_output,
-                               args=(command, self.pbar))
+        thr = threading.Thread(
+            target=read_output,
+            args=(
+                command,
+                self.pbar,
+                main_window
+            )
+        )
         thr.setDaemon(True)
         thr.start()
         self.pbar.show()
