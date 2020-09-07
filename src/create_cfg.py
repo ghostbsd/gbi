@@ -194,7 +194,6 @@ class gbsd_cfg():
                 zfsark = """echo 'vfs.zfs.arc_max="512M"' >> /boot/loader.conf"""
                 f.writelines(f'runCommand={zfsark}\n')
         else:
-            # Network Configuration
-            f.writelines('\n# Network Configuration\n')
-            f.writelines('hostname=installed\n')
-        f.close()
+            f.writelines("runCommand=sysrc -f /etc/rc.conf hostname='installed'\n")
+            f.writelines("runCommand=sed -i '' 's/ghostbsd/root/g' /etc/gettytab\n")
+            f.writelines("runCommand=sed -i '' 's/ghostbsd/root/g' /etc/ttys\n")
