@@ -30,7 +30,8 @@ class network_setup():
 
     def __init__(self):
         os.system("netcardmgr")
-        print(networkdictionary())
+        self.network_info = networkdictionary()
+        print(self.network_info)
         self.vbox1 = Gtk.VBox(False, 0)
         self.vbox1.show()
         Title = Gtk.Label('Network Setup', name="Header")
