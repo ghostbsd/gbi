@@ -7,7 +7,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GLib
 import threading
 import os
-from subprocess import Popen, PIPE, STDOUT, call
+from subprocess import Popen, PIPE, STDOUT
 from time import sleep
 from partition_handler import deletePartition, destroyPartition, addPartition
 from create_cfg import gbsd_cfg
