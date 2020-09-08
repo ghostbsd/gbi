@@ -112,7 +112,7 @@ class ZFS():
             ZFS_NUM = ZFS_NUM - 100
         else:
             ZFS_NUM = ZFS_NUM - 1
-        zfslayout = "/(mountpoint=/)," \
+        zfslayout = "/," \
             "/tmp(mountpoint=/tmp|exec=on|setuid=off)," \
             "/usr(mountpoint=/var|canmount=off)," \
             "/usr/home," \
