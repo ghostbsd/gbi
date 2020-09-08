@@ -633,7 +633,7 @@ class autoFreeSpace():
         partition_list = disk_data[drive]['partitions'][main_slice]['partition_list']
 
         if fs == "ZFS":
-            layout = "/(mountpoint=/)," \
+            layout = "/," \
                 "/tmp(mountpoint=/tmp|exec=on|setuid=off)," \
                 "/usr(mountpoint=/var|canmount=off)," \
                 "/usr/home," \
@@ -742,7 +742,7 @@ class autoFreeSpace():
             cf.close()
 
         if fs == "ZFS":
-            layout = "/(mountpoint=/)," \
+            layout = "/," \
                 "/tmp(mountpoint=/tmp|exec=on|setuid=off)," \
                 "/usr(mountpoint=/var|canmount=off)," \
                 "/usr/home," \
@@ -822,7 +822,7 @@ class createLabel():
         alpha_num += store_list_number
         letter = chr(alpha_num)
         if fs == "ZFS":
-            mountpoint = "/(mountpoint=/)," \
+            mountpoint = "/," \
                 "/tmp(mountpoint=/tmp|exec=on|setuid=off)," \
                 "/usr(mountpoint=/var|canmount=off)," \
                 "/usr/home," \
@@ -997,7 +997,7 @@ class createPartition():
         write_scheme.close()
 
         if fs == "ZFS":
-            mount_point = "/(mountpoint=/)," \
+            mount_point = "/," \
                 "/tmp(mountpoint=/tmp|exec=on|setuid=off)," \
                 "/usr(mountpoint=/var|canmount=off)," \
                 "/usr/home," \
