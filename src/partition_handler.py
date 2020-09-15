@@ -635,7 +635,7 @@ class autoFreeSpace():
         if fs == "ZFS":
             layout = "/," \
                 "/tmp(mountpoint=/tmp|exec=on|setuid=off)," \
-                "/usr(mountpoint=/var|canmount=off)," \
+                "/usr(mountpoint=/usr|canmount=off)," \
                 "/usr/home," \
                 "/usr/ports(setuid=off)," \
                 "/usr/src," \
@@ -744,7 +744,7 @@ class autoFreeSpace():
         if fs == "ZFS":
             layout = "/," \
                 "/tmp(mountpoint=/tmp|exec=on|setuid=off)," \
-                "/usr(mountpoint=/var|canmount=off)," \
+                "/usr(mountpoint=/usr|canmount=off)," \
                 "/usr/home," \
                 "/usr/ports(setuid=off)," \
                 "/usr/src," \
@@ -824,7 +824,7 @@ class createLabel():
         if fs == "ZFS":
             mountpoint = "/," \
                 "/tmp(mountpoint=/tmp|exec=on|setuid=off)," \
-                "/usr(mountpoint=/var|canmount=off)," \
+                "/usr(mountpoint=/usr|canmount=off)," \
                 "/usr/home," \
                 "/usr/ports(setuid=off)," \
                 "/usr/src," \
@@ -999,7 +999,7 @@ class createPartition():
         if fs == "ZFS":
             mount_point = "/," \
                 "/tmp(mountpoint=/tmp|exec=on|setuid=off)," \
-                "/usr(mountpoint=/var|canmount=off)," \
+                "/usr(mountpoint=/usr|canmount=off)," \
                 "/usr/home," \
                 "/usr/ports(setuid=off)," \
                 "/usr/src," \
