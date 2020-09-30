@@ -38,12 +38,8 @@ class gbsd_cfg():
         f.writelines('installMode=fresh\n')
         f.writelines('installInteractive=no\n')
         f.writelines('installType=GhostBSD\n')
-        if os.path.exists(user_passwd):
-            f.writelines('installMedium=livecd\n')
-            f.writelines('packageType=livecd\n')
-        else:
-            f.writelines('installMedium=livezfs\n')
-            f.writelines('packageType=livezfs\n')
+        f.writelines('installMedium=livezfs\n')
+        f.writelines('packageType=livezfs\n')
         # System Language
         if os.path.exists(language):
             langfile = open(language, 'r')
