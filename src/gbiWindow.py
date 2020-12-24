@@ -115,18 +115,19 @@ class MainWindow():
             self.notebook.next_page()
         elif page == 3:
             create_disk_partition_db()
-            if self.types.get_type() == "ufs":
-                udbox = Gtk.VBox(False, 0)
-                udbox.show()
-                self.partition = use_ufs(self.button3)
-                get_ud = self.partition.get_model()
-                udbox.pack_start(get_ud, True, True, 0)
-                label = Gtk.Label("UFS Disk Configuration")
-                self.notebook.insert_page(udbox, label, 4)
-                self.window.show_all()
-                self.notebook.next_page()
-                self.button3.set_sensitive(False)
-            elif self.types.get_type() == "custom":
+#            if self.types.get_type() == "ufs":
+#                udbox = Gtk.VBox(False, 0)
+#                udbox.show()
+#                self.partition = use_ufs(self.button3)
+#                get_ud = self.partition.get_model()
+#                udbox.pack_start(get_ud, True, True, 0)
+#                label = Gtk.Label("UFS Disk Configuration")
+#                self.notebook.insert_page(udbox, label, 4)
+#                self.window.show_all()
+#                self.notebook.next_page()
+#                self.button3.set_sensitive(False)
+#            elif self.types.get_type() == "custom":
+            if self.types.get_type() == "custom":
                 Pbox = Gtk.VBox(False, 0)
                 Pbox.show()
                 self.partition = Partitions(self.button3)
