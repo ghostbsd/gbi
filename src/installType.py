@@ -73,7 +73,7 @@ class Types():
         full_zfs.connect("toggled", self.fstype, "zfs")
         full_zfs.show()
         full_ufs = Gtk.RadioButton.new_with_label_from_widget(full_zfs, "UFS full disk configuration")
-        vbox2.pack_start(full_ufs, False, True, 10)
+#        vbox2.pack_start(full_ufs, False, True, 10)
         full_ufs.connect("toggled", self.fstype, "ufs")
         full_ufs.show()
         custom_ufs = Gtk.RadioButton.new_with_label_from_widget(full_ufs, "Custom disk configuration for UFS and ZFS")
