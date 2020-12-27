@@ -33,6 +33,7 @@ class network_setup():
 
     def __init__(self):
         self.network_info = networkdictionary()
+        print(self.network_info)
         self.vbox1 = Gtk.VBox(homogeneous=False, spacing=0)
         self.vbox1.show()
         Title = Gtk.Label(label='Network Setup', name="Header")
@@ -70,12 +71,17 @@ class network_setup():
         self.wifi_connection_label = Gtk.Label()
         self.wifi_connection_label.set_xalign(0.01)
         self.wifi_connection_image = Gtk.Image()
-
         if wlan_list:
             self.wifi_detection_label.set_label('WiFi card detected')
             self.wifi_detection_image.set_from_stock(Gtk.STOCK_YES, 5)
-            self.wifi_connection_label.set_label('WiFi connected to the internet')
-            self.wifi_connection_image.set_from_stock(Gtk.STOCK_YES, 5)
+            for wlan_card in wlan_list:
+                if self.network_info['cards'][wlan_card]['state']['connection'] == 'Connected':
+                    self.wifi_connection_label.set_label('WiFi connected to an access point')
+                    self.wifi_connection_image.set_from_stock(Gtk.STOCK_YES, 5)
+                    break
+            else:
+                self.wifi_connection_label.set_label('WiFi not connected to an access point')
+                self.wifi_connection_image.set_from_stock(Gtk.STOCK_NO, 5)
         else:
             self.wifi_detection_label.set_label('No WiFi card detected')
             self.wifi_detection_image.set_from_stock(Gtk.STOCK_NO, 5)
@@ -84,8 +90,8 @@ class network_setup():
         sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
         sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         store = Gtk.TreeStore(str)
-        # for line in lang_dictionary:
-        #     store.append(None, [line])
+        for line in self.network_info['cards'][wlan_card]['info']:
+            store.append(None, [line])
         treeView = Gtk.TreeView(store)
         treeView.set_model(store)
         treeView.set_rules_hint(True)
