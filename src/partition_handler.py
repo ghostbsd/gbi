@@ -633,18 +633,14 @@ class autoFreeSpace():
         partition_list = disk_data[drive]['partitions'][main_slice]['partition_list']
 
         if fs == "ZFS":
-            layout = "/," \
-                "/tmp(mountpoint=/tmp|exec=on|setuid=off)," \
-                "/usr(mountpoint=/usr|canmount=off)," \
-                "/usr/home," \
-                "/usr/ports(setuid=off)," \
-                "/usr/src," \
-                "/var(mountpoint=/var|canmount=off)," \
-                "/var/audit(exec=off|setuid=off)," \
-                "/var/crash(exec=off|setuid=off)" \
-                "/var/log(exec=off|setuid=off)," \
-                "/var/mail(atime=on)," \
-                "/var/tmp(setuid=off)"
+            layout = "/(compress=lz4|atime=off),/root(compress=lz4)," \
+                "/tmp(compress=lz4),/usr(canmount=off|mountpoint=none)," \
+                "/usr/home(compress=lz4),/usr/jails(compress=lz4)," \
+                "/usr/obj(compress=lz4),/usr/ports(compress=lz4)," \
+                "/usr/src(compress=lz4)," \
+                "/var(canmount=off|atime=on|mountpoint=none)," \
+                "/var/audit(compress=lz4),/var/log(compress=lz4)," \
+                "/var/mail(compress=lz4),/var/tmp(compress=lz4)"
         else:
             layout = '/'
 
@@ -742,18 +738,14 @@ class autoFreeSpace():
             cf.close()
 
         if fs == "ZFS":
-            layout = "/," \
-                "/tmp(mountpoint=/tmp|exec=on|setuid=off)," \
-                "/usr(mountpoint=/usr|canmount=off)," \
-                "/usr/home," \
-                "/usr/ports(setuid=off)," \
-                "/usr/src," \
-                "/var(mountpoint=/var|canmount=off)," \
-                "/var/audit(exec=off|setuid=off)," \
-                "/var/crash(exec=off|setuid=off)" \
-                "/var/log(exec=off|setuid=off)," \
-                "/var/mail(atime=on)," \
-                "/var/tmp(setuid=off)"
+            layout = "/(compress=lz4|atime=off),/root(compress=lz4)," \
+                "/tmp(compress=lz4),/usr(canmount=off|mountpoint=none)," \
+                "/usr/home(compress=lz4),/usr/jails(compress=lz4)," \
+                "/usr/obj(compress=lz4),/usr/ports(compress=lz4)," \
+                "/usr/src(compress=lz4)," \
+                "/var(canmount=off|atime=on|mountpoint=none)," \
+                "/var/audit(compress=lz4),/var/log(compress=lz4)," \
+                "/var/mail(compress=lz4),/var/tmp(compress=lz4)"
         else:
             layout = '/'
 
@@ -822,18 +814,14 @@ class createLabel():
         alpha_num += store_list_number
         letter = chr(alpha_num)
         if fs == "ZFS":
-            mountpoint = "/," \
-                "/tmp(mountpoint=/tmp|exec=on|setuid=off)," \
-                "/usr(mountpoint=/usr|canmount=off)," \
-                "/usr/home," \
-                "/usr/ports(setuid=off)," \
-                "/usr/src," \
-                "/var(mountpoint=/var|canmount=off)," \
-                "/var/audit(exec=off|setuid=off)," \
-                "/var/crash(exec=off|setuid=off)" \
-                "/var/log(exec=off|setuid=off)," \
-                "/var/mail(atime=on)," \
-                "/var/tmp(setuid=off)"
+            mountpoint = "/(compress=lz4|atime=off),/root(compress=lz4)," \
+                "/tmp(compress=lz4),/usr(canmount=off|mountpoint=none)," \
+                "/usr/home(compress=lz4),/usr/jails(compress=lz4)," \
+                "/usr/obj(compress=lz4),/usr/ports(compress=lz4)," \
+                "/usr/src(compress=lz4)," \
+                "/var(canmount=off|atime=on|mountpoint=none)," \
+                "/var/audit(compress=lz4),/var/log(compress=lz4)," \
+                "/var/mail(compress=lz4),/var/tmp(compress=lz4)"
 
         partition = f'{main_slice}{letter}'
         partition_list[store_list_number] = partition
@@ -997,18 +985,14 @@ class createPartition():
         write_scheme.close()
 
         if fs == "ZFS":
-            mount_point = "/," \
-                "/tmp(mountpoint=/tmp|exec=on|setuid=off)," \
-                "/usr(mountpoint=/usr|canmount=off)," \
-                "/usr/home," \
-                "/usr/ports(setuid=off)," \
-                "/usr/src," \
-                "/var(mountpoint=/var|canmount=off)," \
-                "/var/audit(exec=off|setuid=off)," \
-                "/var/crash(exec=off|setuid=off)" \
-                "/var/log(exec=off|setuid=off)," \
-                "/var/mail(atime=on)," \
-                "/var/tmp(setuid=off)"
+            mount_point = "/(compress=lz4|atime=off),/root(compress=lz4)," \
+                "/tmp(compress=lz4),/usr(canmount=off|mountpoint=none)," \
+                "/usr/home(compress=lz4),/usr/jails(compress=lz4)," \
+                "/usr/obj(compress=lz4),/usr/ports(compress=lz4)," \
+                "/usr/src(compress=lz4)," \
+                "/var(canmount=off|atime=on|mountpoint=none)," \
+                "/var/audit(compress=lz4),/var/log(compress=lz4)," \
+                "/var/mail(compress=lz4),/var/tmp(compress=lz4)"
 
         disk_data = disk_database()
         store_list_number = path[1]

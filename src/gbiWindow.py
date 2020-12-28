@@ -194,7 +194,7 @@ class MainWindow():
             label = Gtk.Label("Installation")
             self.notebook.insert_page(Ibox, label, 8)
             self.notebook.next_page()
-            instpro = installProgress(self.window)
+            instpro = installProgress()
             progressBar = instpro.getProgressBar()
             box1 = Gtk.VBox(False, 0)
             box1.show()

@@ -7,7 +7,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GLib
 import threading
 import os
-from subprocess import Popen, PIPE, STDOUT
+from subprocess import Popen, PIPE, STDOUT, call
 from time import sleep
 from partition_handler import deletePartition, destroyPartition, addPartition
 from create_cfg import gbsd_cfg
@@ -37,7 +37,7 @@ def update_progess(probar, bartext):
     probar.set_text(bartext[0:80])
 
 
-def read_output(command, probar, main_window):
+def read_output(command, probar):
     GLib.idle_add(update_progess, probar, "Creating pcinstall.cfg")
     gbsd_cfg()
     sleep(1)
@@ -70,9 +70,10 @@ def read_output(command, probar, main_window):
         print(bartext)
     if bartext.rstrip() == "Installation finished!":
         Popen(f'python {gbi_path}end.py', shell=True, close_fds=True)
+        Gtk.main_quit()
     else:
         Popen(f'python {gbi_path}error.py', shell=True, close_fds=True)
-    main_window.hide()
+        Gtk.main_quit()
 
 
 class installSlide():
@@ -96,18 +97,12 @@ class installSlide():
 
 class installProgress():
 
-    def __init__(self, main_window):
+    def __init__(self):
         self.pbar = Gtk.ProgressBar()
         self.pbar.set_show_text(True)
         command = '%s -c %spcinstall.cfg' % (sysinstall, tmp)
-        thr = threading.Thread(
-            target=read_output,
-            args=(
-                command,
-                self.pbar,
-                main_window
-            )
-        )
+        thr = threading.Thread(target=read_output,
+                               args=(command, self.pbar))
         thr.setDaemon(True)
         thr.start()
         self.pbar.show()

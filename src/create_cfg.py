@@ -38,8 +38,8 @@ class gbsd_cfg():
         f.writelines('installMode=fresh\n')
         f.writelines('installInteractive=no\n')
         f.writelines('installType=GhostBSD\n')
-        f.writelines('installMedium=livezfs\n')
-        f.writelines('packageType=livezfs\n')
+        f.writelines('installMedium=livecd\n')
+        f.writelines('packageType=livecd\n')
         # System Language
         if os.path.exists(language):
             langfile = open(language, 'r')
@@ -190,11 +190,7 @@ class gbsd_cfg():
                 zfsark = """echo 'vfs.zfs.arc_max="512M"' >> /boot/loader.conf"""
                 f.writelines(f'runCommand={zfsark}\n')
         else:
+            # Network Configuration
             f.writelines('\n# Network Configuration\n')
             f.writelines('hostname=installed\n')
-            f.writelines('\n# command to prepare first boot\n')
-            f.writelines("runCommand=sysrc -f /etc/rc.conf hostname='installed'\n")
-            f.writelines("runCommand=sed -i '' 's/ghostbsd/root/g' /etc/gettytab\n")
-            f.writelines("runCommand=sed -i '' 's/ghostbsd/root/g' /etc/ttys\n")
-            f.writelines("runCommand=pw userdel -n ghostbsd\n")
         f.close()

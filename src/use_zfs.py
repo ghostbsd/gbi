@@ -112,18 +112,14 @@ class ZFS():
             ZFS_NUM = ZFS_NUM - 100
         else:
             ZFS_NUM = ZFS_NUM - 1
-        zfslayout = "/," \
-            "/tmp(mountpoint=/tmp|exec=on|setuid=off)," \
-            "/usr(mountpoint=/usr|canmount=off)," \
-            "/usr/home," \
-            "/usr/ports(setuid=off)," \
-            "/usr/src," \
-            "/var(mountpoint=/var|canmount=off)," \
-            "/var/audit(exec=off|setuid=off)," \
-            "/var/crash(exec=off|setuid=off)" \
-            "/var/log(exec=off|setuid=off)," \
-            "/var/mail(atime=on)," \
-            "/var/tmp(setuid=off)"
+        zfslayout = "/(compress=lz4|atime=off),/root(compress=lz4)," \
+            "/tmp(compress=lz4),/usr(canmount=off|mountpoint=none)," \
+            "/usr/home(compress=lz4),/usr/jails(compress=lz4)," \
+            "/usr/obj(compress=lz4),/usr/ports(compress=lz4)," \
+            "/usr/src(compress=lz4)," \
+            "/var(canmount=off|atime=on|mountpoint=none)," \
+            "/var/audit(compress=lz4),/var/log(compress=lz4)," \
+            "/var/mail(compress=lz4),/var/tmp(compress=lz4)"
         # adding zero to use remaining space
         zfsPart = f'disk0-part=ZFS{dgeli} {ZFS_NUM} {zfslayout}{pool_disk}'
         pfile.writelines(zfsPart)
