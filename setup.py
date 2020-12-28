@@ -56,7 +56,11 @@ lib_gbi = [
     'src/timezone.py',
     'src/use_ufs.py',
     'src/use_zfs.py',
-    'src/addUser.py'
+    'src/addUser.py',
+    'src/welcome_live.py',
+    'src/network_setup.py',
+    'src/disk.png',
+    'src/laptop.png'
 ]
 
 lib_gbi_backend_query = [
