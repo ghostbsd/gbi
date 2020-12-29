@@ -13,7 +13,7 @@ query = "sh /usr/local/lib/gbi/backend-query/"
 if not os.path.exists(tmp):
     os.makedirs(tmp)
 
-logo = "/usr/local/lib/gbi/logo.png"
+
 memory = 'sysctl hw.physmem'
 auto = '%sauto' % tmp
 disk_info = '%sdisk-info.sh' % query

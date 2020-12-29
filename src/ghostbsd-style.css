@@ -1,54 +1,9 @@
-#welcome {
-    background-image: url("/usr/local/lib/gbi/slide-images/ghostbsd/welcome.png");
+#install {
+    background-image: url("/usr/local/lib/gbi/image/installation.jpg");
     background-size: cover;
 }
 
-#software {
-    background-image: url("/usr/local/lib/gbi/slide-images/ghostbsd/software.png");
-    background-size: cover;
-}
-
-#web {
-    background-image: url("/usr/local/lib/gbi/slide-images/ghostbsd/browser.png");
-    background-size: cover;
-}
-
-#email {
-    background-image: url("/usr/local/lib/gbi/slide-images/ghostbsd/email.png");
-    background-size: cover;
-}
-
-#communicate {
-    background-image: url("/usr/local/lib/gbi/slide-images/ghostbsd/social.png");
-    background-size: cover;
-}
-
-#office {
-    background-image: url("/usr/local/lib/gbi/slide-images/ghostbsd/office.png");
-    background-size: cover;
-}
-
-#mutimedia {
-    background-image: url("/usr/local/lib/gbi/slide-images/ghostbsd/music.png");
-    background-size: cover;
-}
-
-#photo {
-    background-image: url("/usr/local/lib/gbi/slide-images/ghostbsd/photo.png");
-    background-size: cover;
-}
-
-#customize {
-    background-image: url("/usr/local/lib/gbi/slide-images/ghostbsd/customize.png");
-    background-size: cover;
-}
-
-#help {
-    background-image: url("/usr/local/lib/gbi/slide-images/ghostbsd/help.png");
-    background-size: cover;
-}
-
-#slideText {
+#sideText {
     color: #F9F9F9;
     font-weight:bold;
     font-size: 14px;

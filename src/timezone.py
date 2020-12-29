@@ -10,7 +10,7 @@ installer = "/usr/local/lib/gbi/"
 if not os.path.exists(tmp):
     os.makedirs(tmp)
 
-logo = "/usr/local/lib/gbi/logo.png"
+
 time = '%stimezone' % tmp
 tzdictionary = timezone_dictionary()
 

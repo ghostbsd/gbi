@@ -21,7 +21,6 @@ query = "sh /usr/local/etc/lib/backend-query/"
 if not os.path.exists(tmp):
     os.makedirs(tmp)
 
-logo = "/usr/local/lib/gbi/logo.png"
 disk_file = '%sdisk' % tmp
 boot_file = '%sboot' % tmp
 signal = '%ssignal' % tmp

@@ -9,7 +9,6 @@ from sys_handler import keyboard_dictionary, keyboard_models
 tmp = "/tmp/.gbi/"
 installer = "/usr/local/lib/gbi/"
 query = "sh /usr/local/lib/gbi/backend-query/"
-logo = "/usr/local/lib/gbi/logo.png"
 
 if not os.path.exists(tmp):
     os.makedirs(tmp)

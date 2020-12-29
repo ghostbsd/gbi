@@ -11,12 +11,13 @@ from partition_handler import createLabel, diskSchemeChanger
 
 # Folder use pr the installer.
 tmp = "/tmp/.gbi"
+logo = "/usr/local/lib/gbi/image/logo.png"
 if not os.path.exists(tmp):
     os.makedirs(tmp)
 disk_scheme = f'{tmp}/scheme'
 disk_file = f'{tmp}/disk'
 slice_file = f'{tmp}/slice'
-logo = "/usr/local/lib/gbi/logo.png"
+
 partition_label_file = f'{tmp}/partlabel'
 
 disk_db_file = f'{tmp}/disk.db'
