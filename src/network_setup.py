@@ -13,7 +13,7 @@ sys.path.append(networkmgr)
 from net_api import networkdictionary
 
 os.system("netcardmgr")
-logo = "/usr/local/lib/gbi/logo.png"
+
 
 cssProvider = Gtk.CssProvider()
 cssProvider.load_from_path('/usr/local/lib/gbi/ghostbsd-style.css')

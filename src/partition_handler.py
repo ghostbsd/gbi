@@ -1130,9 +1130,9 @@ class deletePartition():
             for partition in delete_list:
                 num = slice_number(partition)
                 drive = get_disk_from_partition(partition)
-                call(f"zpool labelclear -f {partition}", shell=True)
+                call(f"sudo zpool labelclear -f {partition}", shell=True)
                 sleep(1)
-                call(f'gpart delete -i {num} {drive}', shell=True)
+                call(f'sudo gpart delete -i {num} {drive}', shell=True)
                 sleep(1)
 
 
@@ -1145,19 +1145,19 @@ class destroyPartition():
                 drive = line[0]
                 scheme = line[1]
                 # Destroy the disk geom
-                gpart_destroy = f"gpart destroy -F {drive}"
+                gpart_destroy = f"sudo gpart destroy -F {drive}"
                 call(gpart_destroy, shell=True)
                 sleep(1)
                 # Make double-sure
-                create_gpt = f"gpart create -s gpt {drive}"
+                create_gpt = f"sudo gpart create -s gpt {drive}"
                 call(create_gpt, shell=True)
                 sleep(1)
                 call(gpart_destroy, shell=True)
                 sleep(1)
-                clear_drive = f"dd if=/dev/zero of={drive} bs=1m count=1"
+                clear_drive = f"sudo dd if=/dev/zero of={drive} bs=1m count=1"
                 call(clear_drive, shell=True)
                 sleep(1)
-                call(f'gpart create -s {scheme} {drive}', shell=True)
+                call(f'sudo gpart create -s {scheme} {drive}', shell=True)
                 sleep(1)
 
 
@@ -1184,18 +1184,18 @@ class addPartition():
                 size = int(line[1])
                 if set("p") & set(part):
                     if bios_or_uefi() == 'UEFI':
-                        cmd = f'gpart add -a 4k -s {size}M -t efi -i {sl} {drive}'
+                        cmd = f'sudo gpart add -a 4k -s {size}M -t efi -i {sl} {drive}'
                         sleep(2)
-                        cmd2 = f'newfs_msdos -F 16 {drive}p{sl}'
+                        cmd2 = f'sudo newfs_msdos -F 16 {drive}p{sl}'
                         call(cmd, shell=True)
                         call(cmd2, shell=True)
                     else:
                         if boot == "grub":
-                            cmd = f'gpart add -a 4k -s {size}M -t bios-boot -i {sl} {drive}'
+                            cmd = f'sudo gpart add -a 4k -s {size}M -t bios-boot -i {sl} {drive}'
                         else:
-                            cmd = f'gpart add -a 4k -s {size}M -t freebsd-boot -i {sl} {drive}'
+                            cmd = f'sudo gpart add -a 4k -s {size}M -t freebsd-boot -i {sl} {drive}'
                         call(cmd, shell=True)
                 elif set("s") & set(part):
-                    cmd = f'gpart add -a 4k -s {size}M -t freebsd -i {sl} {drive}'
+                    cmd = f'sudo gpart add -a 4k -s {size}M -t freebsd -i {sl} {drive}'
                     call(cmd, shell=True)
                 sleep(2)
