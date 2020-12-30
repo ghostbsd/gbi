@@ -121,7 +121,7 @@ class installProgress():
     def __init__(self, main_window):
         self.pbar = Gtk.ProgressBar()
         self.pbar.set_show_text(True)
-        command = 'sudo %s -c %spcinstall.cfg' % (pc_sysinstall, gbi_tmp)
+        command = f'sudo {pc_sysinstall} -c {gbi_tmp}/pcinstall.cfg'
         thr = threading.Thread(
             target=read_output,
             args=(
