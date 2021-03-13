@@ -67,6 +67,7 @@ class gbsd_cfg():
             f.writelines(f'timeZone={t_output}\n')
             f.writelines('enableNTP=yes\n')
         if os.path.exists(zfs_config):
+            zfs = True
             # Disk Setup
             r = open(zfs_config, 'r')
             zfsconf = r.readlines()
@@ -84,6 +85,7 @@ class gbsd_cfg():
                 else:
                     f.writelines(line)
         elif os.path.exists(ufs_config):
+            zfs = False
             # Disk Setup
             r = open(ufs_config, 'r')
             ufsconf = r.readlines()
@@ -130,7 +132,8 @@ class gbsd_cfg():
             f.writelines('commitDiskPart\n')
             # Partition Setup
             f.writelines('\n# Partition Setup\n')
-            part = open(partlabel, 'r')
+            part = open(partlabel, 'r').read()
+            zfs = True if 'ZFS' in part else False
             # If slice and auto file exist add first partition line.
             # But Swap need to be 0 it will take the rest of the freespace.
             for line in part:
@@ -186,7 +189,7 @@ class gbsd_cfg():
                 f.writelines('runExtCommand=cp /etc/X11/xorg.conf $FSMNT/etc/X11/xorg.conf\n')
             f.writelines('runScript=/root/iso_to_hd.sh\n')
             f.writelines('runCommand=rm -f /root/iso_to_hd.sh\n')
-            if os.path.exists(zfs_config):
+            if zfs is True:
                 zfsark = """echo 'vfs.zfs.arc_max="512M"' >> /boot/loader.conf"""
                 f.writelines(f'runCommand={zfsark}\n')
         else:
