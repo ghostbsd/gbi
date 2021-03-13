@@ -17,7 +17,7 @@ query = "sh /usr/local/etc/lib/backend-query/"
 if not os.path.exists(tmp):
     os.makedirs(tmp)
 
-logo = "/usr/local/lib/gbi/logo.png"
+
 boot_file = f'{tmp}/boot'
 disk_scheme = f'{tmp}/scheme'
 zfs_config = f'{tmp}/zfs_config'

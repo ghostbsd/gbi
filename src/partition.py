@@ -1,7 +1,6 @@
 #!/usr/local/bin/python
 
 import os
-import re
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk
@@ -12,12 +11,13 @@ from partition_handler import createLabel, diskSchemeChanger
 
 # Folder use pr the installer.
 tmp = "/tmp/.gbi"
+logo = "/usr/local/lib/gbi/image/logo.png"
 if not os.path.exists(tmp):
     os.makedirs(tmp)
 disk_scheme = f'{tmp}/scheme'
 disk_file = f'{tmp}/disk'
 slice_file = f'{tmp}/slice'
-logo = "/usr/local/lib/gbi/logo.png"
+
 partition_label_file = f'{tmp}/partlabel'
 
 disk_db_file = f'{tmp}/disk.db'
@@ -548,18 +548,18 @@ class Partitions():
                         diskfile = open(disk_file, 'r')
                         disk = diskfile.readlines()[0].strip()
                         diskfile.close()
-                        disk_num = re.sub("[^0-9]", "", disk)
+                        disk_id = self.disk_index.index(disk)
                         num = 0
                         while True:
-                            partition_path = f"{disk_num}:{num}"
+                            partition_path = f"{disk_id}:{num}"
                             try:
                                 first_tree_iter = model.get_iter(partition_path)
                                 first_fs = model.get_value(first_tree_iter, 3)
-                                if first_fs == "UEFI" or 'efi' in first_fs:
-                                    self.efi_exist = True
+                                if 'efi' in first_fs:
+                                    efi_already_exist = True
                                     break
                             except ValueError:
-                                self.efi_exist = False
+                                efi_already_exist = False
                                 break
                             num += 1
                     if 'BOOT' in self.partitions[0] and bios_type == 'BIOS':
@@ -577,9 +577,7 @@ class Partitions():
                             self.button3.set_sensitive(True)
                         elif 'ZFS' in self.partitions[1]:
                             self.button3.set_sensitive(True)
-                        else:
-                            self.button3.set_sensitive(False)
-                    elif self.efi_exist is True and bios_type == 'UEFI':
+                    elif efi_already_exist is True and bios_type == 'UEFI':
                         if '/\n' in self.partitions[0]:
                             self.button3.set_sensitive(True)
                         elif 'ZFS' in self.partitions[0]:
@@ -594,6 +592,8 @@ class Partitions():
                                     self.button3.set_sensitive(False)
                             else:
                                 self.button3.set_sensitive(False)
+                        else:
+                            self.button3.set_sensitive(False)
                     elif 'UEFI' in self.partitions[0] and '/\n' in self.partitions[1]:
                         self.button3.set_sensitive(True)
                     elif 'UEFI' in self.partitions[0] and 'ZFS' in self.partitions[1]:
@@ -726,6 +726,7 @@ class Partitions():
     def Tree_Store(self):
         self.store.clear()
         disk_db = disk_database()
+        self.disk_index = list(disk_db.keys())
         for disk in disk_db:
             disk_info = disk_db[disk]
             disk_schemee = disk_info['scheme']

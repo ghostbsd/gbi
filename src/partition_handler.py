@@ -633,14 +633,18 @@ class autoFreeSpace():
         partition_list = disk_data[drive]['partitions'][main_slice]['partition_list']
 
         if fs == "ZFS":
-            layout = "/(compress=lz4|atime=off),/root(compress=lz4)," \
-                "/tmp(compress=lz4),/usr(canmount=off|mountpoint=none)," \
-                "/usr/home(compress=lz4),/usr/jails(compress=lz4)," \
-                "/usr/obj(compress=lz4),/usr/ports(compress=lz4)," \
-                "/usr/src(compress=lz4)," \
-                "/var(canmount=off|atime=on|mountpoint=none)," \
-                "/var/audit(compress=lz4),/var/log(compress=lz4)," \
-                "/var/mail(compress=lz4),/var/tmp(compress=lz4)"
+            layout = "/," \
+                "/tmp(mountpoint=/tmp|exec=on|setuid=off)," \
+                "/usr(mountpoint=/usr|canmount=off)," \
+                "/usr/home," \
+                "/usr/ports(setuid=off)," \
+                "/usr/src," \
+                "/var(mountpoint=/var|canmount=off)," \
+                "/var/audit(exec=off|setuid=off)," \
+                "/var/crash(exec=off|setuid=off)" \
+                "/var/log(exec=off|setuid=off)," \
+                "/var/mail(atime=on)," \
+                "/var/tmp(setuid=off)"
         else:
             layout = '/'
 
@@ -738,14 +742,18 @@ class autoFreeSpace():
             cf.close()
 
         if fs == "ZFS":
-            layout = "/(compress=lz4|atime=off),/root(compress=lz4)," \
-                "/tmp(compress=lz4),/usr(canmount=off|mountpoint=none)," \
-                "/usr/home(compress=lz4),/usr/jails(compress=lz4)," \
-                "/usr/obj(compress=lz4),/usr/ports(compress=lz4)," \
-                "/usr/src(compress=lz4)," \
-                "/var(canmount=off|atime=on|mountpoint=none)," \
-                "/var/audit(compress=lz4),/var/log(compress=lz4)," \
-                "/var/mail(compress=lz4),/var/tmp(compress=lz4)"
+            layout = "/," \
+                "/tmp(mountpoint=/tmp|exec=on|setuid=off)," \
+                "/usr(mountpoint=/usr|canmount=off)," \
+                "/usr/home," \
+                "/usr/ports(setuid=off)," \
+                "/usr/src," \
+                "/var(mountpoint=/var|canmount=off)," \
+                "/var/audit(exec=off|setuid=off)," \
+                "/var/crash(exec=off|setuid=off)" \
+                "/var/log(exec=off|setuid=off)," \
+                "/var/mail(atime=on)," \
+                "/var/tmp(setuid=off)"
         else:
             layout = '/'
 
@@ -814,14 +822,18 @@ class createLabel():
         alpha_num += store_list_number
         letter = chr(alpha_num)
         if fs == "ZFS":
-            mountpoint = "/(compress=lz4|atime=off),/root(compress=lz4)," \
-                "/tmp(compress=lz4),/usr(canmount=off|mountpoint=none)," \
-                "/usr/home(compress=lz4),/usr/jails(compress=lz4)," \
-                "/usr/obj(compress=lz4),/usr/ports(compress=lz4)," \
-                "/usr/src(compress=lz4)," \
-                "/var(canmount=off|atime=on|mountpoint=none)," \
-                "/var/audit(compress=lz4),/var/log(compress=lz4)," \
-                "/var/mail(compress=lz4),/var/tmp(compress=lz4)"
+            mountpoint = "/," \
+                "/tmp(mountpoint=/tmp|exec=on|setuid=off)," \
+                "/usr(mountpoint=/usr|canmount=off)," \
+                "/usr/home," \
+                "/usr/ports(setuid=off)," \
+                "/usr/src," \
+                "/var(mountpoint=/var|canmount=off)," \
+                "/var/audit(exec=off|setuid=off)," \
+                "/var/crash(exec=off|setuid=off)" \
+                "/var/log(exec=off|setuid=off)," \
+                "/var/mail(atime=on)," \
+                "/var/tmp(setuid=off)"
 
         partition = f'{main_slice}{letter}'
         partition_list[store_list_number] = partition
@@ -985,14 +997,18 @@ class createPartition():
         write_scheme.close()
 
         if fs == "ZFS":
-            mount_point = "/(compress=lz4|atime=off),/root(compress=lz4)," \
-                "/tmp(compress=lz4),/usr(canmount=off|mountpoint=none)," \
-                "/usr/home(compress=lz4),/usr/jails(compress=lz4)," \
-                "/usr/obj(compress=lz4),/usr/ports(compress=lz4)," \
-                "/usr/src(compress=lz4)," \
-                "/var(canmount=off|atime=on|mountpoint=none)," \
-                "/var/audit(compress=lz4),/var/log(compress=lz4)," \
-                "/var/mail(compress=lz4),/var/tmp(compress=lz4)"
+            mount_point = "/," \
+                "/tmp(mountpoint=/tmp|exec=on|setuid=off)," \
+                "/usr(mountpoint=/usr|canmount=off)," \
+                "/usr/home," \
+                "/usr/ports(setuid=off)," \
+                "/usr/src," \
+                "/var(mountpoint=/var|canmount=off)," \
+                "/var/audit(exec=off|setuid=off)," \
+                "/var/crash(exec=off|setuid=off)" \
+                "/var/log(exec=off|setuid=off)," \
+                "/var/mail(atime=on)," \
+                "/var/tmp(setuid=off)"
 
         disk_data = disk_database()
         store_list_number = path[1]
@@ -1114,9 +1130,9 @@ class deletePartition():
             for partition in delete_list:
                 num = slice_number(partition)
                 drive = get_disk_from_partition(partition)
-                call(f"zpool labelclear -f {partition}", shell=True)
+                call(f"sudo zpool labelclear -f {partition}", shell=True)
                 sleep(1)
-                call(f'gpart delete -i {num} {drive}', shell=True)
+                call(f'sudo gpart delete -i {num} {drive}', shell=True)
                 sleep(1)
 
 
@@ -1129,19 +1145,19 @@ class destroyPartition():
                 drive = line[0]
                 scheme = line[1]
                 # Destroy the disk geom
-                gpart_destroy = f"gpart destroy -F {drive}"
+                gpart_destroy = f"sudo gpart destroy -F {drive}"
                 call(gpart_destroy, shell=True)
                 sleep(1)
                 # Make double-sure
-                create_gpt = f"gpart create -s gpt {drive}"
+                create_gpt = f"sudo gpart create -s gpt {drive}"
                 call(create_gpt, shell=True)
                 sleep(1)
                 call(gpart_destroy, shell=True)
                 sleep(1)
-                clear_drive = f"dd if=/dev/zero of={drive} bs=1m count=1"
+                clear_drive = f"sudo dd if=/dev/zero of={drive} bs=1m count=1"
                 call(clear_drive, shell=True)
                 sleep(1)
-                call(f'gpart create -s {scheme} {drive}', shell=True)
+                call(f'sudo gpart create -s {scheme} {drive}', shell=True)
                 sleep(1)
 
 
@@ -1168,18 +1184,18 @@ class addPartition():
                 size = int(line[1])
                 if set("p") & set(part):
                     if bios_or_uefi() == 'UEFI':
-                        cmd = f'gpart add -a 4k -s {size}M -t efi -i {sl} {drive}'
+                        cmd = f'sudo gpart add -a 4k -s {size}M -t efi -i {sl} {drive}'
                         sleep(2)
-                        cmd2 = f'newfs_msdos -F 16 {drive}p{sl}'
+                        cmd2 = f'sudo newfs_msdos -F 16 {drive}p{sl}'
                         call(cmd, shell=True)
                         call(cmd2, shell=True)
                     else:
                         if boot == "grub":
-                            cmd = f'gpart add -a 4k -s {size}M -t bios-boot -i {sl} {drive}'
+                            cmd = f'sudo gpart add -a 4k -s {size}M -t bios-boot -i {sl} {drive}'
                         else:
-                            cmd = f'gpart add -a 4k -s {size}M -t freebsd-boot -i {sl} {drive}'
+                            cmd = f'sudo gpart add -a 4k -s {size}M -t freebsd-boot -i {sl} {drive}'
                         call(cmd, shell=True)
                 elif set("s") & set(part):
-                    cmd = f'gpart add -a 4k -s {size}M -t freebsd -i {sl} {drive}'
+                    cmd = f'sudo gpart add -a 4k -s {size}M -t freebsd -i {sl} {drive}'
                     call(cmd, shell=True)
                 sleep(2)

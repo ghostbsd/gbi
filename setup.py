@@ -35,15 +35,12 @@ def datafilelist(installbase, sourcebase):
 prefix = sys.prefix
 
 lib_gbi = [
-    'src/install-gbsd.png',
-    'src/logo.png',
     'src/boot_manager.py',
     'src/create_cfg.py',
     'src/end.py',
     'src/error.py',
     'src/gbiWindow.py',
     'src/ghostbsd-style.css',
-    'src/desktopbsd-style.css',
     'src/install.py',
     'src/installType.py',
     'src/keyboard.py',
@@ -51,7 +48,6 @@ lib_gbi = [
     'src/partition.py',
     'src/partition_handler.py',
     'src/root.py',
-    'src/slides.py',
     'src/sys_handler.py',
     'src/timezone.py',
     'src/use_ufs.py',
@@ -61,6 +57,15 @@ lib_gbi = [
     'src/network_setup.py',
     'src/disk.png',
     'src/laptop.png'
+]
+
+lib_gbi_image = [
+    'src/image/G_logo.gif',
+    'src/image/install-gbsd.png',
+    'src/image/logo.png',
+    'src/image/disk.png',
+    'src/image/laptop.png',
+    'src/image/installation.jpg'
 ]
 
 lib_gbi_backend_query = [
@@ -89,25 +94,11 @@ lib_gbi_backend_query = [
     'src/backend-query/xkeyboard-variants.sh'
 ]
 
-lib_gbi_slide_images = [
-    'src/slide-images/ghostbsd/browser.png',
-    'src/slide-images/ghostbsd/customize.png',
-    'src/slide-images/ghostbsd/email.png',
-    'src/slide-images/ghostbsd/help.png',
-    'src/slide-images/ghostbsd/G-logo.png',
-    'src/slide-images/ghostbsd/music.png',
-    'src/slide-images/ghostbsd/office.png',
-    'src/slide-images/ghostbsd/photo.png',
-    'src/slide-images/ghostbsd/social.png',
-    'src/slide-images/ghostbsd/software.png',
-    'src/slide-images/ghostbsd/welcome.png'
-]
-
 data_files = [
     (f'{prefix}/share/applications', ['src/gbi.desktop']),
     (f'{prefix}/lib/gbi', lib_gbi),
     (f'{prefix}/lib/gbi/backend-query', lib_gbi_backend_query),
-    (f'{prefix}/lib/gbi/slide-images/ghostbsd', lib_gbi_slide_images)
+    (f'{prefix}/lib/gbi/image', lib_gbi_image)
 ]
 
 data_files.extend(datafilelist(f'{prefix}/share/locale', 'build/mo'))

@@ -15,7 +15,7 @@ class PyApp():
         window.set_border_width(8)
         window.connect("destroy", Gtk.main_quit)
         window.set_title("Installation Error")
-        # window.set_icon_from_file("/usr/local/lib/gbi/logo.png")
+        # window.set_icon_from_file("/usr/local/lib/gbi/image/logo.png")
         box1 = Gtk.VBox(False, 0)
         window.add(box1)
         box1.show()

@@ -51,8 +51,8 @@ from boot_manager import bootManager
 from root import RootUser
 from addUser import AddUser
 from partition_handler import create_disk_partition_db
-from install import installProgress, installSlide
-logo = "/usr/local/lib/gbi/logo.png"
+from install import installProgress, installWindow
+logo = "/usr/local/lib/gbi/image/logo.png"
 tmp = "/tmp/.gbi/"
 if not os.path.exists(tmp):
     os.makedirs(tmp)
@@ -188,7 +188,7 @@ class MainWindow():
             self.adduser.save_selection()
             Ibox = Gtk.VBox(False, 0)
             Ibox.show()
-            install = installSlide()
+            install = installWindow()
             get_install = install.get_model()
             Ibox.pack_start(get_install, True, True, 0)
             label = Gtk.Label("Installation")
@@ -262,7 +262,7 @@ class MainWindow():
         vbox.show()
         self.lang = Language()
         get_lang = self.lang.get_model()
-        # self.lang = Installs()
+        # self.lang = installWindow()
         # get_lang = self.lang.get_model()
         vbox.pack_start(get_lang, True, True, 0)
         label = Gtk.Label("Language")

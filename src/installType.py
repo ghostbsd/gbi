@@ -21,7 +21,6 @@ query = "sh /usr/local/etc/lib/backend-query/"
 if not os.path.exists(tmp):
     os.makedirs(tmp)
 
-logo = "/usr/local/lib/gbi/logo.png"
 disk_file = '%sdisk' % tmp
 boot_file = '%sboot' % tmp
 signal = '%ssignal' % tmp
@@ -68,15 +67,15 @@ class Types():
         pass_file.writelines(self.ne)
         pass_file.close
         self.vbox1.pack_start(hbox1, False, False, 10)
-        full_zfs = Gtk.RadioButton.new_with_label_from_widget(None, "ZFS full disk configuration(Recommended option for BE)")
+        full_zfs = Gtk.RadioButton.new_with_label_from_widget(None, "Full disk configuration")
         vbox2.pack_start(full_zfs, False, True, 10)
         full_zfs.connect("toggled", self.fstype, "zfs")
         full_zfs.show()
-        full_ufs = Gtk.RadioButton.new_with_label_from_widget(full_zfs, "UFS full disk configuration")
-        vbox2.pack_start(full_ufs, False, True, 10)
-        full_ufs.connect("toggled", self.fstype, "ufs")
-        full_ufs.show()
-        custom_ufs = Gtk.RadioButton.new_with_label_from_widget(full_ufs, "Custom disk configuration for UFS and ZFS")
+#        full_ufs = Gtk.RadioButton.new_with_label_from_widget(full_zfs, "UFS full disk configuration")
+#        vbox2.pack_start(full_ufs, False, True, 10)
+#        full_ufs.connect("toggled", self.fstype, "ufs")
+#        full_ufs.show()
+        custom_ufs = Gtk.RadioButton.new_with_label_from_widget(full_zfs, "Custom (Advanced partitioning)")
         vbox2.pack_start(custom_ufs, False, True, 10)
         custom_ufs.connect("toggled", self.fstype, "custom")
         custom_ufs.show()
