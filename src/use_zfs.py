@@ -9,10 +9,10 @@ from partition_handler import zfs_disk_query, zfs_disk_size_query, bios_or_uefi
 # Folder use pr the installer.
 tmp = "/tmp/.gbi/"
 installer = "/usr/local/lib/gbi/"
+logo = f"{installer}image/logo.png"
 query = "sh /usr/local/lib/gbi/backend-query/"
 if not os.path.exists(tmp):
     os.makedirs(tmp)
-
 
 memory = 'sysctl hw.physmem'
 auto = '%sauto' % tmp
@@ -320,7 +320,7 @@ class ZFS():
         self.mirrorTips = Gtk.Label('Please select one drive')
         self.mirrorTips.set_justify(Gtk.Justification.LEFT)
         self.mirrorTips.set_alignment(0.01, 0.5)
-        # Mirro, raidz and stripe
+        # Mirror, raidz and stripe
         self.mirror = 'none'
         mirror_label = Gtk.Label('<b>Pool Type</b>')
         mirror_label.set_use_markup(True)
@@ -339,7 +339,7 @@ class ZFS():
         pool_check = Gtk.CheckButton('Pool Name')
         pool_check.connect("toggled", self.on_check_poll)
         self.pool = Gtk.Entry()
-        self.pool.set_text('tank')
+        self.pool.set_text('zroot')
         self.pool.set_sensitive(False)
         # Creating MBR or GPT drive
         scheme_label = Gtk.Label('<b>Partition Scheme</b>')
