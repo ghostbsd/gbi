@@ -6,15 +6,11 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk
 import sys
-import os
 import re
 networkmgr = "/usr/local/share/networkmgr"
 sys.path.append(networkmgr)
 from net_api import networkdictionary
 logo = "/usr/local/lib/gbi/logo.png"
-
-os.system("netcardmgr")
-
 
 cssProvider = Gtk.CssProvider()
 cssProvider.load_from_path('/usr/local/lib/gbi/ghostbsd-style.css')
