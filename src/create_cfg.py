@@ -136,7 +136,7 @@ class gbsd_cfg():
             zfs = True if 'ZFS' in part else False
             # If slice and auto file exist add first partition line.
             # But Swap need to be 0 it will take the rest of the freespace.
-            for line in part:
+            for line in part.splitlines():
                 if 'BOOT' in line or 'BIOS' in line or 'UEFI' in line:
                     pass
                 else:
