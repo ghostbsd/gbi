@@ -4,7 +4,7 @@
 
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, Gdk, GLib
+from gi.repository import Gtk, Gdk, GLib, GdkPixbuf
 import re
 import sys
 import _thread
@@ -35,7 +35,35 @@ class network_setup():
     def get_model(self):
         return self.vbox1
 
-    def __init__(self):
+    def wifi_stat(self, bar):
+        if bar > 75:
+            return 'nm-signal-100'
+        elif bar > 50:
+            return 'nm-signal-75'
+        elif bar > 25:
+            return 'nm-signal-50'
+        elif bar > 5:
+            return 'nm-signal-25'
+        else:
+            return 'nm-signal-00'
+
+    def secure_wifi(self, bar):
+        img = Gtk.Image()
+        if bar > 90:
+            img.set_from_icon_name("nm-signal-100-secure", Gtk.IconSize.MENU)
+        elif bar > 65:
+            img.set_from_icon_name("nm-signal-75-secure", Gtk.IconSize.MENU)
+        elif bar > 40:
+            img.set_from_icon_name("nm-signal-50-secure", Gtk.IconSize.MENU)
+        elif bar > 15:
+            img.set_from_icon_name("nm-signal-25-secure", Gtk.IconSize.MENU)
+        else:
+            img.set_from_icon_name("nm-signal-00-secure", Gtk.IconSize.MENU)
+        img.show()
+        return img
+
+    def __init__(self, next_button):
+        self.next_button = next_button
         self.network_info = networkdictionary()
         print(self.network_info)
         self.vbox1 = Gtk.VBox(homogeneous=False, spacing=0)
@@ -90,22 +118,28 @@ class network_setup():
             self.wifi_detection_label.set_label('No WiFi card detected')
             self.wifi_detection_image.set_from_stock(Gtk.STOCK_NO, 5)
         if wlan_card:
+            # add a default card variable
             sw = Gtk.ScrolledWindow()
             sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
             sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
-            store = Gtk.TreeStore(str)
-            for line in self.network_info['cards'][wlan_card]['info']:
-                store.append(None, [line])
+            store = Gtk.ListStore(GdkPixbuf.Pixbuf, str, str)
+            for ssid in self.network_info['cards'][wlan_card]['info']:
+                ssid_info = self.network_info['cards'][wlan_card]['info'][ssid]
+                bar = ssid_info[4]
+                stat = self.wifi_stat(bar)
+                pixbuf = Gtk.IconTheme.get_default().load_icon(stat, 32, 0)
+                store.append([pixbuf, ssid, f'{ssid_info}'])
             treeView = Gtk.TreeView(store)
             treeView.set_model(store)
             treeView.set_rules_hint(True)
+            pixbuf_cell = Gtk.CellRendererPixbuf()
+            pixbuf_column = Gtk.TreeViewColumn('Stat', pixbuf_cell)
+            pixbuf_column.add_attribute(pixbuf_cell, "pixbuf", 0)
+            pixbuf_column.set_resizable(True)
+            treeView.append_column(pixbuf_column)
             cell = Gtk.CellRendererText()
-            column = Gtk.TreeViewColumn(None, cell, text=0)
-            column_header = Gtk.Label(label='WiFi Network Detected')
-            column_header.set_use_markup(True)
-            column_header.show()
-            column.set_widget(column_header)
-            column.set_sort_column_id(0)
+            column = Gtk.TreeViewColumn('SSID', cell, text=1)
+            column.set_sort_column_id(1)
             treeView.append_column(column)
             tree_selection = treeView.get_selection()
             tree_selection.set_mode(Gtk.SelectionMode.SINGLE)
@@ -134,7 +168,7 @@ class network_setup():
     def wifi_setup(self, tree_selection):
         model, treeiter = tree_selection.get_selected()
         if treeiter is not None:
-            value = model[treeiter][0]
+            value = model[treeiter][1]
             print(value)
         return
 
