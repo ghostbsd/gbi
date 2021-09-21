@@ -167,8 +167,7 @@ class gbsd_cfg():
             f.writelines(f'userShell={shell}\n')
             upath = uf[4]
             f.writelines(f'userHome={upath.rstrip()}\n')
-            f.writelines('defaultGroup=wheel\n')
-            f.writelines('userGroups=operator\n')
+            f.writelines('userGroups=wheel,operator\n')
             f.writelines('commitUser\n')
             f.writelines('\n# Run command and script\n')
             nv = Popen('pciconf -lv | grep -B 4 VGA', shell=True,
