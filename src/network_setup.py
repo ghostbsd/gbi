@@ -88,6 +88,8 @@ class network_setup():
                 if self.network_info['cards'][card]['state']['connection'] == 'Connected':
                     self.wire_connection_label.set_label('Network card connected to the internet')
                     self.wire_connection_image.set_from_stock(Gtk.STOCK_YES, 5)
+                    print('Connected True')
+                    self.next_button.set_sensitive(True)
                     break
             else:
                 self.wire_connection_label.set_label('Network card connected to the internet')
