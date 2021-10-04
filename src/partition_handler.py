@@ -1193,7 +1193,8 @@ class addPartition():
                         if boot == "grub":
                             cmd = f'sudo gpart add -a 4k -s {size}M -t bios-boot -i {sl} {drive}'
                         else:
-                            cmd = f'sudo gpart add -a 4k -s {size}M -t freebsd-boot -i {sl} {drive}'
+                            # freebsd-boot partition must never be larger than 512B blocks.
+                            cmd = f'sudo gpart add -a 4k -s 512 -t freebsd-boot -i {sl} {drive}'
                         call(cmd, shell=True)
                 elif set("s") & set(part):
                     cmd = f'sudo gpart add -a 4k -s {size}M -t freebsd -i {sl} {drive}'
