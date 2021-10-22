@@ -1,14 +1,15 @@
-name: 'Verify code with Lintly-Flake8'
-on:
-  pull_request:
-    branches: [master]
+on: [pull_request]
 
 jobs:
   lint:
     runs-on: ubuntu-latest
+    name: Verify code with Lintly-Flake8
     steps:
-      - uses: actions/checkout@v1
-      - uses: grantmcconnaughey/lintly-flake8-github-action@v1.0
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Test action
+        id: test
+        uses: grantmcconnaughey/lintly-flake8-github-action@v1.0
         with:
           # The GitHub API token to create reviews with
           token: ${{ secrets.GITHUB_TOKEN }}
