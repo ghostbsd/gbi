@@ -16,9 +16,10 @@ lang_dictionary = language_dictionary()
 
 Messages = """To run GhostBSD without installing, select "Try GhostBSD."
 
-To install GhostBSD on your computer's hard disk drive, select "Install GhostBSD."
+To install GhostBSD on your computer hard disk drive, click "Install GhostBSD."
 
-Note: Language selection only works when selecting "Try GhostBSD." When installing GhostBSD, the installation program is only in English."""
+Note: Language selection only works when selecting "Try GhostBSD."
+      When installing GhostBSD, the installation program is only in English."""
 
 cssProvider = Gtk.CssProvider()
 cssProvider.load_from_path('/usr/local/lib/gbi/ghostbsd-style.css')
@@ -112,10 +113,12 @@ class Welcome:
             preserve_aspect_ratio=True)
         image2 = Gtk.Image.new_from_pixbuf(pixbuf2)
         image2.show()
-        install_button = Gtk.Button(label='Install GhostBSD', image=image1, image_position=2)
+        install_button = Gtk.Button(label='Install GhostBSD', image=image1,
+                                    image_position=2)
         install_button.set_always_show_image(True)
         install_button.connect("clicked", self.install_system)
-        try_button = Gtk.Button(label='Try GhostBSD', image=image2, image_position=2)
+        try_button = Gtk.Button(label='Try GhostBSD', image=image2,
+                                image_position=2)
         try_button.set_always_show_image(True)
         try_button.connect("clicked", self.try_system)
         text_label = Gtk.Label(Messages)

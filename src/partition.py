@@ -4,10 +4,18 @@ import os
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk
-from partition_handler import create_disk_partition_db, disk_database, Delete_partition
-from partition_handler import bios_or_uefi, how_partition, createSlice
-from partition_handler import autoFreeSpace, createPartition
-from partition_handler import createLabel, diskSchemeChanger
+from partition_handler import (
+    create_disk_partition_db,
+    disk_database,
+    Delete_partition,
+    bios_or_uefi,
+    how_partition,
+    createSlice,
+    autoFreeSpace,
+    createPartition,
+    createLabel,
+    diskSchemeChanger
+)
 
 # Folder use pr the installer.
 tmp = "/tmp/.gbi"
@@ -53,14 +61,16 @@ class Partitions():
     def on_add_label(self, widget, entry, free_space, path, create):
         create_size = entry.get_value_as_int()
         left_size = free_space - create_size
-        createLabel(path, self.disk, self.slice, left_size, create_size, self.mountpoint, self.fs)
+        createLabel(path, self.disk, self.slice, left_size, create_size,
+                    self.mountpoint, self.fs)
         self.window.hide()
         self.update()
 
     def on_add_partition(self, widget, entry, free_space, path, create):
         create_size = entry.get_value_as_int()
         left_size = int(free_space - create_size)
-        createPartition(path, self.disk, left_size, create_size, self.mountpoint, self.fs)
+        createPartition(path, self.disk, left_size, create_size,
+                        self.mountpoint, self.fs)
         self.window.hide()
         self.update()
 
@@ -186,7 +196,8 @@ class Partitions():
             elif scheme == 'GPT' and self.fs == 'BOOT':
                 button.connect("clicked", self.on_add_partition, self.entry,
                                free_space, path, True)
-            elif scheme == 'GPT' and self.fs == 'UEFI' and self.efi_exist is False:
+            elif (scheme == 'GPT' and self.fs == 'UEFI'
+                  and self.efi_exist is False):
                 button.connect("clicked", self.on_add_partition, self.entry,
                                free_space, path, True)
             else:
@@ -194,8 +205,8 @@ class Partitions():
                                free_space, path, False)
         else:
             if scheme == 'MBR':
-                button.connect("clicked", self.on_add_label, self.entry, free_space,
-                               path, False)
+                button.connect("clicked", self.on_add_label, self.entry,
+                               free_space, path, False)
             elif scheme == 'GPT':
                 button.connect("clicked", self.on_add_partition, self.entry,
                                free_space, path, False)
@@ -251,7 +262,8 @@ class Partitions():
         self.window.show_all()
 
     def set_auto_partition(self, widget):
-        autoFreeSpace(self.path, self.size, self.fs, self.efi_exist, self.disk, self.scheme)
+        autoFreeSpace(self.path, self.size, self.fs, self.efi_exist,
+                      self.disk, self.scheme)
         self.window.hide()
         self.update()
 
@@ -445,7 +457,8 @@ class Partitions():
             if self.scheme == "MBR" and self.path[1] < 4:
                 self.sliceEditor()
             elif self.scheme == "GPT":
-                self.labelEditor(self.path, self.slice, self.size, 'GPT', False)
+                self.labelEditor(self.path, self.slice, self.size, 'GPT',
+                                 False)
 
     def partition_selection(self, widget):
         model, self.iter, = widget.get_selected()
@@ -480,13 +493,18 @@ class Partitions():
                 self.label = model.get_value(tree_iter3, 0)
             else:
                 self.label = 'Not selected'
-            if len(self.path) == 2 and self.path[1] > 0 and self.scheme == "GPT":
+            if (len(self.path) == 2 and self.path[1] > 0
+                    and self.scheme == "GPT"):
                 pathbehind = f'{self.path[0]}:{str(int(self.path[1] - 1))}'
                 tree_iter4 = model.get_iter(pathbehind)
                 self.mountpoint_behind = model.get_value(tree_iter4, 2)
                 self.fs_behind = model.get_value(tree_iter4, 3)
-            elif len(self.path) == 3 and self.path[2] > 0 and self.scheme == "MBR":
-                pathbehind2 = f'{self.path[0]}:{str(self.path[1])}:{str(int(self.path[2] - 1))}'
+            elif (len(self.path) == 3 and self.path[2] > 0
+                    and self.scheme == "MBR"):
+                path1 = self.path[0]
+                path2 = str(self.path[1])
+                path3 = str(int(self.path[2] - 1))
+                pathbehind2 = f'{path1}:{path2}:{path3}'
                 tree_iter1 = model.get_iter(pathbehind2)
                 self.mountpoint_behind = model.get_value(tree_iter1, 2)
                 self.fs_behind = model.get_value(tree_iter1, 3)
@@ -501,8 +519,8 @@ class Partitions():
                 # scan for efi partition
                 for num in range(self.path[1]):
                     partition_path = f"{self.path[0]}:{num}"
-                    first_tree_iter = model.get_iter(partition_path)
-                    first_fs = model.get_value(first_tree_iter, 3)
+                    tree_iter_1 = model.get_iter(partition_path)
+                    first_fs = model.get_value(tree_iter_1, 3)
                     if first_fs == "UEFI" or 'efi' in first_fs:
                         self.efi_exist = True
                         break
@@ -553,8 +571,8 @@ class Partitions():
                         while True:
                             partition_path = f"{disk_id}:{num}"
                             try:
-                                first_tree_iter = model.get_iter(partition_path)
-                                first_fs = model.get_value(first_tree_iter, 3)
+                                tree_iter_1 = model.get_iter(partition_path)
+                                first_fs = model.get_value(tree_iter_1, 3)
                                 if 'efi' in first_fs:
                                     efi_already_exist = True
                                     break
@@ -594,11 +612,14 @@ class Partitions():
                                 self.button3.set_sensitive(False)
                         else:
                             self.button3.set_sensitive(False)
-                    elif 'UEFI' in self.partitions[0] and '/\n' in self.partitions[1]:
+                    elif ('UEFI' in self.partitions[0]
+                          and '/\n' in self.partitions[1]):
                         self.button3.set_sensitive(True)
-                    elif 'UEFI' in self.partitions[0] and 'ZFS' in self.partitions[1]:
+                    elif ('UEFI' in self.partitions[0]
+                          and 'ZFS' in self.partitions[1]):
                         self.button3.set_sensitive(True)
-                    elif 'UEFI' in self.partitions[0] and "/boot\n" in self.partitions[1]:
+                    elif ('UEFI' in self.partitions[0]
+                          and "/boot\n" in self.partitions[1]):
                         if len(self.partitions) >= 3:
                             if '/\n' in self.partitions[2]:
                                 self.button3.set_sensitive(True)
@@ -611,7 +632,6 @@ class Partitions():
                     else:
                         self.button3.set_sensitive(False)
                 else:
-                    # to be changed when MBR UEFI will be supported by pc-sysinstall.
                     self.efi_exist = False
                     if len(self.partitions) >= 1:
                         if "/boot\n" in self.partitions[0]:
@@ -734,7 +754,8 @@ class Partitions():
             disk_size = str(disk_info['size'])
             disk_partitions = disk_info['partitions']
             partition_list = disk_info['partition_list']
-            pinter1 = self.store.append(None, [disk, disk_size, mount_point, disk_schemee, True])
+            pinter1 = self.store.append(None, [disk, disk_size, mount_point,
+                                        disk_schemee, True])
             for partition in partition_list:
                 partition_info = disk_partitions[partition]
                 file_system = partition_info['file_system']
@@ -742,13 +763,16 @@ class Partitions():
                 partition_size = str(partition_info['size'])
                 partition_partitions = partition_info['partitions']
                 partition_list = partition_info['partition_list']
-                pinter2 = self.store.append(pinter1, [partition, partition_size, mount_point, file_system, True])
+                pinter2 = self.store.append(pinter1, [partition,
+                                            partition_size, mount_point,
+                                            file_system, True])
                 for partition in partition_list:
                     partition_info = partition_partitions[partition]
                     file_system = partition_info['file_system']
                     mount_point = partition_info['mount_point']
                     partition_size = str(partition_info['size'])
-                    self.store.append(pinter2, [partition, partition_size, mount_point, file_system, True])
+                    self.store.append(pinter2, [partition, partition_size,
+                                      mount_point, file_system, True])
         return self.store
 
     def get_model(self):
