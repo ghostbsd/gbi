@@ -63,43 +63,46 @@ class network_setup():
         return img
 
     def update_network_detection(self):
-        card_list = list(self.network_info['cards'].keys())
+        cards = self.network_info['cards']
+        card_list = list(cards.keys())
         r = re.compile("wlan")
         wlan_list = list(filter(r.match, card_list))
         wire_list = list(set(card_list).difference(wlan_list))
-
+        cards = self.network_info['cards']
         if wire_list:
-            self.wire_detection_label.set_label('Network internet card detected')
-            self.wire_detection_image.set_from_stock(Gtk.STOCK_YES, 5)
             for card in wire_list:
-                if self.network_info['cards'][card]['state']['connection'] == 'Connected':
-                    self.wire_connection_label.set_label('Network card connected to the internet')
+                if cards[card]['state']['connection'] == 'Connected':
+
+                    wire_text = 'Network card connected to the internet'
                     self.wire_connection_image.set_from_stock(Gtk.STOCK_YES, 5)
                     print('Connected True')
                     self.next_button.set_sensitive(True)
                     break
             else:
-                self.wire_connection_label.set_label('Network card connected to the internet')
+                wire_text = 'Network card not connected to the internet'
                 self.wire_connection_image.set_from_stock(Gtk.STOCK_NO, 5)
         else:
-            self.wire_detection_label.set_label('No network card detected')
-            self.wire_detection_image.set_from_stock(Gtk.STOCK_NO, 5)
+            wire_text = 'No network card detected'
+            self.wire_connection_image.set_from_stock(Gtk.STOCK_NO, 5)
+
+        self.wire_connection_label.set_label(wire_text)
 
         if wlan_list:
-            self.wifi_detection_label.set_label('WiFi card detected')
-            self.wifi_detection_image.set_from_stock(Gtk.STOCK_YES, 5)
             for wlan_card in wlan_list:
-                if self.network_info['cards'][wlan_card]['state']['connection'] == 'Connected':
-                    self.wifi_connection_label.set_label('WiFi connected to an access point')
+                if cards[wlan_card]['state']['connection'] == 'Connected':
+                    wifi_text = 'WiFi card detected and connected to an ' \
+                        'access point'
                     self.wifi_connection_image.set_from_stock(Gtk.STOCK_YES, 5)
                     break
             else:
-                self.wifi_connection_label.set_label('WiFi not connected to an access point')
+                wifi_text = 'WiFi card detected but not connected to an ' \
+                    'access point'
                 self.wifi_connection_image.set_from_stock(Gtk.STOCK_NO, 5)
         else:
-            wlan_card = ""
-            self.wifi_detection_label.set_label('No WiFi card detected')
-            self.wifi_detection_image.set_from_stock(Gtk.STOCK_NO, 5)
+            wlan_card = "WiFi card not detected or not supported"
+            self.wifi_connection_image.set_from_stock(Gtk.STOCK_NO, 5)
+
+        self.wifi_connection_label.set_label(wifi_text)
 
     def __init__(self, next_button):
         self.next_button = next_button
@@ -110,60 +113,55 @@ class network_setup():
         Title = Gtk.Label(label='Network Setup', name="Header")
         Title.set_property("height-request", 50)
         self.vbox1.pack_start(Title, False, False, 0)
-        card_list = list(self.network_info['cards'].keys())
+        cards = self.network_info['cards']
+        card_list = list(cards.keys())
         r = re.compile("wlan")
         wlan_list = list(filter(r.match, card_list))
         wire_list = list(set(card_list).difference(wlan_list))
 
-        self.wire_detection_label = Gtk.Label()
-        self.wire_detection_image = Gtk.Image()
-        self.wire_detection_label.set_xalign(0.01)
         self.wire_connection_label = Gtk.Label()
         self.wire_connection_label.set_xalign(0.01)
         self.wire_connection_image = Gtk.Image()
-
-        self.wifi_detection_label = Gtk.Label()
-        self.wifi_detection_label.set_xalign(0.01)
-        self.wifi_detection_image = Gtk.Image()
         self.wifi_connection_label = Gtk.Label()
         self.wifi_connection_label.set_xalign(0.01)
         self.wifi_connection_image = Gtk.Image()
 
         if wire_list:
-            self.wire_detection_label.set_label('Network internet card detected')
-            self.wire_detection_image.set_from_stock(Gtk.STOCK_YES, 5)
             for card in wire_list:
-                if self.network_info['cards'][card]['state']['connection'] == 'Connected':
-                    self.wire_connection_label.set_label('Network card connected to the internet')
+                if cards[card]['state']['connection'] == 'Connected':
+                    wire_text = 'Network card connected to the internet'
                     self.wire_connection_image.set_from_stock(Gtk.STOCK_YES, 5)
                     print('Connected True')
                     self.next_button.set_sensitive(True)
                     break
             else:
-                self.wire_connection_label.set_label('Network card connected to the internet')
+                wire_text = 'Network card not connected to the internet'
                 self.wire_connection_image.set_from_stock(Gtk.STOCK_NO, 5)
         else:
-            self.wire_detection_label.set_label('No network card detected')
-            self.wire_detection_image.set_from_stock(Gtk.STOCK_NO, 5)
+            wire_text = 'No network card detected'
+            self.wire_connection_image.set_from_stock(Gtk.STOCK_NO, 5)
+
+        self.wire_connection_label.set_label(wire_text)
 
         if wlan_list:
-            self.wifi_detection_label.set_label('WiFi card detected')
-            self.wifi_detection_image.set_from_stock(Gtk.STOCK_YES, 5)
             for wlan_card in wlan_list:
-                if self.network_info['cards'][wlan_card]['state']['connection'] == 'Connected':
-                    self.wifi_connection_label.set_label('WiFi connected to an access point')
+                if cards[wlan_card]['state']['connection'] == 'Connected':
+                    wifi_text = 'WiFi card detected and connected to an ' \
+                        'access point'
                     self.wifi_connection_image.set_from_stock(Gtk.STOCK_YES, 5)
                     break
             else:
-                self.wifi_connection_label.set_label('WiFi not connected to an access point')
+                wifi_text = 'WiFi card detected but not connected to an ' \
+                    'access point'
                 self.wifi_connection_image.set_from_stock(Gtk.STOCK_NO, 5)
         else:
             wlan_card = ""
-            self.wifi_detection_label.set_label('No WiFi card detected')
-            self.wifi_detection_image.set_from_stock(Gtk.STOCK_NO, 5)
+            wifi_text = 'WiFi card not detected or not supported'
+            self.wifi_connection_image.set_from_stock(Gtk.STOCK_NO, 5)
+
+        self.wifi_connection_label.set_label(wifi_text)
 
         self.connection_box = Gtk.HBox(homogeneous=True, spacing=20)
-
         if wlan_card:
             # add a default card variable
             sw = Gtk.ScrolledWindow()
@@ -193,21 +191,18 @@ class network_setup():
             tree_selection.connect("changed", self.wifi_setup, wlan_card)
             sw.add(treeView)
             self.connection_box.pack_start(sw, True, True, 50)
+
         main_grid = Gtk.Grid()
         main_grid.set_row_spacing(10)
         main_grid.set_column_spacing(10)
         main_grid.set_column_homogeneous(True)
         main_grid.set_row_homogeneous(True)
         self.vbox1.pack_start(main_grid, True, True, 10)
-        main_grid.attach(self.wire_detection_image, 2, 1, 1, 1)
-        main_grid.attach(self.wire_detection_label, 3, 1, 8, 1)
-        main_grid.attach(self.wire_connection_image, 2, 2, 1, 1)
-        main_grid.attach(self.wire_connection_label, 3, 2, 8, 1)
-        main_grid.attach(self.wifi_detection_image, 2, 3, 1, 1)
-        main_grid.attach(self.wifi_detection_label, 3, 3, 8, 1)
-        main_grid.attach(self.wifi_connection_image, 2, 4, 1, 1)
-        main_grid.attach(self.wifi_connection_label, 3, 4, 8, 1)
-        main_grid.attach(self.connection_box, 1, 5, 10, 5)
+        main_grid.attach(self.wire_connection_image, 2, 1, 1, 1)
+        main_grid.attach(self.wire_connection_label, 3, 1, 8, 1)
+        main_grid.attach(self.wifi_connection_image, 2, 2, 1, 1)
+        main_grid.attach(self.wifi_connection_label, 3, 2, 8, 1)
+        main_grid.attach(self.connection_box, 1, 4, 10, 5)
 
     def wifi_setup(self, tree_selection, wificard):
         model, treeiter = tree_selection.get_selected()
@@ -220,12 +215,13 @@ class network_setup():
             print(ssid_info)
             if caps == 'E' or caps == 'ES':
                 if f'"{ssid}"' in open("/etc/wpa_supplicant.conf").read():
-                    connectToSsid(ssid, wificard)
+                    self.try_to_connect_to_ssid(ssid, ssid_info, wificard)
                 else:
                     self.Open_Wpa_Supplicant(ssid, wificard)
+                    self.try_to_connect_to_ssid(ssid, ssid_info, wificard)
             else:
                 if f'"{ssid}"' in open('/etc/wpa_supplicant.conf').read():
-                    connectToSsid(ssid, wificard)
+                    self.try_to_connect_to_ssid(ssid, ssid_info, wificard)
                 else:
                     self.Authentication(ssid_info, wificard, False)
         return
