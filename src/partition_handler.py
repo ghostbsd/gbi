@@ -194,11 +194,11 @@ class create_disk_partition_db():
                 part_db = self.mbr_partition_slice_db(disk)
             else:
                 disk_info_db['scheme'] = None
-                partition_db = None
-            part_list = [] if partition_db is None else list(part_db.keys())
+                part_db = None
+            part_list = [] if part_db is None else list(part_db.keys())
             disk_info_db['size'] = self.disk_size(disk)
             disk_info_db['device_model'] = self.device_model(disk)
-            disk_info_db['partitions'] = partition_db
+            disk_info_db['partitions'] = part_db
             disk_info_db['partition_list'] = part_list
             disk_info_db['stat'] = None
             disk_db[disk] = disk_info_db

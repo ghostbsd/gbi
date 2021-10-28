@@ -67,8 +67,10 @@ class Types():
         pass_file.writelines(self.ne)
         pass_file.close
         self.vbox1.pack_start(hbox1, False, False, 10)
-        full_zfs = Gtk.RadioButton()
-        full_zfs.new_with_label_from_widget(None, "Full disk configuration")
+        full_zfs = Gtk.RadioButton.new_with_label_from_widget(
+            None,
+            "Full disk configuration"
+        )
         vbox2.pack_start(full_zfs, False, True, 10)
         full_zfs.connect("toggled", self.fstype, "zfs")
         full_zfs.show()
@@ -78,10 +80,10 @@ class Types():
         # vbox2.pack_start(full_ufs, False, True, 10)
         # full_ufs.connect("toggled", self.fstype, "ufs")
         # full_ufs.show()
-        custom_ufs = Gtk.RadioButton()
-        custom_ufs .new_with_label_from_widget(full_zfs,
-                                               "Custom (Advanced partitioning)"
-                                               )
+        custom_ufs = Gtk.RadioButton.new_with_label_from_widget(
+            full_zfs,
+            "Custom (Advanced partitioning)"
+        )
         vbox2.pack_start(custom_ufs, False, True, 10)
         custom_ufs.connect("toggled", self.fstype, "custom")
         custom_ufs.show()

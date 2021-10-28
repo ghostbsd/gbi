@@ -56,7 +56,7 @@ def lowerUpperNumber(strg, search=re.compile(r'[^a-zA-Z0-9]').search):
 
 # Find if pasword contain only lower and upper case and
 def allCharacter(strg):
-    search = re.compile(r'[^a-zA-Z0-9~\!@#\$%\^&\*_\+":;\'\-]').search()
+    search = re.compile(r'[^a-zA-Z0-9~\!@#\$%\^&\*_\+":;\'\-]').search
     return not bool(search(strg))
 
 
