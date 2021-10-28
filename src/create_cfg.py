@@ -207,3 +207,4 @@ class gbsd_cfg():
             f.writelines("runCommand=sed -i '' 's/ghostbsd/root/g' "
                          "/etc/ttys\n")
             f.writelines("runCommand=pw userdel -n ghostbsd\n")
+        f.close()
