@@ -54,8 +54,10 @@ def lowerUpperNumber(strg, search=re.compile(r'[^a-zA-Z0-9]').search):
     return not bool(search(strg))
 
 
-# Find if pasword contain only lowercase, uppercase numbers and some special character.
-def allCharacter(strg, search=re.compile(r'[^a-zA-Z0-9~\!@#\$%\^&\*_\+":;\'\-]').search):
+# Find if password contain only lowercase, uppercase numbers
+# and some special character.
+def allCharacter(strg):
+    search = re.compile(r'[^a-zA-Z0-9~\!@#\$%\^&\*_\+":;\'\-]').search
     return not bool(search(strg))
 
 
@@ -251,7 +253,8 @@ class AddUser:
                 self.label3.set_text("Super Strong")
 
     def passwdVerification(self, widget, button3):
-        if self.password.get_text() == self.repassword.get_text() and self.password.get_text() != "":
+        if (self.password.get_text() == self.repassword.get_text()
+                and self.password.get_text() != ""):
             self.img.set_from_stock(Gtk.STOCK_YES, 5)
             button3.set_sensitive(True)
 

@@ -175,27 +175,35 @@ class gbsd_cfg():
             if "NVIDIA" not in nv.stdout.read():
                 f.writelines('runCommand=pkg delete -fy nvidia-driver\n')
             vbguest = Popen('pciconf -lv | grep "VirtualBox"', shell=True,
-                            stdout=PIPE, close_fds=True, universal_newlines=True)
+                            stdout=PIPE, close_fds=True,
+                            universal_newlines=True)
             if "VirtualBox" in vbguest.stdout.read():
                 f.writelines('runCommand=rc-update add vboxguest default\n')
                 f.writelines('runCommand=rc-update add vboxservice default\n')
             else:
-                f.writelines('runCommand=pkg delete -fy virtualbox-ose-additions\n')
-            if os.path.exists("/etc/wpa_supplicant.conf"):
-                f.writelines('runExtCommand=cp /etc/wpa_supplicant.conf $FSMNT/etc/wpa_supplicant.conf\n')
-                f.writelines('runExtCommand=chmod 665 $FSMNT/etc/wpa_supplicant.conf\n')
+                f.writelines('runCommand=pkg delete -fy '
+                             'virtualbox-ose-additions\n')
+            if os.path.exists('/etc/wpa_supplicant.conf'):
+                f.writelines('runExtCommand=cp /etc/wpa_supplicant.conf '
+                             '$FSMNT/etc/wpa_supplicant.conf\n')
+                f.writelines('runExtCommand=chmod 665 '
+                             '$FSMNT/etc/wpa_supplicant.conf\n')
             if os.path.exists("/etc/X11/xorg.conf"):
-                f.writelines('runExtCommand=cp /etc/X11/xorg.conf $FSMNT/etc/X11/xorg.conf\n')
+                f.writelines('runExtCommand=cp /etc/X11/xorg.conf '
+                             '$FSMNT/etc/X11/xorg.conf\n')
             f.writelines('runScript=/root/iso_to_hd.sh\n')
             f.writelines('runCommand=rm -f /root/iso_to_hd.sh\n')
             if zfs is True:
-                zfsark = """echo 'vfs.zfs.arc_max="512M"' >> /boot/loader.conf"""
+                zfsark = "echo 'vfs.zfs.arc_max=\"512M\"' >> /boot/loader.conf"
                 f.writelines(f'runCommand={zfsark}\n')
         else:
             f.writelines('\n# Network Configuration\n')
             f.writelines('hostname=installed\n')
             f.writelines('\n# command to prepare first boot\n')
-            f.writelines("runCommand=sysrc -f /etc/rc.conf hostname='installed'\n")
-            f.writelines("runCommand=sed -i '' 's/ghostbsd/root/g' /etc/gettytab\n")
-            f.writelines("runCommand=sed -i '' 's/ghostbsd/root/g' /etc/ttys\n")
+            f.writelines("runCommand=sysrc -f /etc/rc.conf "
+                         "hostname='installed'\n")
+            f.writelines("runCommand=sed -i '' 's/ghostbsd/root/g' "
+                         "/etc/gettytab\n")
+            f.writelines("runCommand=sed -i '' 's/ghostbsd/root/g' "
+                         "/etc/ttys\n")
             f.writelines("runCommand=pw userdel -n ghostbsd\n")
