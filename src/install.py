@@ -94,9 +94,17 @@ class installWindow():
         label2 = Gtk.Label(name="sideText")
 
         label2.set_markup("Thank you for choosing GhostBSD!\n\n"
-                          "We believe every computer operating system should be simple, elegant, secure and protect your privacy while being easy to use. GhostBSD is simplifying FreeBSD for those who lack the technical expertise required to use it and lower the entry-level of using BSD. \n\n"
-                          "We hope you'll enjoy our BSD operating system.\n\n"
-                          "While the operating system is installing, you can join us on <a href='https://t.me/ghostbsd'>Telegram</a> and our <a href='https://forums.ghostbsd.org/'>Forums</a>.")
+                          "We believe every computer operating system should "
+                          "be simple, elegant, secure and protect your privacy"
+                          " while being easy to use. GhostBSD is simplifying "
+                          "FreeBSD for those who lack the technical expertise "
+                          "required to use it and lower the entry-level of "
+                          "using BSD. \n\nWe hope you'll enjoy our BSD "
+                          "operating system.\n\nWhile the operating system "
+                          "is installing, you can join us on "
+                          "<a href='https://t.me/ghostbsd'>Telegram</a> "
+                          "and our <a href='https://forums.ghostbsd.org/'>"
+                          "Forums</a>.")
         label2.set_justify(Gtk.Justification.LEFT)
         label2.set_line_wrap(True)
         # label2.set_max_width_chars(10)

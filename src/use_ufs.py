@@ -65,8 +65,10 @@ def lowerUpperNumber(strg, search=re.compile(r'[^a-zA-Z0-9]').search):
     return not bool(search(strg))
 
 
-# Find if pasword contain only lowercase, uppercase numbers and some special character.
-def allCharacter(strg, search=re.compile(r'[^a-zA-Z0-9~\!@#\$%\^&\*_\+":;\'\-]').search):
+# Find if password contain only lowercase, uppercase numbers and some
+# special character.
+def allCharacter(strg):
+    search = re.compile(r'[^a-zA-Z0-9~\!@#\$%\^&\*_\+":;\'\-]').search()
     return not bool(search(strg))
 
 
@@ -80,7 +82,8 @@ class use_ufs():
         else:
             dgeli = ''
         pfile = open(Part_label, 'w')
-        pfile.writelines('disk0=%s\n' % ufs_dsk_list[0].partition('-')[0].rstrip())
+        disk = ufs_dsk_list[0].partition('-')[0].rstrip()
+        pfile.writelines(f'disk0={disk}\n')
         if self.mirror is True:
             ufs_disk = ufs_dsk_list
             disk_len = len(ufs_disk) - 1
@@ -280,8 +283,8 @@ class use_ufs():
         else:
             shemebox.set_sensitive(True)
         # Swap Size
-        # ram = Popen(memory, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT,
-        #            universal_newlines=True, close_fds=True)
+        # ram = Popen(memory, shell=True, stdin=PIPE, stdout=PIPE,
+        #             stderr=STDOUT, universal_newlines=True, close_fds=True)
         # mem = ram.stdout.read()
         swap = 2048
         swp_size_label = Gtk.Label('<b>Swap Size(MB)</b>')
@@ -358,7 +361,8 @@ class use_ufs():
 
     def digit_only(self, *args):
         text = self.swap_entry.get_text().strip()
-        self.swap_entry.set_text(''.join([i for i in text if i in '0123456789']))
+        digit = ''.join([i for i in text if i in '0123456789'])
+        self.swap_entry.set_text(digit)
 
     def col1_toggled_cb(self, cell, path, model):
         model[path][3] = not model[path][3]
