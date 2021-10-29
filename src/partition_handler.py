@@ -181,7 +181,7 @@ class create_disk_partition_db():
     def __init__(self):
         if os.path.exists(disk_db_file):
             os.remove(disk_db_file)
-        df = open(disk_db_file, 'wb')
+        drives_database = open(disk_db_file, 'wb')
         disk_db = {}
         for disk in self.disk_list():
             disk_info_db = {}
@@ -203,8 +203,8 @@ class create_disk_partition_db():
             disk_info_db['stat'] = None
             disk_db[disk] = disk_info_db
         # print(json.dumps(disk_db, indent=4))
-        pickle.dump(disk_db, df)
-        df.close()
+        pickle.dump(disk_db, drives_database)
+        drives_database.close()
 
 
 def diskSchemeChanger(scheme, path, disk, size):
@@ -238,9 +238,9 @@ def diskSchemeChanger(scheme, path, disk, size):
         disk_data[disk]['partition_list'] = [
             'freespace1'
         ]
-    df = open(disk_db_file, 'wb')
-    pickle.dump(disk_data, df)
-    df.close()
+    drives_database = open(disk_db_file, 'wb')
+    pickle.dump(disk_data, drives_database)
+    drives_database.close()
 
 
 def find_next_partition(partition_name, partition_list):
@@ -401,9 +401,9 @@ class Delete_partition():
                 'partition_list': []
             }
             disk_partitions['partition_list'] = partition_list
-        disk_db = open(disk_db_file, 'wb')
-        pickle.dump(disk_data, disk_db)
-        disk_db.close()
+        drives_database = open(disk_db_file, 'wb')
+        pickle.dump(disk_data, drives_database)
+        drives_database.close()
 
         new_partitions = open(partition_label_file, 'w')
         for part in partition_list:
@@ -572,9 +572,9 @@ class Delete_partition():
             }
             disk_data[drive]['partition_list'] = partition_list
 
-        disk_db = open(disk_db_file, 'wb')
-        pickle.dump(disk_data, disk_db)
-        disk_db.close()
+        drives_database = open(disk_db_file, 'wb')
+        pickle.dump(disk_data, drives_database)
+        drives_database.close()
 
         # if delete file exist check if slice is in the list
         if os.path.exists(f'{tmp}/delete'):
@@ -681,9 +681,9 @@ class autoFreeSpace():
 
         disk_db[drive]['partitions'][main_slice]['partition_list'] = part_list
 
-        disk_db = open(disk_db_file, 'wb')
-        pickle.dump(disk_db, disk_db)
-        disk_db.close()
+        drives_database = open(disk_db_file, 'wb')
+        pickle.dump(disk_db, drives_database)
+        drives_database.close()
 
         write_partition = open(partition_label_file, 'w')
         write_partition.writelines(f'{fs} {root_size} {layout}\n')
@@ -797,9 +797,9 @@ class autoFreeSpace():
         }
 
         disk_data[drive]['partition_list'] = partition_list
-        disk_db = open(disk_db_file, 'wb')
-        pickle.dump(disk_data, disk_db)
-        disk_db.close()
+        drives_database = open(disk_db_file, 'wb')
+        pickle.dump(disk_data, drives_database)
+        drives_database.close()
 
         write_partition = open(partition_label_file, 'w')
         if self.bios_type == "UEFI" and efi_exist is False:
@@ -869,9 +869,9 @@ class createLabel():
 
         disk_db[drive]['partitions'][main_slice]['partition_list'] = part_list
 
-        disk_db = open(disk_db_file, 'wb')
-        pickle.dump(disk_db, disk_db)
-        disk_db.close()
+        drives_database = open(disk_db_file, 'wb')
+        pickle.dump(disk_db, drives_database)
+        drives_database.close()
 
         write_partition = open(partition_label_file, 'w')
         for partition in part_list:
@@ -980,9 +980,9 @@ class createSlice():
             }
 
         disk_db[drive]['partition_list'] = partition_list
-        disk_db = open(disk_db_file, 'wb')
-        pickle.dump(disk_db, disk_db)
-        disk_db.close()
+        drives_database = open(disk_db_file, 'wb')
+        pickle.dump(disk_db, drives_database)
+        drives_database.close()
 
         write_slice = open(slice_file, 'w')
         write_slice.writelines(partition.replace(drive, ''))
@@ -1056,9 +1056,9 @@ class createPartition():
             }
 
         disk_data[drive]['partition_list'] = partition_list
-        disk_db = open(disk_db_file, 'wb')
-        pickle.dump(disk_data, disk_db)
-        disk_db.close()
+        drives_database = open(disk_db_file, 'wb')
+        pickle.dump(disk_data, drives_database)
+        drives_database.close()
         if mount_point == '/' or fs == "ZFS":
             write_slice = open(slice_file, 'w')
             write_slice.writelines(partition.replace(drive, ''))
