@@ -1141,43 +1141,39 @@ class createPartition():
 #                 cf.close()
 
 
-class deletePartition():
-    def __init__(self):
-        if os.path.exists(f'{tmp}/delete'):
-            delete_file = open(f'{tmp}/delete', 'rb')
-            delete_list = pickle.load(delete_file)
-            for partition in delete_list:
-                num = slice_number(partition)
-                drive = get_disk_from_partition(partition)
-                call(f"sudo zpool labelclear -f {partition}", shell=True)
-                sleep(1)
-                call(f'sudo gpart delete -i {num} {drive}', shell=True)
-                sleep(1)
+def deletePartition():
+    if os.path.exists(f'{tmp}/delete'):
+        delete_file = open(f'{tmp}/delete', 'rb')
+        delete_list = pickle.load(delete_file)
+        for partition in delete_list:
+            num = slice_number(partition)
+            drive = get_disk_from_partition(partition)
+            call(f"sudo zpool labelclear -f {partition}", shell=True)
+            sleep(1)
+            call(f'sudo gpart delete -i {num} {drive}', shell=True)
+            sleep(1)
+    else:
+        print(f'{tmp}/create is missing')
 
 
-class destroyPartition():
-    def __init__(self):
-        if os.path.exists(f'{tmp}/destroy'):
-            dsf = open(f'{tmp}/destroy', 'rb')
-            ds = pickle.load(dsf)
-            for line in ds:
-                drive = line[0]
-                scheme = line[1]
-                # Destroy the disk geom
-                gpart_destroy = f"sudo gpart destroy -F {drive}"
-                call(gpart_destroy, shell=True)
-                sleep(1)
-                # Make double-sure
-                create_gpt = f"sudo gpart create -s gpt {drive}"
-                call(create_gpt, shell=True)
-                sleep(1)
-                call(gpart_destroy, shell=True)
-                sleep(1)
-                clear_drive = f"sudo dd if=/dev/zero of={drive} bs=1m count=1"
-                call(clear_drive, shell=True)
-                sleep(1)
-                call(f'sudo gpart create -s {scheme} {drive}', shell=True)
-                sleep(1)
+def destroyPartition():
+    if os.path.exists(f'{tmp}/destroy'):
+        dsf = open(f'{tmp}/destroy', 'rb')
+        ds = pickle.load(dsf)
+        for line in ds:
+            drive = line[0]
+            scheme = line[1]
+            # Destroy the disk geom
+            gpart_destroy = f"sudo gpart destroy -F {drive}"
+            call(gpart_destroy, shell=True)
+            sleep(1)
+            clear_drive = f"sudo dd if=/dev/zero of={drive} bs=1m count=1"
+            call(clear_drive, shell=True)
+            sleep(1)
+            call(f'sudo gpart create -s {scheme} {drive}', shell=True)
+            sleep(1)
+    else:
+        print(f'{tmp}/destroy is missing!')
 
 
 def bios_or_uefi():
@@ -1187,40 +1183,41 @@ def bios_or_uefi():
     return output1.stdout.readlines()[0].rstrip()
 
 
-class addPartition():
-
-    def __init__(self):
-        if os.path.exists(f'{tmp}/create'):
-            pf = open(f'{tmp}/create', 'rb')
-            pl = pickle.load(pf)
-            read = open(boot_file, 'r')
-            boot = read.readlines()[0].strip()
-            size = 0
-            for line in pl:
-                part = line[0]
-                drive = get_disk_from_partition(part)
-                sl = slice_number(part)
-                size = int(line[1])
-                if set("p") & set(part):
-                    if bios_or_uefi() == 'UEFI':
-                        cmd = f'sudo gpart add -a 4k -s {size}M -t efi ' \
-                            f'-i {sl} {drive}'
-                        sleep(2)
-                        cmd2 = f'sudo newfs_msdos -F 16 {drive}p{sl}'
-                        call(cmd, shell=True)
-                        call(cmd2, shell=True)
-                    else:
-                        if boot == "grub":
-                            cmd = f'sudo gpart add -a 4k -s {size}M -t ' \
-                                'bios-boot -i {sl} {drive}'
-                        else:
-                            # freebsd-boot partition must never be larger
-                            # than 512B blocks.
-                            cmd = 'sudo gpart add -a 4k -s 512 -t ' \
-                                f'freebsd-boot -i {sl} {drive}'
-                        call(cmd, shell=True)
-                elif set("s") & set(part):
-                    cmd = f'sudo gpart add -a 4k -s {size}M -t freebsd ' \
+def addPartition(self):
+    if os.path.exists(f'{tmp}/create'):
+        pf = open(f'{tmp}/create', 'rb')
+        pl = pickle.load(pf)
+        read = open(boot_file, 'r')
+        boot = read.readlines()[0].strip()
+        size = 0
+        for line in pl:
+            part = line[0]
+            drive = get_disk_from_partition(part)
+            sl = slice_number(part)
+            size = int(line[1])
+            if set("p") & set(part):
+                if bios_or_uefi() == 'UEFI':
+                    cmd = f'sudo gpart add -a 4k -s {size}M -t efi ' \
                         f'-i {sl} {drive}'
+                    sleep(2)
+                    cmd2 = f'sudo newfs_msdos -F 16 {drive}p{sl}'
                     call(cmd, shell=True)
-                sleep(2)
+                    call(cmd2, shell=True)
+                else:
+                    if boot == "grub":
+                        cmd = f'sudo gpart add -a 4k -s {size}M -t ' \
+                            'bios-boot -i {sl} {drive}'
+                    else:
+                        # freebsd-boot partition must never be larger
+                        # than 512B blocks.
+                        cmd = 'sudo gpart add -a 4k -s 512 -t ' \
+                            f'freebsd-boot -i {sl} {drive}'
+                    call(cmd, shell=True)
+            elif set("s") & set(part):
+                # remove 1M to size to avoid no space left
+                cmd = f'sudo gpart add -a 4k -s {size - 1}M -t freebsd ' \
+                    f'-i {sl} {drive}'
+                call(cmd, shell=True)
+            sleep(2)
+    else:
+        print(f'{tmp}/create is missing')
