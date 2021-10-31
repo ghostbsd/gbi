@@ -109,7 +109,7 @@ class create_disk_partition_db():
             if 'freespace' in line:
                 slice_name = f'freespace{free_num}'
                 free_num += 1
-            part_db = self.mbr_part_db(info[0])
+            part_db = self.mbr_partition_db(info[0])
             part_list = [] if part_db is None else list(part_db.keys())
             partitions = {
                 'name': slice_name,
