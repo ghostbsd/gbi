@@ -98,8 +98,8 @@ class create_disk_partition_db():
         return scheme
 
     def mbr_partition_slice_db(self, disk):
-        partition_output = Popen('%s %s' % (query_partition, disk),
-                                 shell=True, stdin=PIPE, stdout=PIPE,
+        partition_output = Popen(f'{query_partition} {disk}', shell=True,
+                                 stdin=PIPE, stdout=PIPE,
                                  universal_newlines=True)
         slice_db = {}
         free_num = 1
@@ -140,7 +140,7 @@ class create_disk_partition_db():
                     free_num += 1
                 else:
                     letter = chr(alph)
-                    partition_name = f'{info[0]}{letter}'
+                    partition_name = f'{pslice}{letter}'
                     alph += 1
                 partitions = {
                     'name': partition_name,
@@ -155,8 +155,8 @@ class create_disk_partition_db():
             return partition_db
 
     def gpt_partition_db(self, disk):
-        partition_output = Popen('%s %s' % (query_partition, disk),
-                                 shell=True, stdin=PIPE, stdout=PIPE,
+        partition_output = Popen(f'{query_partition} {disk}', shell=True,
+                                 stdin=PIPE, stdout=PIPE,
                                  universal_newlines=True)
         partition_db = {}
         free_num = 1
