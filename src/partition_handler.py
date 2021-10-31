@@ -605,6 +605,8 @@ class Delete_partition():
 class autoFreeSpace():
 
     def create_mbr_partiton(self, drive, size, path, fs):
+        # remove 1M to size to avoid no space left
+        main_size = int(size) - 1
         file_disk = open(disk_file, 'w')
         file_disk.writelines(f'{drive}\n')
         file_disk.close()
@@ -633,7 +635,7 @@ class autoFreeSpace():
         write_slice.writelines(f'{main_slice.replace(drive, "")}\n')
         write_slice.close()
 
-        root_size = int(size)
+        root_size = int(main_size)
         swap_size = 2048
         root_size -= swap_size
 
@@ -695,7 +697,7 @@ class autoFreeSpace():
         if os.path.exists(f'{tmp}/create'):
             pf = open(f'{tmp}/create', 'rb')
             mpl = pickle.load(pf)
-        pl.extend(([main_slice, size]))
+        pl.extend(([main_slice, main_size]))
         mpl.append(pl)
         cf = open(f'{tmp}/create', 'wb')
         pickle.dump(mpl, cf)
@@ -709,13 +711,15 @@ class autoFreeSpace():
             self.create_mbr_partiton(disk, size, path, fs)
 
     def create_gpt_partiton(self, drive, size, path, fs, efi_exist):
+        # remove 1M to size to avoid no space left
+        main_size = int(size) - 1
         file_disk = open(disk_file, 'w')
         file_disk.writelines(f'{drive}\n')
         file_disk.close()
         write_scheme = open(scheme_file, 'w')
         write_scheme.writelines('partscheme=GPT')
         write_scheme.close()
-        root_size = int(size)
+        root_size = int(main_size)
         swap_size = 2048
         root_size -= int(swap_size)
         if self.bios_type == "UEFI" and efi_exist is False:
@@ -1214,8 +1218,7 @@ def addPartition():
                             f'freebsd-boot -i {sl} {drive}'
                     call(cmd, shell=True)
             elif set("s") & set(part):
-                # remove 1M to size to avoid no space left
-                cmd = f'sudo gpart add -a 4k -s {size - 1}M -t freebsd ' \
+                cmd = f'sudo gpart add -a 4k -s {size}M -t freebsd ' \
                     f'-i {sl} {drive}'
                 call(cmd, shell=True)
             sleep(2)
