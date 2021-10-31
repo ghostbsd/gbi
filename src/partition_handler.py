@@ -1183,7 +1183,7 @@ def bios_or_uefi():
     return output1.stdout.readlines()[0].rstrip()
 
 
-def addPartition(self):
+def addPartition():
     if os.path.exists(f'{tmp}/create'):
         pf = open(f'{tmp}/create', 'rb')
         pl = pickle.load(pf)
