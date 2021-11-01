@@ -262,7 +262,7 @@ class Delete_partition():
         partitions_info = disk_partitions['partitions']
         label_list = disk_partitions['partition-list']
         last_list_number = len(label_list) - 1
-        store_list_number = path[1]
+        store_list_number = path[2]
         size_free = int(partitions_info[label]['size'])
         if last_list_number == store_list_number and len(label_list) > 1:
             label_behind = label_list[store_list_number - 1]
@@ -404,18 +404,18 @@ class Delete_partition():
         drives_database = open(disk_db_file, 'wb')
         pickle.dump(disk_data, drives_database)
         drives_database.close()
-
-        new_partitions = open(partition_label_file, 'w')
-        for part in label_list:
-            partitions_info = disk_partitions['partitions']
-            size = partitions_info[part]['size']
-            mount_point = partitions_info[part]['mount-point']
-            file_system = partitions_info[part]['file-system']
-            stat = partitions_info[part]['stat']
-            if stat == 'New':
-                partition_text = f'{file_system} {size} {mount_point}\n'
-                new_partitions.writelines(partition_text)
-        new_partitions.close()
+        if os.path.exists(partition_label_file):
+            new_partitions = open(partition_label_file, 'w')
+            for part in label_list:
+                partitions_info = disk_partitions['partitions']
+                size = partitions_info[part]['size']
+                mount_point = partitions_info[part]['mount-point']
+                file_system = partitions_info[part]['file-system']
+                stat = partitions_info[part]['stat']
+                if stat == 'New':
+                    partition_text = f'{file_system} {size} {mount_point}\n'
+                    new_partitions.writelines(partition_text)
+            new_partitions.close()
 
     def __init__(self, part, path):
         drive = get_disk_from_partition(part)
@@ -588,7 +588,7 @@ class Delete_partition():
         pickle.dump(main_delete_list, cf)
         cf.close()
 
-        if "p" in partition:
+        if "p" in partition and os.path.exists(partition_label_file):
             new_partitions = open(partition_label_file, 'w')
             for part in partition_list:
                 partitions_info = disk_data[drive]['partitions']
