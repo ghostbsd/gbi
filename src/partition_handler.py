@@ -882,9 +882,9 @@ class createLabel():
             drive_part = disk_db[drive]['partitions']
             part_info = drive_part[main_slice]['partitions'][partition]
             if part_info['stat'] == 'New':
-                partition_text = f'{part_info["file_system"]} ' \
+                partition_text = f'{part_info["file-system"]} ' \
                     f'{part_info["size"]} ' \
-                    f'{part_info["mount_point"]}\n'
+                    f'{part_info["mount-point"]}\n'
                 write_partition.writelines(partition_text)
         write_partition.close()
 
@@ -1084,9 +1084,9 @@ class createPartition():
         for partition in partition_list:
             partition_info = disk_data[drive]['partitions'][partition]
             if partition_info['stat'] == 'New':
-                partition_text = f'{partition_info["file_system"]} ' \
+                partition_text = f'{partition_info["file-system"]} ' \
                     f'{partition_info["size"]} ' \
-                    f'{partition_info["mount_point"]}\n'
+                    f'{partition_info["mount-point"]}\n'
                 write_partition.writelines(partition_text)
         write_partition.close()
 
