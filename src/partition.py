@@ -753,23 +753,23 @@ class Partitions():
             mount_point = ''
             disk_size = str(disk_info['size'])
             disk_partitions = disk_info['partitions']
-            partition_list = disk_info['partition_list']
+            partition_list = disk_info['partition-list']
             pinter1 = self.store.append(None, [disk, disk_size, mount_point,
                                         disk_schemee, True])
             for partition in partition_list:
                 partition_info = disk_partitions[partition]
-                file_system = partition_info['file_system']
-                mount_point = partition_info['mount_point']
+                file_system = partition_info['file-system']
+                mount_point = partition_info['mount-point']
                 partition_size = str(partition_info['size'])
                 partition_partitions = partition_info['partitions']
-                partition_list = partition_info['partition_list']
+                partition_list = partition_info['partition-list']
                 pinter2 = self.store.append(pinter1, [partition,
                                             partition_size, mount_point,
                                             file_system, True])
                 for partition in partition_list:
                     partition_info = partition_partitions[partition]
-                    file_system = partition_info['file_system']
-                    mount_point = partition_info['mount_point']
+                    file_system = partition_info['file-system']
+                    mount_point = partition_info['mount-point']
                     partition_size = str(partition_info['size'])
                     self.store.append(pinter2, [partition, partition_size,
                                       mount_point, file_system, True])
