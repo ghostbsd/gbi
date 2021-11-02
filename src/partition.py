@@ -120,23 +120,23 @@ class Partitions():
             else:
                 self.fs_type.append_text("BOOT")
                 if not os.path.exists(partition_label_file):
-                    self.fs_type.set_active(5)
+                    self.fs_type.set_active(6)
                     self.fs = "BOOT"
                 elif len(self.partitions) == 0:
-                    self.fs_type.set_active(5)
+                    self.fs_type.set_active(6)
                     self.fs = "BOOT"
                 elif self.mountpoint_behind == "/" or self.fs_behind == "ZFS":
-                    self.fs_type.set_active(4)
+                    self.fs_type.set_active(5)
                     self.fs = "SWAP"
                 else:
                     self.fs_type.set_active(0)
                     self.fs = "ZSF"
         elif self.mountpoint_behind == "/" or self.fs_behind == "ZFS":
-            self.fs_type.set_active(4)
+            self.fs_type.set_active(5)
             self.fs = "SWAP"
         else:
-            self.fs_type.set_active(0)
-            self.fs = "ZFS"
+            self.fs_type.set_active(4)
+            self.fs = "UFS+SUJ"
         self.fs_type.connect("changed", self.set_fs)
         adj = Gtk.Adjustment(free_space, 0, free_space, 1, 100, 0)
         self.entry = Gtk.SpinButton(adjustment=adj, numeric=True)
@@ -238,8 +238,12 @@ class Partitions():
         self.fs_type.append_text('UFS+S')
         self.fs_type.append_text('UFS+J')
         self.fs_type.append_text('UFS+SUJ')
-        self.fs_type.set_active(0)
-        self.fs = "ZFS"
+        if self.scheme == 'GPT':
+            self.fs_type.set_active(0)
+            self.fs = "ZFS"
+        else:
+            self.fs_type.set_active(4)
+            self.fs = "UFS+SUJ"
         self.fs_type.connect("changed", self.on_fs)
         table.attach(label1, 0, 1, 1, 2)
         table.attach(self.fs_type, 1, 2, 1, 2)
