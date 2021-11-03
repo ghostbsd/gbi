@@ -73,7 +73,10 @@ class bootManager():
         self.vbox1.pack_start(hbox1, True, True, 10)
         bbox1 = Gtk.VBox()
         bbox1.show()
-        self.refind = Gtk.RadioButton.new_with_label_from_widget(None, "Setup rEFInd boot manager")
+        self.refind = Gtk.RadioButton().new_with_label_from_widget(
+            None,
+            "Setup rEFInd boot manager"
+        )
         bbox1.pack_start(self.refind, False, True, 10)
         self.refind.connect("toggled", self.boot_manager, "refind")
         self.refind.show()
@@ -81,7 +84,10 @@ class bootManager():
             self.refind.set_sensitive(True)
         else:
             self.refind.set_sensitive(False)
-        self.bsd = Gtk.RadioButton.new_with_label_from_widget(self.refind, "Setup FreeBSD boot manager")
+        self.bsd = Gtk.RadioButton.new_with_label_from_widget(
+            self.refind,
+            "Setup FreeBSD boot manager"
+        )
         bbox1.pack_start(self.bsd, False, True, 10)
         self.bsd.connect("toggled", self.boot_manager, "bsd")
         self.bsd.show()
@@ -89,7 +95,10 @@ class bootManager():
             self.bsd.set_sensitive(True)
         else:
             self.bsd.set_sensitive(False)
-        self.none = Gtk.RadioButton.new_with_label_from_widget(self.bsd, f"FreeBSD {loader} loader only")
+        self.none = Gtk.RadioButton.new_with_label_from_widget(
+            self.bsd,
+            f"FreeBSD {loader} loader only"
+        )
         bbox1.pack_start(self.none, False, True, 10)
         self.none.connect("toggled", self.boot_manager, "none")
         self.none.show()

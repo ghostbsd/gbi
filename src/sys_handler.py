@@ -4,6 +4,7 @@ from subprocess import Popen, PIPE
 
 pc_sysinstall = '/usr/local/sbin/pc-sysinstall'
 
+
 def language_dictionary():
     langs = Popen(f'{pc_sysinstall} query-langs', shell=True, stdin=PIPE,
                   stdout=PIPE, universal_newlines=True,

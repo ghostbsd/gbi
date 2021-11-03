@@ -1,0 +1,20 @@
+on: [pull_request]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    name: Verify code with Lintly-Flake8
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Test action
+        id: test
+        uses: grantmcconnaughey/lintly-flake8-github-action@v1.0
+        with:
+          # The GitHub API token to create reviews with
+          token: ${{ secrets.GITHUB_TOKEN }}
+          # Fail if "new" violations detected or "any", default "new"
+          failIf: any
+          # Additional arguments to pass to flake8,
+          # default "." (current directory)
+          args: "--ignore=E402,W503 ."

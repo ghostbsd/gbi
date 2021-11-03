@@ -55,6 +55,8 @@ lib_gbi = [
     'src/addUser.py',
     'src/welcome_live.py',
     'src/network_setup.py',
+    'src/disk.png',
+    'src/laptop.png'
 ]
 
 lib_gbi_image = [

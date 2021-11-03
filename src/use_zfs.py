@@ -69,7 +69,8 @@ def lowerUpperNumber(strg, search=re.compile(r'[^a-zA-Z0-9]').search):
 
 # Find if pasword contain only lowercase, uppercase numbers
 # and some special character.
-def allCharacter(strg, search=re.compile(r'[^a-zA-Z0-9~\!@#\$%\^&\*_\+":;\'\-]').search):
+def allCharacter(strg):
+    search = re.compile(r'[^a-zA-Z0-9~\!@#\$%\^&\*_\+":;\'\-]').search
     return not bool(search(strg))
 
 
@@ -91,7 +92,8 @@ class ZFS():
             pfile.writelines('ashift=12\n\n')
         else:
             pfile.writelines('ashift=9\n\n')
-        pfile.writelines('disk0=%s\n' % zfs_dsk_list[0].partition('-')[0].rstrip())
+        disk = zfs_dsk_list[0].partition('-')[0].rstrip()
+        pfile.writelines(f'disk0={disk}\n')
         pfile.writelines('partition=ALL\n')
         pfile.writelines('partscheme=%s\n' % self.scheme)
         pfile.writelines('commitDiskPart\n\n')
@@ -165,28 +167,32 @@ class ZFS():
                 self.button3.set_sensitive(False)
         elif self.mirror == "3 disk raidz1":
             self.poolType = 'raidz1'
-            self.mirrorTips.set_text("Please select 3 drive for raidz1" + mirror_mesage)
+            self.mirrorTips.set_text(f"Please select 3 drive for "
+                                     f"raidz1{mirror_mesage}")
             if len(zfs_dsk_list) == 3:
                 self.button3.set_sensitive(True)
             else:
                 self.button3.set_sensitive(False)
         elif self.mirror == "4 disk raidz2":
             self.poolType = 'raidz2'
-            self.mirrorTips.set_text("Please select 4 drive for raidz2" + mirror_mesage)
+            self.mirrorTips.set_text(f"Please select 4 drive for "
+                                     f"raidz2{mirror_mesage}")
             if len(zfs_dsk_list) == 4:
                 self.button3.set_sensitive(True)
             else:
                 self.button3.set_sensitive(False)
         elif self.mirror == "5 disk raidz3":
             self.poolType = 'raidz3'
-            self.mirrorTips.set_text("Please select 5 drive for raidz3" + mirror_mesage)
+            self.mirrorTips.set_text("Please select 5 drive for "
+                                     f"raidz3{mirror_mesage}")
             if len(zfs_dsk_list) == 5:
                 self.button3.set_sensitive(True)
             else:
                 self.button3.set_sensitive(False)
         elif self.mirror == "2+ disk stripe":
             self.poolType = 'stripe'
-            self.mirrorTips.set_text("Please select 2 or more drive for stripe" + mirror_mesage)
+            self.mirrorTips.set_text("Please select 2 or more drive for "
+                                     f"stripe{mirror_mesage}")
             if len(zfs_dsk_list) >= 2:
                 self.button3.set_sensitive(True)
             else:
@@ -361,8 +367,8 @@ class ZFS():
         zfs4kcheck.connect("toggled", self.on_check)
         zfs4kcheck.set_active(True)
         # Swap Size
-        # ram = Popen(memory, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT,
-        #             universal_newlines=True, close_fds=True)
+        # ram = Popen(memory, shell=True, stdin=PIPE, stdout=PIPE,
+        #             stderr=STDOUT, universal_newlines=True, close_fds=True)
         # mem = ram.stdout.read()
         swap = 2048
         swp_size_label = Gtk.Label('<b>Swap Size(MB)</b>')
@@ -412,8 +418,8 @@ class ZFS():
         grid.attach(self.mirrorTips, 1, 3, 8, 1)
         grid.attach(zfs4kcheck, 9, 3, 2, 1)
         grid.attach(sw, 1, 4, 10, 3)
-        grid.attach(scheme_label, 1, 9, 1, 1)
-        grid.attach(shemebox, 2, 9, 1, 1)
+        # grid.attach(scheme_label, 1, 9, 1, 1)
+        # grid.attach(shemebox, 2, 9, 1, 1)
         grid.attach(swp_size_label, 9, 9, 1, 1)
         grid.attach(self.swap_entry, 10, 9, 1, 1)
         # grid.attach(self.swap_encrypt_check, 9, 15, 11, 12)
@@ -433,7 +439,8 @@ class ZFS():
 
     def digit_only(self, *args):
         text = self.swap_entry.get_text().strip()
-        self.swap_entry.set_text(''.join([i for i in text if i in '0123456789']))
+        digit = ''.join([i for i in text if i in '0123456789'])
+        self.swap_entry.set_text(digit)
 
     def check_if_small_disk(self, size):
         if len(zfs_dsk_list) != 0:
