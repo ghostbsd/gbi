@@ -463,6 +463,8 @@ class Partitions():
             elif self.scheme == "GPT":
                 self.labelEditor(self.path, self.slice, self.size, 'GPT',
                                  False)
+        else:
+            print('This method of creating partition is not implemented')
 
     def partition_selection(self, widget):
         model, self.iter, = widget.get_selected()
@@ -479,7 +481,9 @@ class Partitions():
                 self.change_schemes = False
             else:
                 if len(self.path) == 1:
-                    if how_partition(self.disk) == 1:
+                    if how_partition(self.disk) == 0:
+                        self.change_schemes = True
+                    elif how_partition(self.disk) == 1:
                         slice_path = f'{self.path[0]}:0'
                         tree_iter2 = model.get_iter(slice_path)
                         if 'freespace' in model.get_value(tree_iter2, 0):
