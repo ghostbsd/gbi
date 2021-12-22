@@ -130,7 +130,7 @@ class Partitions():
                     self.fs = "SWAP"
                 else:
                     self.fs_type.set_active(0)
-                    self.fs = "ZSF"
+                    self.fs = "ZFS"
         elif self.mountpoint_behind == "/" or self.fs_behind == "ZFS":
             self.fs_type.set_active(5)
             self.fs = "SWAP"
