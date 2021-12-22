@@ -130,7 +130,7 @@ class Partitions():
                     self.fs = "SWAP"
                 else:
                     self.fs_type.set_active(0)
-                    self.fs = "ZSF"
+                    self.fs = "ZFS"
         elif self.mountpoint_behind == "/" or self.fs_behind == "ZFS":
             self.fs_type.set_active(5)
             self.fs = "SWAP"
@@ -589,20 +589,25 @@ class Partitions():
                                 break
                             num += 1
                     if 'BOOT' in self.partitions[0] and bios_type == 'BIOS':
-                        if "/boot\n" in self.partitions[1]:
-                            if len(self.partitions) >= 3:
-                                if '/\n' in self.partitions[2]:
-                                    self.button3.set_sensitive(True)
-                                elif 'ZFS' in self.partitions[2]:
-                                    self.button3.set_sensitive(True)
+                        if len(self.partitions) >= 2:
+                            if "/boot\n" in self.partitions[1]:
+                                if len(self.partitions) >= 3:
+                                    if '/\n' in self.partitions[2]:
+                                        self.button3.set_sensitive(True)
+                                    elif 'ZFS' in self.partitions[2]:
+                                        self.button3.set_sensitive(True)
+                                    else:
+                                        self.button3.set_sensitive(False)
                                 else:
                                     self.button3.set_sensitive(False)
+                            elif '/\n' in self.partitions[1]:
+                                self.button3.set_sensitive(True)
+                            elif 'ZFS' in self.partitions[1]:
+                                self.button3.set_sensitive(True)
                             else:
                                 self.button3.set_sensitive(False)
-                        elif '/\n' in self.partitions[1]:
-                            self.button3.set_sensitive(True)
-                        elif 'ZFS' in self.partitions[1]:
-                            self.button3.set_sensitive(True)
+                        else:
+                            self.button3.set_sensitive(False)
                     elif efi_already_exist is True and bios_type == 'UEFI':
                         if '/\n' in self.partitions[0]:
                             self.button3.set_sensitive(True)
@@ -620,19 +625,22 @@ class Partitions():
                                 self.button3.set_sensitive(False)
                         else:
                             self.button3.set_sensitive(False)
-                    elif ('UEFI' in self.partitions[0]
-                          and '/\n' in self.partitions[1]):
-                        self.button3.set_sensitive(True)
-                    elif ('UEFI' in self.partitions[0]
-                          and 'ZFS' in self.partitions[1]):
-                        self.button3.set_sensitive(True)
-                    elif ('UEFI' in self.partitions[0]
-                          and "/boot\n" in self.partitions[1]):
-                        if len(self.partitions) >= 3:
-                            if '/\n' in self.partitions[2]:
-                                self.button3.set_sensitive(True)
-                            elif 'ZFS' in self.partitions[2]:
-                                self.button3.set_sensitive(True)
+                    elif len(self.partitions) >= 2:
+                        if ('UEFI' in self.partitions[0]
+                                and '/\n' in self.partitions[1]):
+                            self.button3.set_sensitive(True)
+                        elif ('UEFI' in self.partitions[0]
+                              and 'ZFS' in self.partitions[1]):
+                            self.button3.set_sensitive(True)
+                        elif ('UEFI' in self.partitions[0]
+                              and "/boot\n" in self.partitions[1]):
+                            if len(self.partitions) >= 3:
+                                if '/\n' in self.partitions[2]:
+                                    self.button3.set_sensitive(True)
+                                elif 'ZFS' in self.partitions[2]:
+                                    self.button3.set_sensitive(True)
+                                else:
+                                    self.button3.set_sensitive(False)
                             else:
                                 self.button3.set_sensitive(False)
                         else:

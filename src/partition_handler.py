@@ -1203,9 +1203,10 @@ def addPartition():
                 if bios_or_uefi() == 'UEFI':
                     cmd = f'sudo gpart add -a 4k -s {size}M -t efi ' \
                         f'-i {sl} {drive}'
-                    sleep(2)
-                    cmd2 = f'sudo newfs_msdos -F 16 {drive}p{sl}'
                     call(cmd, shell=True)
+                    sleep(1)
+                    call(f'sudo zpool labelclear -f {drive}p{sl}', shell=True)
+                    cmd2 = f'sudo newfs_msdos -F 16 {drive}p{sl}'
                     call(cmd2, shell=True)
                 else:
                     if boot == "grub":
@@ -1217,6 +1218,7 @@ def addPartition():
                         cmd = 'sudo gpart add -a 4k -s 512 -t ' \
                             f'freebsd-boot -i {sl} {drive}'
                     call(cmd, shell=True)
+                    call(f'sudo zpool labelclear -f {drive}p{sl}', shell=True)
             elif set("s") & set(part):
                 cmd = f'sudo gpart add -a 4k -s {size}M -t freebsd ' \
                     f'-i {sl} {drive}'
