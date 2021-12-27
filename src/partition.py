@@ -485,11 +485,15 @@ class Partitions():
                         self.change_schemes = True
                     elif how_partition(self.disk) == 1:
                         slice_path = f'{self.path[0]}:0'
-                        tree_iter2 = model.get_iter(slice_path)
-                        if 'freespace' in model.get_value(tree_iter2, 0):
+                        # Try to see if tree_iter2 exist
+                        try:
+                            tree_iter2 = model.get_iter(slice_path)
+                            if 'freespace' in model.get_value(tree_iter2, 0):
+                                self.change_schemes = True
+                            else:
+                                self.change_schemes = False
+                        except ValueError:
                             self.change_schemes = True
-                        else:
-                            self.change_schemes = False
                     else:
                         self.change_schemes = False
                     self.slice = 'Not selected'
