@@ -131,6 +131,7 @@ class AddUser:
         self.label5 = Gtk.Label("Shell")
         shell = Gtk.ComboBoxText()
         self.sh = '/usr/local/bin/fish'
+        # Keeping this code for future project example.
         shell.append_text('sh')
         shell.append_text('csh')
         shell.append_text('tcsh')
@@ -164,8 +165,8 @@ class AddUser:
         # set image for password matching
         self.img = Gtk.Image()
         table.attach(self.img, 2, 3, 5, 6)
-        table.attach(self.label5, 0, 1, 6, 7)
-        table.attach(shell, 1, 2, 6, 7)
+        # table.attach(self.label5, 0, 1, 6, 7)
+        # table.attach(shell, 1, 2, 6, 7)
         box2.pack_start(table, False, False, 0)
         self.box3 = Gtk.VBox(False, 10)
         self.box3.set_border_width(10)
