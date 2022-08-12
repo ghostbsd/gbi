@@ -3,7 +3,11 @@
 from gi.repository import Gtk, Gdk
 import os
 import os.path
-from sys_handler import language_dictionary
+from sys_handler import (
+    language_dictionary,
+    localize_system
+)
+
 # Folder use for the installer.
 tmp = "/tmp/.gbi/"
 installer = "/usr/local/lib/gbi/"
@@ -54,6 +58,9 @@ class Language:
         lang_file.writelines(self.language)
         lang_file.close()
         return
+
+    def save_language(self):
+        localize_system(self.language)
 
     # Initial definition.
     def __init__(self):
