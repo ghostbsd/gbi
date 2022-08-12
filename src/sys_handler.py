@@ -1,8 +1,18 @@
 #!/usr/bin/env python
 
-from subprocess import Popen, PIPE
+import re
+import os
+from subprocess import Popen, run, PIPE
 
 pc_sysinstall = '/usr/local/sbin/pc-sysinstall'
+
+
+def replace_patern(current, new, file):
+    parser_file = open(file, 'r').read()
+    parser_patched = re.sub(current, new, parser_file)
+    save_parser_file = open(file, 'w')
+    save_parser_file.writelines(parser_patched)
+    save_parser_file.close()
 
 
 def language_dictionary():
@@ -77,3 +87,23 @@ def timezone_dictionary():
         dictionary[continent] = city_list
         last_continent = continent
     return dictionary
+
+
+def localize_system(locale):
+    replace_patern('lang=C', f'lang={locale}', '/etc/login.conf')
+    run()
+    replace_patern('en_US', locale, '/etc/profile')
+    replace_patern('en_US', locale, '/usr/share/skel/dot.profile')
+
+    if os.path.exists("/usr/local/share/xgreeters/slick-greeter.desktop"):
+        replace_patern(
+            'Exec=slick-greeter',
+            f'Exec=env LANG={locale}.UTF-8 slick-greeter',
+            '/usr/local/share/xgreeters/slick-greeter.desktop'
+        )
+    elif os.path.exists("/usr/local/share/xgreeters/lightdm-gtk-greeter.desktop"):
+        replace_patern(
+            'Exec=lightdm-gtk-greete',
+            f'Exec=env LANG={locale}.UTF-8 lightdm-gtk-greeter',
+            '/usr/local/share/xgreeters/slick-greeter.desktop'
+        )
