@@ -3,15 +3,11 @@
 # root.py set root password.
 
 from gi.repository import Gtk, Gdk
-import os
-import re
 import pickle
+from gbi_common import password_strength
 
 # Directory use from the installer.
 tmp = "/tmp/.gbi/"
-installer = "/usr/local/lib/gbi/"
-if not os.path.exists(tmp):
-    os.makedirs(tmp)
 
 cssProvider = Gtk.CssProvider()
 cssProvider.load_from_path('/usr/local/lib/gbi/ghostbsd-style.css')
@@ -24,50 +20,14 @@ styleContext.add_provider_for_screen(
 )
 
 
-# Find if pasword contain only lower case and number
-def lowerCase(strg, search=re.compile(r'[^a-z]').search):
-    return not bool(search(strg))
-
-
-# Find if pasword contain only upper case
-def upperCase(strg, search=re.compile(r'[^A-Z]').search):
-    return not bool(search(strg))
-
-
-# Find if pasword contain only lower case and number
-def lowerandNunber(strg, search=re.compile(r'[^a-z0-9]').search):
-    return not bool(search(strg))
-
-
-# Find if pasword contain only upper case and number
-def upperandNunber(strg, search=re.compile(r'[^A-Z0-9]').search):
-    return not bool(search(strg))
-
-
-# Find if pasword contain only lower and upper case and
-def lowerUpperCase(strg, search=re.compile(r'[^a-zA-Z]').search):
-    return not bool(search(strg))
-
-
-# Find if pasword contain only lower and upper case and
-def lowerUpperNumber(strg, search=re.compile(r'[^a-zA-Z0-9]').search):
-    return not bool(search(strg))
-
-
-# Find if pasword contain only lower and upper case and
-def allCharacter(strg):
-    search = re.compile(r'[^a-zA-Z0-9~\!@#\$%\^&\*_\+":;\'\-]').search
-    return not bool(search(strg))
-
-
 class RootUser:
+
     def save_selection(self):
-        if self.password.get_text() == self.repassword.get_text():
-            f = open('%sroot' % tmp, 'wb')
-            rp = self.password.get_text()
-            ul = [rp]
-            pickle.dump(ul, f)
-            f.close()
+        f = open(f'{tmp}root', 'wb')
+        rp = self.password.get_text()
+        ul = [rp]
+        pickle.dump(ul, f)
+        f.close()
 
     def __init__(self, button3):
         self.vbox1 = Gtk.VBox(False, 0)
@@ -106,74 +66,9 @@ class RootUser:
     def get_model(self):
         return self.vbox1
 
-    def password_strength(self):
-        password = self.password.get_text()
-        same_character_type = any(
-            [
-                lowerCase(password),
-                upperCase(password),
-                password.isdigit()
-            ]
-        )
-        mix_character = any(
-            [
-                lowerandNunber(password),
-                upperandNunber(password),
-                lowerUpperCase(password)
-            ]
-        )
-        if ' ' in password or '\t' in password:
-            self.label3.set_text("Space not allowed")
-        elif len(password) <= 4:
-            self.label3.set_text("Super Weak")
-        elif len(password) <= 8 and same_character_type:
-            self.label3.set_text("Super Weak")
-        elif len(password) <= 8 and mix_character:
-            self.label3.set_text("Very Weak")
-        elif len(password) <= 8 and lowerUpperNumber(password):
-            self.label3.set_text("Fairly Weak")
-        elif len(password) <= 8 and allCharacter(password):
-            self.label3.set_text("Weak")
-        elif len(password) <= 12 and same_character_type:
-            self.label3.set_text("Very Weak")
-        elif len(password) <= 12 and mix_character:
-            self.label3.set_text("Fairly Weak")
-        elif len(password) <= 12 and lowerUpperNumber(password):
-            self.label3.set_text("Weak")
-        elif len(password) <= 12 and allCharacter(password):
-            self.label3.set_text("Strong")
-        elif len(password) <= 16 and same_character_type:
-            self.label3.set_text("Fairly Weak")
-        elif len(password) <= 16 and mix_character:
-            self.label3.set_text("Weak")
-        elif len(password) <= 16 and lowerUpperNumber(password):
-            self.label3.set_text("Strong")
-        elif len(password) <= 16 and allCharacter(password):
-            self.label3.set_text("Fairly Strong")
-        elif len(password) <= 20 and same_character_type:
-            self.label3.set_text("Weak")
-        elif len(password) <= 20 and mix_character:
-            self.label3.set_text("Strong")
-        elif len(password) <= 20 and lowerUpperNumber(password):
-            self.label3.set_text("Fairly Strong")
-        elif len(password) <= 20 and allCharacter(password):
-            self.label3.set_text("Very Strong")
-        elif len(password) <= 24 and same_character_type:
-            self.label3.set_text("Strong")
-        elif len(password) <= 24 and mix_character:
-            self.label3.set_text("Fairly Strong")
-        elif len(password) <= 24 and lowerUpperNumber(password):
-            self.label3.set_text("Very Strong")
-        elif len(password) <= 24 and allCharacter(password):
-            self.label3.set_text("Super Strong")
-        elif same_character_type:
-            self.label3.set_text("Fairly Strong")
-        else:
-            self.label3.set_text("Super Strong")
-
     def password_verification(self, widget, button3):
-        self.password_strength()
         password = self.password.get_text()
+        password_strength(password, self.label3)
         repassword = self.repassword.get_text()
         if password == repassword and password != "" and " " not in password:
             self.img.set_from_stock(Gtk.STOCK_YES, 5)

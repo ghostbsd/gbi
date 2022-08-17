@@ -200,8 +200,7 @@ class gbsd_cfg():
             f.writelines('\n# Network Configuration\n')
             f.writelines('hostname=installed\n')
             f.writelines('\n# command to prepare first boot\n')
-            f.writelines("runCommand=sysrc -f /etc/rc.conf "
-                         "hostname='installed'\n")
+            f.writelines("runCommand=sysrc hostname='installed'\n")
             f.writelines("runCommand=sed -i '' 's/ghostbsd/root/g' "
                          "/etc/gettytab\n")
             f.writelines("runCommand=sed -i '' 's/ghostbsd/root/g' "

@@ -40,6 +40,7 @@ lib_gbi = [
     'src/end.py',
     'src/error.py',
     'src/gbiWindow.py',
+    'src/gbi_common.py',
     'src/ghostbsd-style.css',
     'src/install.py',
     'src/installType.py',
