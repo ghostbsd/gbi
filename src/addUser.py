@@ -3,6 +3,7 @@
 from gi.repository import Gtk, Gdk
 import pickle
 from gbi_common import password_strength
+from sys_handler import set_addmin_user
 
 # Directory use from the installer.
 tmp = "/tmp/.gbi/"
@@ -28,8 +29,8 @@ class AddUser:
         name = self.name.get_text()
         up = self.password.get_text()
         shell = self.sh
-        hf = '/home/%s' % self.user.get_text()
-        hst = self.host.get_text()
+        hf = f'/home/{uname}'
+        hst = f'{uname}-ghostbsd'
         ul = [uname, name, up, shell, hf, hst]
         pickle.dump(ul, uf)
         uf.close()
@@ -39,6 +40,17 @@ class AddUser:
         ul = [rp]
         pickle.dump(ul, rf)
         rf.close()
+
+    def save_admin_user(self):
+        # Set admin user
+        uname = self.user.get_text()
+        name = self.name.get_text()
+        up = self.password.get_text()
+        shell = self.sh
+        hf = f'/home/{uname}'
+        hst = f'{uname}-ghostbsd'
+        # Set root password
+        set_addmin_user(uname, name, up, shell, hf, hst)
 
     def on_shell(self, widget):
         SHELL = widget.get_active_text()
@@ -113,15 +125,15 @@ class AddUser:
         label.set_alignment(0, .5)
         table = Gtk.Table(1, 3, True)
         table.set_row_spacings(10)
-        pcname = Gtk.Label("Hostname")
+        # pcname = Gtk.Label("Hostname")
         self.host = Gtk.Entry()
         # table.attach(label, 0, 2, 0, 1)
         table.attach(self.label2, 0, 1, 1, 2)
         table.attach(self.name, 1, 2, 1, 2)
-        table.attach(pcname, 0, 1, 2, 3)
-        table.attach(self.host, 1, 2, 2, 3)
-        table.attach(Username, 0, 1, 3, 4)
-        table.attach(self.user, 1, 2, 3, 4)
+        # table.attach(pcname, 0, 1, 2, 3)
+        # table.attach(self.host, 1, 2, 2, 3)
+        table.attach(Username, 0, 1, 2, 3)
+        table.attach(self.user, 1, 2, 2, 3)
         table.attach(self.labelpass, 0, 1, 4, 5)
         table.attach(self.password, 1, 2, 4, 5)
         self.label3 = Gtk.Label()

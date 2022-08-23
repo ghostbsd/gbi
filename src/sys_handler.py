@@ -91,7 +91,6 @@ def timezone_dictionary():
 
 def localize_system(locale):
     replace_patern('lang=C', f'lang={locale}', '/etc/login.conf')
-    run()
     replace_patern('en_US', locale, '/etc/profile')
     replace_patern('en_US', locale, '/usr/share/skel/dot.profile')
 
@@ -107,3 +106,13 @@ def localize_system(locale):
             f'Exec=env LANG={locale}.UTF-8 lightdm-gtk-greeter',
             '/usr/local/share/xgreeters/slick-greeter.desktop'
         )
+
+
+def set_addmin_user(username, name, password, shell, homedir, hostname):
+    # Set Root user
+    run(f"echo '{password}' | pw usermod -n root -h 0", shell=True)
+    cmd = f"echo '{password}' | pw useradd {username} -c {name} -h 0" \
+        f" -s {shell} -m -d {homedir} -g wheel,operator"
+    run(cmd, shell=True)
+    run(f"sysrc hostname={hostname}", shell=True)
+    run(f"hostname {hostname}", shell=True)

@@ -22,16 +22,13 @@ styleContext.add_provider_for_screen(
 class AddUsers:
 
     def save_selection(self):
-        f = open(userfile, 'wb')
         uname = self.user.get_text()
         name = self.name.get_text()
         up = self.password.get_text()
         shell = self.sh
         hf = '/home/%s' % self.user.get_text()
         hst = self.host.get_text()
-        ul = [uname, name, up, shell, hf, hst]
-        pickle.dump(ul, f)
-        f.close()
+        ul = [uname, name, up, shell, hf]
 
     def on_shell(self, widget):
         SHELL = widget.get_active_text()
