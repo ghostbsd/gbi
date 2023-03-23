@@ -28,6 +28,25 @@ def language_dictionary():
     return dictionary
 
 
+def localize_system(locale):
+    replace_patern('lang=C', f'lang={locale}', '/etc/login.conf')
+    replace_patern('en_US', locale, '/etc/profile')
+    replace_patern('en_US', locale, '/usr/share/skel/dot.profile')
+
+    if os.path.exists("/usr/local/share/xgreeters/slick-greeter.desktop"):
+        replace_patern(
+            'Exec=slick-greeter',
+            f'Exec=env LANG={locale}.UTF-8 slick-greeter',
+            '/usr/local/share/xgreeters/slick-greeter.desktop'
+        )
+    elif os.path.exists("/usr/local/share/xgreeters/lightdm-gtk-greeter.desktop"):
+        replace_patern(
+            'Exec=lightdm-gtk-greete',
+            f'Exec=env LANG={locale}.UTF-8 lightdm-gtk-greeter',
+            '/usr/local/share/xgreeters/slick-greeter.desktop'
+        )
+
+
 def keyboard_dictionary():
     xkeyboard_layouts = Popen(f'{pc_sysinstall} xkeyboard-layouts', shell=True,
                               stdout=PIPE,
@@ -66,6 +85,23 @@ def keyboard_models():
     return dictionary
 
 
+def change_keyboard(kb_layout, kb_variant=None, kb_model=None):
+    if kb_variant is None and kb_model is not None:
+        run(f"setxkbmap -layout {kb_layout} -model {kb_model}", shell=True)
+    elif kb_variant is not None and kb_model is None:
+        run(f"setxkbmap -layout {kb_layout} -variant {kb_variant}", shell=True)
+    elif kb_variant is not None and kb_model is not None:
+        set_kb_cmd = f"setxkbmap -layout {kb_layout} -variant {kb_variant} " \
+            f"-model {kb_model}"
+        run(set_kb_cmd, shell=True)
+    else:
+        run(f"setxkbmap -layout {kb_layout}", shell=True)
+
+
+def set_keyboard(kb_layout, kb_variant, kb_model):
+    pass
+
+
 def timezone_dictionary():
     tz_list = Popen(f'{pc_sysinstall} list-tzones', shell=True,
                     stdout=PIPE, universal_newlines=True).stdout.readlines()
@@ -87,25 +123,6 @@ def timezone_dictionary():
         dictionary[continent] = city_list
         last_continent = continent
     return dictionary
-
-
-def localize_system(locale):
-    replace_patern('lang=C', f'lang={locale}', '/etc/login.conf')
-    replace_patern('en_US', locale, '/etc/profile')
-    replace_patern('en_US', locale, '/usr/share/skel/dot.profile')
-
-    if os.path.exists("/usr/local/share/xgreeters/slick-greeter.desktop"):
-        replace_patern(
-            'Exec=slick-greeter',
-            f'Exec=env LANG={locale}.UTF-8 slick-greeter',
-            '/usr/local/share/xgreeters/slick-greeter.desktop'
-        )
-    elif os.path.exists("/usr/local/share/xgreeters/lightdm-gtk-greeter.desktop"):
-        replace_patern(
-            'Exec=lightdm-gtk-greete',
-            f'Exec=env LANG={locale}.UTF-8 lightdm-gtk-greeter',
-            '/usr/local/share/xgreeters/slick-greeter.desktop'
-        )
 
 
 def set_addmin_user(username, name, password, shell, homedir, hostname):
