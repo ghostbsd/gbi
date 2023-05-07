@@ -100,11 +100,7 @@ class installWindow():
                           "FreeBSD for those who lack the technical expertise "
                           "required to use it and lower the entry-level of "
                           "using BSD. \n\nWe hope you'll enjoy our BSD "
-                          "operating system.\n\nWhile the operating system "
-                          "is installing, you can join us on "
-                          "<a href='https://t.me/ghostbsd'>Telegram</a> "
-                          "and our <a href='https://forums.ghostbsd.org/'>"
-                          "Forums</a>.")
+                          "operating system.")
         label2.set_justify(Gtk.Justification.LEFT)
         label2.set_line_wrap(True)
         # label2.set_max_width_chars(10)
