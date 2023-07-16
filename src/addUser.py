@@ -92,6 +92,8 @@ class AddUser:
             self.sh = '/usr/local/bin/zsh'
         elif SHELL == 'ksh':
             self.sh = '/usr/local/bin/ksh93'
+        elif SHELL == 'elvish':
+            self.sh = '/usr/local/bin/elvish'
 
     def userAndHost(self, widget):
         username = self.name.get_text().split()
@@ -138,6 +140,7 @@ class AddUser:
         shell.append_text('fish')
         shell.append_text('bash')
         shell.append_text('rbash')
+        shell.append_text('elvish')
         shell.append_text('ksh')
         shell.append_text('zsh')
         shell.set_active(3)
