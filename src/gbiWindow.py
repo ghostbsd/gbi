@@ -48,7 +48,7 @@ from use_ufs import use_ufs
 from partition import Partitions
 from use_zfs import ZFS
 from boot_manager import bootManager
-from addUser import AddUser
+from add_admin import AddUser
 from partition_handler import create_disk_partition_db
 from install import installProgress, installWindow
 logo = "/usr/local/lib/gbi/image/logo.png"
@@ -152,15 +152,15 @@ class MainWindow():
             Mbox = Gtk.VBox(False, 0)
             Mbox.show()
             self.bootmanager = bootManager()
-            get_root = self.bootmanager.get_model()
-            Mbox.pack_start(get_root, True, True, 0)
+            get_bootmanager = self.bootmanager.get_model()
+            Mbox.pack_start(get_bootmanager, True, True, 0)
             label = Gtk.Label("Boot Option")
             self.notebook.insert_page(Mbox, label, 5)
             self.window.show_all()
             self.notebook.next_page()
             self.button3.set_sensitive(True)
         elif page == 5:
-            self.rootuser.save_selection()
+            self.bootmanager.save_selection()
             Abox = Gtk.VBox(False, 0)
             Abox.show()
             self.adduser = AddUser(self.button3)
