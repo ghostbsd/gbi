@@ -160,7 +160,6 @@ class MainWindow():
             self.notebook.next_page()
             self.button3.set_sensitive(True)
         elif page == 5:
-            self.bootmanager.save_selection()
             Abox = Gtk.VBox(False, 0)
             Abox.show()
             self.adduser = AddUser(self.button3)
