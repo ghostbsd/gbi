@@ -161,7 +161,7 @@ class Partitions():
         self.mountpoint_box.append_text('/root')
         self.mountpoint_box.append_text('/tmp')
         self.mountpoint_box.append_text('/usr')
-        self.mountpoint_box.append_text('/usr/home')
+        self.mountpoint_box.append_text('/home')
         self.mountpoint_box.append_text('/var')
         self.mountpoint_box.set_active(0)
         if 'UFS' in self.fs:
