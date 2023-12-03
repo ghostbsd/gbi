@@ -645,7 +645,7 @@ class autoFreeSpace():
             layout = "/," \
                 "/tmp(mountpoint=/tmp|exec=on|setuid=off)," \
                 "/usr(mountpoint=/usr|canmount=off)," \
-                "/usr/home," \
+                "/home," \
                 "/usr/ports(setuid=off)," \
                 "/usr/src," \
                 "/var(mountpoint=/var|canmount=off)," \
@@ -756,7 +756,7 @@ class autoFreeSpace():
             layout = "/," \
                 "/tmp(mountpoint=/tmp|exec=on|setuid=off)," \
                 "/usr(mountpoint=/usr|canmount=off)," \
-                "/usr/home," \
+                "/home," \
                 "/usr/ports(setuid=off)," \
                 "/usr/src," \
                 "/var(mountpoint=/var|canmount=off)," \
@@ -837,7 +837,7 @@ class createLabel():
             mountpoint = "/," \
                 "/tmp(mountpoint=/tmp|exec=on|setuid=off)," \
                 "/usr(mountpoint=/usr|canmount=off)," \
-                "/usr/home," \
+                "/home," \
                 "/usr/ports(setuid=off)," \
                 "/usr/src," \
                 "/var(mountpoint=/var|canmount=off)," \
@@ -1018,7 +1018,7 @@ class createPartition():
             mount_point = "/," \
                 "/tmp(mountpoint=/tmp|exec=on|setuid=off)," \
                 "/usr(mountpoint=/usr|canmount=off)," \
-                "/usr/home," \
+                "/home," \
                 "/usr/ports(setuid=off)," \
                 "/usr/src," \
                 "/var(mountpoint=/var|canmount=off)," \
