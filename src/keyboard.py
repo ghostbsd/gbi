@@ -2,8 +2,13 @@
 
 from gi.repository import Gtk, Gdk
 import os
-from subprocess import call
-from sys_handler import keyboard_dictionary, keyboard_models
+from sys_handler import (
+    keyboard_dictionary,
+    keyboard_models,
+    change_keyboard,
+    set_keyboard
+
+)
 
 # Folder use for the installer.
 tmp = "/tmp/.gbi/"
@@ -92,11 +97,7 @@ class Keyboard:
             kb_lv = kb_dictionary[value]
             self.kb_layout = kb_lv['layout']
             self.kb_variant = kb_lv['variant']
-            if self.kb_variant is None:
-                call("setxkbmap %s" % self.kb_layout, shell=True)
-            else:
-                call("setxkbmap %s %s" % (self.kb_layout, self.kb_variant),
-                     shell=True)
+            change_keyboard(self.kb_layout, self.kb_variant)
             button3.set_sensitive(True)
         else:
             button3.set_sensitive(False)
@@ -106,6 +107,7 @@ class Keyboard:
         if treeiter is not None:
             value = model[treeiter][0]
             self.kb_model = kbm_dictionary[value]
+            change_keyboard(self.kb_layout, self.kb_variant, self.kb_model)
 
     def get_model(self):
         self.treeView.set_cursor(0)
@@ -119,6 +121,9 @@ class Keyboard:
         File.writelines("%s\n" % self.kb_model)
         File.close()
         return
+
+    def save_keyboard(self):
+        set_keyboard(self.kb_layout, self.kb_variant, self.kb_model)
 
     def __init__(self, button3):
         self.button3 = button3

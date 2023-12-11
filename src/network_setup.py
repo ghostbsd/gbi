@@ -11,11 +11,11 @@ import _thread
 from time import sleep
 networkmgr = "/usr/local/share/networkmgr"
 sys.path.append(networkmgr)
-from net_api import (
+from NetworkMgr.net_api import (
     networkdictionary,
     connectToSsid,
     delete_ssid_wpa_supplicant_config,
-    wlan_status
+    nic_status
 )
 
 logo = "/usr/local/lib/gbi/logo.png"
@@ -241,7 +241,7 @@ class network_setup():
             GLib.idle_add(self.restart_authentication, ssid_info, card)
         else:
             for _ in list(range(30)):
-                if wlan_status(card) == 'associated':
+                if nic_status(card) == 'associated':
                     self.network_info = networkdictionary()
                     print(self.network_info)
                     self.update_network_detection()

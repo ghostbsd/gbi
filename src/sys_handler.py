@@ -1,8 +1,18 @@
 #!/usr/bin/env python
 
-from subprocess import Popen, PIPE
+import re
+import os
+from subprocess import Popen, run, PIPE
 
 pc_sysinstall = '/usr/local/sbin/pc-sysinstall'
+
+
+def replace_patern(current, new, file):
+    parser_file = open(file, 'r').read()
+    parser_patched = re.sub(current, new, parser_file)
+    save_parser_file = open(file, 'w')
+    save_parser_file.writelines(parser_patched)
+    save_parser_file.close()
 
 
 def language_dictionary():
@@ -16,6 +26,27 @@ def language_dictionary():
         lang_code = lang_list.partition(' ')[0]
         dictionary[lang_name] = lang_code
     return dictionary
+
+
+def localize_system(locale):
+    slick_greeter = "/usr/local/share/xgreeters/slick-greeter.desktop"
+    gtk_greeter = "/usr/local/share/xgreeters/lightdm-gtk-greeter.desktop"
+    replace_patern('lang=C', f'lang={locale}', '/etc/login.conf')
+    replace_patern('en_US', locale, '/etc/profile')
+    replace_patern('en_US', locale, '/usr/share/skel/dot.profile')
+
+    if os.path.exists(slick_greeter):
+        replace_patern(
+            'Exec=slick-greeter',
+            f'Exec=env LANG={locale}.UTF-8 slick-greeter',
+            slick_greeter
+        )
+    elif os.path.exists(gtk_greeter):
+        replace_patern(
+            'Exec=lightdm-gtk-greete',
+            f'Exec=env LANG={locale}.UTF-8 lightdm-gtk-greeter',
+            gtk_greeter
+        )
 
 
 def keyboard_dictionary():
@@ -56,6 +87,23 @@ def keyboard_models():
     return dictionary
 
 
+def change_keyboard(kb_layout, kb_variant=None, kb_model=None):
+    if kb_variant is None and kb_model is not None:
+        run(f"setxkbmap -layout {kb_layout} -model {kb_model}", shell=True)
+    elif kb_variant is not None and kb_model is None:
+        run(f"setxkbmap -layout {kb_layout} -variant {kb_variant}", shell=True)
+    elif kb_variant is not None and kb_model is not None:
+        set_kb_cmd = f"setxkbmap -layout {kb_layout} -variant {kb_variant} " \
+            f"-model {kb_model}"
+        run(set_kb_cmd, shell=True)
+    else:
+        run(f"setxkbmap -layout {kb_layout}", shell=True)
+
+
+def set_keyboard(kb_layout, kb_variant=None, kb_model=None):
+    pass
+
+
 def timezone_dictionary():
     tz_list = Popen(f'{pc_sysinstall} list-tzones', shell=True,
                     stdout=PIPE, universal_newlines=True).stdout.readlines()
@@ -77,3 +125,13 @@ def timezone_dictionary():
         dictionary[continent] = city_list
         last_continent = continent
     return dictionary
+
+
+def set_addmin_user(username, name, password, shell, homedir, hostname):
+    # Set Root user
+    run(f"echo '{password}' | pw usermod -n root -h 0", shell=True)
+    cmd = f"echo '{password}' | pw useradd {username} -c {name} -h 0" \
+        f" -s {shell} -m -d {homedir} -g wheel,operator"
+    run(cmd, shell=True)
+    run(f"sysrc hostname={hostname}", shell=True)
+    run(f"hostname {hostname}", shell=True)

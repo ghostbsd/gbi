@@ -14,7 +14,7 @@ from setuptools import setup
 # ,,python setup.py build_i18n -m''
 
 # silence pyflakes, __VERSION__ is properly assigned below...
-__VERSION__ = '10.0.1'
+__VERSION__ = '10.1'
 # for line in file('networkmgr').readlines():
 #    if (line.startswith('__VERSION__')):
 #        exec(line.strip())
@@ -40,6 +40,7 @@ lib_gbi = [
     'src/end.py',
     'src/error.py',
     'src/gbiWindow.py',
+    'src/gbi_common.py',
     'src/ghostbsd-style.css',
     'src/install.py',
     'src/installType.py',
@@ -47,12 +48,13 @@ lib_gbi = [
     'src/language.py',
     'src/partition.py',
     'src/partition_handler.py',
-    'src/root.py',
+    'src/setup_system.py',
     'src/sys_handler.py',
     'src/timezone.py',
     'src/use_ufs.py',
     'src/use_zfs.py',
-    'src/addUser.py',
+    'src/add_admin.py',
+    'src/add_users.py',
     'src/welcome_live.py',
     'src/network_setup.py',
     'src/disk.png',

@@ -48,8 +48,7 @@ from use_ufs import use_ufs
 from partition import Partitions
 from use_zfs import ZFS
 from boot_manager import bootManager
-from root import RootUser
-from addUser import AddUser
+from add_admin import AddUser
 from partition_handler import create_disk_partition_db
 from install import installProgress, installWindow
 logo = "/usr/local/lib/gbi/image/logo.png"
@@ -153,38 +152,26 @@ class MainWindow():
             Mbox = Gtk.VBox(False, 0)
             Mbox.show()
             self.bootmanager = bootManager()
-            get_root = self.bootmanager.get_model()
-            Mbox.pack_start(get_root, True, True, 0)
+            get_bootmanager = self.bootmanager.get_model()
+            Mbox.pack_start(get_bootmanager, True, True, 0)
             label = Gtk.Label("Boot Option")
             self.notebook.insert_page(Mbox, label, 5)
             self.window.show_all()
             self.notebook.next_page()
             self.button3.set_sensitive(True)
         elif page == 5:
-            Rbox = Gtk.VBox(False, 0)
-            Rbox.show()
-            self.rootuser = RootUser(self.button3)
-            get_root = self.rootuser.get_model()
-            Rbox.pack_start(get_root, True, True, 0)
-            label = Gtk.Label("Root Password")
-            self.notebook.insert_page(Rbox, label, 6)
-            self.window.show_all()
-            self.notebook.next_page()
-            self.button3.set_sensitive(False)
-        elif page == 6:
-            self.rootuser.save_selection()
             Abox = Gtk.VBox(False, 0)
             Abox.show()
             self.adduser = AddUser(self.button3)
             get_adduser = self.adduser.get_model()
             Abox.pack_start(get_adduser, True, True, 0)
             label = Gtk.Label("Adding User")
-            self.notebook.insert_page(Abox, label, 7)
+            self.notebook.insert_page(Abox, label, 6)
             self.button3.set_label("Install")
             self.window.show_all()
             self.notebook.next_page()
             self.button3.set_sensitive(False)
-        elif page == 7:
+        elif page == 6:
             self.adduser.save_selection()
             Ibox = Gtk.VBox(False, 0)
             Ibox.show()
@@ -192,7 +179,7 @@ class MainWindow():
             get_install = install.get_model()
             Ibox.pack_start(get_install, True, True, 0)
             label = Gtk.Label("Installation")
-            self.notebook.insert_page(Ibox, label, 8)
+            self.notebook.insert_page(Ibox, label, 7)
             self.notebook.next_page()
             instpro = installProgress(self.window)
             progressBar = instpro.getProgressBar()
