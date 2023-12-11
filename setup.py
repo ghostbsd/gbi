@@ -48,6 +48,7 @@ lib_gbi = [
     'src/language.py',
     'src/partition.py',
     'src/partition_handler.py',
+    'src/setup_system.py',
     'src/sys_handler.py',
     'src/timezone.py',
     'src/use_ufs.py',

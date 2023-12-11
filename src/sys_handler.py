@@ -29,21 +29,23 @@ def language_dictionary():
 
 
 def localize_system(locale):
+    slick_greeter = "/usr/local/share/xgreeters/slick-greeter.desktop"
+    gtk_greeter = "/usr/local/share/xgreeters/lightdm-gtk-greeter.desktop"
     replace_patern('lang=C', f'lang={locale}', '/etc/login.conf')
     replace_patern('en_US', locale, '/etc/profile')
     replace_patern('en_US', locale, '/usr/share/skel/dot.profile')
 
-    if os.path.exists("/usr/local/share/xgreeters/slick-greeter.desktop"):
+    if os.path.exists(slick_greeter):
         replace_patern(
             'Exec=slick-greeter',
             f'Exec=env LANG={locale}.UTF-8 slick-greeter',
-            '/usr/local/share/xgreeters/slick-greeter.desktop'
+            slick_greeter
         )
-    elif os.path.exists("/usr/local/share/xgreeters/lightdm-gtk-greeter.desktop"):
+    elif os.path.exists(gtk_greeter):
         replace_patern(
             'Exec=lightdm-gtk-greete',
             f'Exec=env LANG={locale}.UTF-8 lightdm-gtk-greeter',
-            '/usr/local/share/xgreeters/slick-greeter.desktop'
+            gtk_greeter
         )
 
 
@@ -98,7 +100,7 @@ def change_keyboard(kb_layout, kb_variant=None, kb_model=None):
         run(f"setxkbmap -layout {kb_layout}", shell=True)
 
 
-def set_keyboard(kb_layout, kb_variant, kb_model):
+def set_keyboard(kb_layout, kb_variant=None, kb_model=None):
     pass
 
 
