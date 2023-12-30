@@ -117,7 +117,7 @@ class ZFS():
         zfslayout = "/," \
             "/tmp(mountpoint=/tmp|exec=on|setuid=off)," \
             "/usr(mountpoint=/usr|canmount=off)," \
-            "/usr/home," \
+            "/home," \
             "/usr/ports(setuid=off)," \
             "/usr/src," \
             "/var(mountpoint=/var|canmount=off)," \
