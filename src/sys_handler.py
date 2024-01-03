@@ -7,7 +7,7 @@ from subprocess import Popen, run, PIPE
 pc_sysinstall = '/usr/local/sbin/pc-sysinstall'
 
 
-def replace_patern(current, new, file):
+def replace_pattern(current, new, file):
     parser_file = open(file, 'r').read()
     parser_patched = re.sub(current, new, parser_file)
     save_parser_file = open(file, 'w')
@@ -31,18 +31,18 @@ def language_dictionary():
 def localize_system(locale):
     slick_greeter = "/usr/local/share/xgreeters/slick-greeter.desktop"
     gtk_greeter = "/usr/local/share/xgreeters/lightdm-gtk-greeter.desktop"
-    replace_patern('lang=C', f'lang={locale}', '/etc/login.conf')
-    replace_patern('en_US', locale, '/etc/profile')
-    replace_patern('en_US', locale, '/usr/share/skel/dot.profile')
+    replace_pattern('lang=C', f'lang={locale}', '/etc/login.conf')
+    replace_pattern('en_US', locale, '/etc/profile')
+    replace_pattern('en_US', locale, '/usr/share/skel/dot.profile')
 
     if os.path.exists(slick_greeter):
-        replace_patern(
+        replace_pattern(
             'Exec=slick-greeter',
             f'Exec=env LANG={locale}.UTF-8 slick-greeter',
             slick_greeter
         )
     elif os.path.exists(gtk_greeter):
-        replace_patern(
+        replace_pattern(
             'Exec=lightdm-gtk-greete',
             f'Exec=env LANG={locale}.UTF-8 lightdm-gtk-greeter',
             gtk_greeter
@@ -127,7 +127,7 @@ def timezone_dictionary():
     return dictionary
 
 
-def set_addmin_user(username, name, password, shell, homedir, hostname):
+def set_admin_user(username, name, password, shell, homedir, hostname):
     # Set Root user
     run(f"echo '{password}' | pw usermod -n root -h 0", shell=True)
     cmd = f"echo '{password}' | pw useradd {username} -c {name} -h 0" \

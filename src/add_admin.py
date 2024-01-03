@@ -3,7 +3,7 @@
 from gi.repository import Gtk, Gdk
 import pickle
 from gbi_common import password_strength
-from sys_handler import set_addmin_user
+from sys_handler import set_admin_user
 
 # Directory use from the installer.
 tmp = "/tmp/.gbi/"
@@ -50,7 +50,7 @@ class AddUser:
         hf = f'/home/{uname}'
         hst = f'{uname}-ghostbsd'
         # Set root password
-        set_addmin_user(uname, name, up, shell, hf, hst)
+        set_admin_user(uname, name, up, shell, hf, hst)
 
     def on_shell(self, widget):
         SHELL = widget.get_active_text()

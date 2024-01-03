@@ -1,5 +1,20 @@
 import re
 
+be_name="default"
+# Default zfs datasets layout
+zfs_datasets = "/," \
+    "/home(mountpoint=/home)," \
+    "/tmp(mountpoint=/tmp|exec=on|setuid=off)," \
+    "/usr(mountpoint=/usr|canmount=off)," \
+    "/usr/ports(setuid=off)," \
+    "/usr/src," \
+    "/var(mountpoint=/var|canmount=off)," \
+    "/var/audit(exec=off|setuid=off)," \
+    "/var/crash(exec=off|setuid=off)," \
+    "/var/log(exec=off|setuid=off)," \
+    "/var/mail(atime=on)," \
+    "/var/tmp(setuid=off)"
+
 
 # Find if pasword contain only lower case and number
 def lowerCase(strg, search=re.compile(r'[^a-z]').search):

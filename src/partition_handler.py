@@ -5,6 +5,7 @@ import re
 import pickle
 from time import sleep
 from subprocess import Popen, PIPE, STDOUT, call
+from gbi_common import zfs_datasets
 
 tmp = "/tmp/.gbi"
 if not os.path.exists(tmp):
@@ -642,18 +643,7 @@ class autoFreeSpace():
         part_list = disk_db[drive]['partitions'][main_slice]['partition-list']
 
         if fs == "ZFS":
-            layout = "/," \
-                "/tmp(mountpoint=/tmp|exec=on|setuid=off)," \
-                "/usr(mountpoint=/usr|canmount=off)," \
-                "/home," \
-                "/usr/ports(setuid=off)," \
-                "/usr/src," \
-                "/var(mountpoint=/var|canmount=off)," \
-                "/var/audit(exec=off|setuid=off)," \
-                "/var/crash(exec=off|setuid=off)" \
-                "/var/log(exec=off|setuid=off)," \
-                "/var/mail(atime=on)," \
-                "/var/tmp(setuid=off)"
+            layout = zfs_datasets
         else:
             layout = '/'
 
@@ -753,18 +743,7 @@ class autoFreeSpace():
             cf.close()
 
         if fs == "ZFS":
-            layout = "/," \
-                "/tmp(mountpoint=/tmp|exec=on|setuid=off)," \
-                "/usr(mountpoint=/usr|canmount=off)," \
-                "/home," \
-                "/usr/ports(setuid=off)," \
-                "/usr/src," \
-                "/var(mountpoint=/var|canmount=off)," \
-                "/var/audit(exec=off|setuid=off)," \
-                "/var/crash(exec=off|setuid=off)" \
-                "/var/log(exec=off|setuid=off)," \
-                "/var/mail(atime=on)," \
-                "/var/tmp(setuid=off)"
+            layout = zfs_datasets
         else:
             layout = '/'
 
@@ -834,18 +813,7 @@ class createLabel():
         alpha_num += store_list_number
         letter = chr(alpha_num)
         if fs == "ZFS":
-            mountpoint = "/," \
-                "/tmp(mountpoint=/tmp|exec=on|setuid=off)," \
-                "/usr(mountpoint=/usr|canmount=off)," \
-                "/home," \
-                "/usr/ports(setuid=off)," \
-                "/usr/src," \
-                "/var(mountpoint=/var|canmount=off)," \
-                "/var/audit(exec=off|setuid=off)," \
-                "/var/crash(exec=off|setuid=off)" \
-                "/var/log(exec=off|setuid=off)," \
-                "/var/mail(atime=on)," \
-                "/var/tmp(setuid=off)"
+            mountpoint = zfs_datasets
 
         partition = f'{main_slice}{letter}'
         part_list[store_list_number] = partition
@@ -1015,18 +983,7 @@ class createPartition():
         write_scheme.close()
 
         if fs == "ZFS":
-            mount_point = "/," \
-                "/tmp(mountpoint=/tmp|exec=on|setuid=off)," \
-                "/usr(mountpoint=/usr|canmount=off)," \
-                "/home," \
-                "/usr/ports(setuid=off)," \
-                "/usr/src," \
-                "/var(mountpoint=/var|canmount=off)," \
-                "/var/audit(exec=off|setuid=off)," \
-                "/var/crash(exec=off|setuid=off)" \
-                "/var/log(exec=off|setuid=off)," \
-                "/var/mail(atime=on)," \
-                "/var/tmp(setuid=off)"
+            mount_point = zfs_datasets
 
         disk_data = disk_database()
         store_list_number = path[1]
