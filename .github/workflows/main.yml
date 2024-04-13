@@ -18,4 +18,4 @@ jobs:
           failIf: any
           # Additional arguments to pass to flake8,
           # default "." (current directory)
-          args: "--ignore=E402,W503 ."
+          args: "--ignore=E402,W503 --max-line-length=120."
