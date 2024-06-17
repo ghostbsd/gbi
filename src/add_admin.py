@@ -53,22 +53,22 @@ class AddUser:
         set_admin_user(uname, name, up, shell, hf, hst)
 
     def on_shell(self, widget):
-        SHELL = widget.get_active_text()
-        if SHELL == 'sh':
+        shell = widget.get_active_text()
+        if shell == 'sh':
             self.sh = '/bin/sh'
-        elif SHELL == 'csh':
+        elif shell == 'csh':
             self.sh = '/bin/csh'
-        elif SHELL == 'tcsh':
+        elif shell == 'tcsh':
             self.sh = '/bin/tcsh'
-        elif SHELL == 'fish':
+        elif shell == 'fish':
             self.sh = '/usr/local/bin/fish'
-        elif SHELL == 'bash':
+        elif shell == 'bash':
             self.sh = '/usr/local/bin/bash'
-        elif SHELL == 'rbash':
+        elif shell == 'rbash':
             self.sh = '/usr/local/bin/rbash'
-        elif SHELL == 'zsh':
+        elif shell == 'zsh':
             self.sh = '/usr/local/bin/zsh'
-        elif SHELL == 'ksh':
+        elif shell == 'ksh':
             self.sh = '/usr/local/bin/ksh93'
 
     def user_and_host(self, widget):
@@ -152,6 +152,7 @@ class AddUser:
         self.box3.set_border_width(10)
         self.vbox1.pack_start(self.box3, True, True, 0)
         self.box3.show()
+
         # self.label3 = Gtk.Label()
         # self.box3.pack_start(self.label3, False, False, 0)
 

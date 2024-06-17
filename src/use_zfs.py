@@ -2,7 +2,6 @@
 
 from gi.repository import Gtk, Gdk
 import os
-import os.path
 import re
 from gbi_common import zfs_datasets, be_name
 from partition_handler import (
