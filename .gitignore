@@ -34,7 +34,5 @@ nosetests.xml
 .mr.developer.cfg
 .project
 .pydevproject
-.project
-.pydevproject
 .idea*
 .settings*
