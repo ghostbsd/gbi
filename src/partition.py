@@ -1,5 +1,4 @@
 #!/usr/local/bin/python
-
 import os
 import gi
 gi.require_version('Gtk', '3.0')
@@ -612,7 +611,7 @@ class Partitions:
                             self.button3.set_sensitive(True)
                         else:
                             self.button3.set_sensitive(False)
-                    elif len(self.partitions) >= 2and 'UEFI' in self.partitions[0] and 'ZFS' in self.partitions[1]:
+                    elif len(self.partitions) >= 2 and 'UEFI' in self.partitions[0] and 'ZFS' in self.partitions[1]:
                         self.button3.set_sensitive(True)
                     else:
                         self.button3.set_sensitive(False)
