@@ -73,8 +73,12 @@ class AddUser:
 
     def user_and_host(self, widget):
         username = self.name.get_text().split()
-        self.host.set_text("%s-ghostbsd-pc" % username[0].lower())
-        self.user.set_text(username[0].lower())
+        if len(username) > 1:
+            self.host.set_text(f"{username[0].lower()}-ghostbsd-pc")
+            self.user.set_text(username[0].lower())
+        else:
+            self.host.set_text("")
+            self.user.set_text("")
 
     def __init__(self, button3):
         self.vbox1 = Gtk.VBox(False, 0)
