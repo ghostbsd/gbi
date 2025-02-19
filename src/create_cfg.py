@@ -1,11 +1,4 @@
 #!/usr/bin/env python
-#
-# Copyright (c) 2013 GhostBSD
-#
-# See COPYING for licence terms.
-#
-# create_cfg.py v 1.4 Friday, January 17 2014 Eric Turgeon
-#
 
 import os
 import pickle
@@ -29,7 +22,7 @@ zfs_config = f'{tmp}/zfs_config'
 ufs_config = f'{tmp}/ufs_config'
 
 
-class gbsd_cfg():
+class GhostBSDCfg:
     def __init__(self):
         f = open(f'{tmp}/pcinstall.cfg', 'w')
         # Installation Mode
@@ -183,6 +176,9 @@ class gbsd_cfg():
             if zfs is True:
                 zfsark = "echo 'vfs.zfs.arc_max=\"512M\"' >> /boot/loader.conf"
                 f.write(f'runCommand={zfsark}\n')
+            f.write("runCommand=echo '# For XHCI Mouse Support' >> /boot/loader.conf\n")
+            f.write("runCommand=echo 'hw.usb.usbhid.enable=\"1\"' >> /boot/loader.conf\n")
+            f.write("runCommand=echo 'usbhid_load=\"YES\"' >> /boot/loader.conf\n")
         else:
             f.write('\n# Network Configuration\n')
             f.write('hostname=installed\n')
@@ -196,4 +192,7 @@ class gbsd_cfg():
             f.write("runCommand=mv /usr/local/etc/devd/automount_devd"
                     "_localdisks.conf.skip /usr/local/etc/devd/"
                     "automount_devd_localdisks.conf\n")
+            f.write("runCommand=echo '# For XHCI Mouse Support' >> /boot/loader.conf\n")
+            f.write("runCommand=echo 'hw.usb.usbhid.enable=\"1\"' >> /boot/loader.conf\n")
+            f.write("runCommand=echo 'usbhid_load=\"YES\"' >> /boot/loader.conf\n")
         f.close()
