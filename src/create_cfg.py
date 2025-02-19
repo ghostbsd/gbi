@@ -176,9 +176,6 @@ class GhostBSDCfg:
             if zfs is True:
                 zfsark = "echo 'vfs.zfs.arc_max=\"512M\"' >> /boot/loader.conf"
                 f.write(f'runCommand={zfsark}\n')
-            f.write("runCommand=echo '# For XHCI Mouse Support' >> /boot/loader.conf\n")
-            f.write("runCommand=echo 'hw.usb.usbhid.enable=\"1\"' >> /boot/loader.conf\n")
-            f.write("runCommand=echo 'usbhid_load=\"YES\"' >> /boot/loader.conf\n")
         else:
             f.write('\n# Network Configuration\n')
             f.write('hostname=installed\n')
@@ -192,7 +189,7 @@ class GhostBSDCfg:
             f.write("runCommand=mv /usr/local/etc/devd/automount_devd"
                     "_localdisks.conf.skip /usr/local/etc/devd/"
                     "automount_devd_localdisks.conf\n")
-            f.write("runCommand=echo '# For XHCI Mouse Support' >> /boot/loader.conf\n")
-            f.write("runCommand=echo 'hw.usb.usbhid.enable=\"1\"' >> /boot/loader.conf\n")
-            f.write("runCommand=echo 'usbhid_load=\"YES\"' >> /boot/loader.conf\n")
+        f.write("runCommand=echo '# For XHCI Mouse Support' >> /boot/loader.conf\n")
+        f.write("runCommand=echo 'hw.usb.usbhid.enable=\"1\"' >> /boot/loader.conf\n")
+        f.write("runCommand=echo 'usbhid_load=\"YES\"' >> /boot/loader.conf\n")
         f.close()
