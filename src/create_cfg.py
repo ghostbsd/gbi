@@ -192,4 +192,6 @@ class GhostBSDCfg:
         f.write("runCommand=echo '# For XHCI Mouse Support' >> /boot/loader.conf\n")
         f.write("runCommand=echo 'hw.usb.usbhid.enable=\"1\"' >> /boot/loader.conf\n")
         f.write("runCommand=echo 'usbhid_load=\"YES\"' >> /boot/loader.conf\n")
+        f.write("runCommand=echo '# For UTouch Support' >> /boot/loader.conf\n")
+        f.write("runCommand=echo 'utouch_load=\"YES\"' >> /boot/loader.conf\n")
         f.close()
