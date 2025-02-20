@@ -10,7 +10,7 @@ import os
 from subprocess import Popen, PIPE, STDOUT
 from time import sleep
 from partition_handler import deletePartition, destroyPartition, addPartition
-from create_cfg import gbsd_cfg
+from create_cfg import GhostBSDCfg
 import sys
 
 gbi_dir = "/usr/local/lib/gbi"
@@ -38,7 +38,7 @@ def update_progess(probar, bartext):
 
 def read_output(command, probar, main_window):
     GLib.idle_add(update_progess, probar, "Creating pcinstall.cfg")
-    gbsd_cfg()
+    GhostBSDCfg()
     sleep(1)
     if os.path.exists(f'{gbi_tmp}/delete'):
         GLib.idle_add(update_progess, probar, "Deleting partition")
