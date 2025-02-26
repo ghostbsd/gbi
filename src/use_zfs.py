@@ -276,7 +276,7 @@ class ZFS:
         for disk in zfs_disk_query():
             dsk = disk.partition(':')[0].rstrip()
             if dsk.startswith("da"):
-            continue
+                continue
             dsk_name = disk.partition(':')[2].rstrip()
             dsk_size = zfs_disk_size_query(dsk).rstrip()
             self.store.append(None, [dsk, dsk_size, dsk_name, False])
