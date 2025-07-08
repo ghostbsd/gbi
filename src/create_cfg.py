@@ -174,8 +174,8 @@ class GhostBSDCfg:
                     "_localdisks.conf.skip /usr/local/etc/devd/"
                     "automount_devd_localdisks.conf\n")
             if zfs is True:
-                zfsark = "echo 'vfs.zfs.arc_max=\"512M\"' >> /boot/loader.conf"
-                f.write(f'runCommand={zfsark}\n')
+                zfs_arc = "echo 'vfs.zfs.arc.sys_free=\"1G\"' >> /boot/loader.conf"
+                f.write(f'runCommand={zfs_arc}\n')
         else:
             f.write('\n# Network Configuration\n')
             f.write('hostname=installed\n')
