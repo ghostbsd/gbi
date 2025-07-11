@@ -26,7 +26,11 @@ class AddUsers:
         name = self.name.get_text()
         up = self.password.get_text()
         shell = self.sh
-        hf = '/home/%s' % self.user.get_text()
+        try:
+            open('/Users')
+            hf = '/Users/%s' % self.user.get_text()
+        except:
+            hf = '/home/%s' % self.user.get_text()
         hst = self.host.get_text()
         ul = [uname, name, up, shell, hf]
 
@@ -86,7 +90,13 @@ class AddUsers:
         self.repassword.connect("changed", self.password_verification, button3)
         self.label5 = Gtk.Label("Shell")
         shell = Gtk.ComboBoxText()
-        self.sh = '/usr/local/bin/fish'
+        try:
+            open('/Users')
+            self.sh = '/usr/local/bin/zsh'
+            shell_default = 7
+        except:
+            self.sh = '/usr/local/bin/fish'
+            shell_default = 3
         shell.append_text('sh')
         shell.append_text('csh')
         shell.append_text('tcsh')
@@ -95,7 +105,7 @@ class AddUsers:
         shell.append_text('rbash')
         shell.append_text('ksh')
         shell.append_text('zsh')
-        shell.set_active(3)
+        shell.set_active(shell_default)
         shell.connect("changed", self.on_shell)
         label = Gtk.Label('<b>Set Hostname</b>')
         label.set_use_markup(True)
