@@ -103,7 +103,6 @@ class AddUsers:
         shell.append_text('rbash')
         shell.append_text('ksh')
         shell.append_text('zsh')
-        shell.set_active(shell_default)
         shell.connect("changed", self.on_shell)
         label = Gtk.Label('<b>Set Hostname</b>')
         label.set_use_markup(True)
