@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from gi.repository import Gtk, Gdk
+import os
 import pickle
 from gbi_common import password_strength
 from sys_handler import set_admin_user
