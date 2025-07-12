@@ -93,10 +93,8 @@ class AddUsers:
         try:
             open('/Users')
             self.sh = '/usr/local/bin/zsh'
-            shell_default = 7
         except:
             self.sh = '/usr/local/bin/fish'
-            shell_default = 3
         shell.append_text('sh')
         shell.append_text('csh')
         shell.append_text('tcsh')
