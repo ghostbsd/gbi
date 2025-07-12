@@ -2,6 +2,7 @@
 
 from gi.repository import Gtk, Gdk
 import pickle
+import os
 from gbi_common import password_strength
 
 # Directory use from the installer.
@@ -26,11 +27,10 @@ class AddUsers:
         name = self.name.get_text()
         up = self.password.get_text()
         shell = self.sh
-        try:
-            open('/Users')
-            hf = '/Users/%s' % self.user.get_text()
-        except:
-            hf = '/home/%s' % self.user.get_text()
+        if os.path.isdir('/Users'):
+            if os.path.isdir('/Users'):
+        if os.path.isdir('/Users'):
+            if os.path.isdir('/Users'):	
         hst = self.host.get_text()
         ul = [uname, name, up, shell, hf]
 
