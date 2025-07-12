@@ -29,7 +29,10 @@ class AddUser:
         name = self.name.get_text()
         up = self.password.get_text()
         shell = self.sh
-        hf = f'/home/{uname}'
+        if os.path.isdir('/Users'):
+          hf = f'/Users/{uname}'
+        else:
+          hf = f'/home/{uname}'
         hst = f'{uname}-ghostbsd'
         ul = [uname, name, up, shell, hf, hst]
         pickle.dump(ul, uf)
@@ -114,7 +117,10 @@ class AddUser:
         self.repassword.connect("changed", self.password_verification, button3)
         self.label5 = Gtk.Label(label="Shell")
         shell = Gtk.ComboBoxText()
-        self.sh = '/usr/local/bin/fish'
+        if os.path.isdir('/Users'):
+            self.sh = '/usr/local/bin/zsh'
+        else:
+            self.sh = '/usr/local/bin/fish'
         # Keeping this code for future project example.
         shell.append_text('sh')
         shell.append_text('csh')
