@@ -28,9 +28,9 @@ class AddUsers:
         up = self.password.get_text()
         shell = self.sh
         if os.path.isdir('/Users'):
-            if os.path.isdir('/Users'):
-        if os.path.isdir('/Users'):
-            if os.path.isdir('/Users'):	
+            hf = '/Users/%s' % self.user.get_text()
+        else:
+            hf = '/home/%s' % self.user.get_text()
         hst = self.host.get_text()
         ul = [uname, name, up, shell, hf]
 
