@@ -118,10 +118,7 @@ class AddUser:
         self.repassword.connect("changed", self.password_verification, button3)
         self.label5 = Gtk.Label(label="Shell")
         shell = Gtk.ComboBoxText()
-        if os.path.isdir('/Local/Users'):
-            self.sh = '/usr/local/bin/zsh'
-        else:
-            self.sh = '/usr/local/bin/fish'
+        self.sh = '/usr/local/bin/zsh'
         # Keeping this code for future project example.
         shell.append_text('sh')
         shell.append_text('csh')
@@ -131,7 +128,7 @@ class AddUser:
         shell.append_text('rbash')
         shell.append_text('ksh')
         shell.append_text('zsh')
-        shell.set_active(3)
+        shell.set_active(7)
         shell.connect("changed", self.on_shell)
         label = Gtk.Label(label='<b>Set Hostname</b>')
         label.set_use_markup(True)
