@@ -65,7 +65,6 @@ class bootManager():
             read = open(disk_scheme, 'r')
             read_scheme = read.read()
         scheme = 'GPT' if 'GPT' in read_scheme else 'MBR'
-        # encrypted = 'encpass=' in read_scheme
         Title = Gtk.Label('Boot Option', name="Header")
         Title.set_property("height-request", 50)
         self.vbox1.pack_start(Title, False, False, 0)
@@ -81,7 +80,6 @@ class bootManager():
         bbox1.pack_start(self.refind, False, True, 10)
         self.refind.connect("toggled", self.boot_manager, "refind")
         self.refind.show()
-        # if scheme == 'GPT' and loader == "UEFI" and not encrypted:
         if scheme == 'GPT' and loader == "UEFI":
             self.refind.set_sensitive(True)
         else:
