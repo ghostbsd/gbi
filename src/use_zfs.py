@@ -99,7 +99,8 @@ class ZFS:
         self.mirror = data
         if self.mirror == "stripe":
             self.poolType = 'stripe'
-            self.mirrorTips.set_text("Select 1 or more drives, no redundancy")
+            self.mirrorTips.set_text(
+                f"Select 1 or more drives, no redundancy {smallest_msg}")
             valid = len(self.zfs_disk_list) >= 1
         elif self.mirror == "mirror":
             self.poolType = 'mirror'
@@ -109,17 +110,17 @@ class ZFS:
         elif self.mirror == "raidz1":
             self.poolType = 'raidz1'
             self.mirrorTips.set_text(
-                f"Select 3 drives for raidz1{smallest_msg}")
+                f"Select 3 drives for raidz1 {smallest_msg}")
             valid = len(self.zfs_disk_list) == 3
         elif self.mirror == "raidz2":
             self.poolType = 'raidz2'
             self.mirrorTips.set_text(
-                f"Select 4 drives for raidz2{smallest_msg}")
+                f"Select 4 drives for raidz2 {smallest_msg}")
             valid = len(self.zfs_disk_list) == 4
         elif self.mirror == "raidz3":
             self.poolType = 'raidz3'
             self.mirrorTips.set_text(
-                f"Select 5 drives for raidz3{smallest_msg}")
+                f"Select 5 drives for raidz3 {smallest_msg}")
             valid = len(self.zfs_disk_list) == 5
         else:
             valid = False
