@@ -83,7 +83,6 @@ lib_gbi_backend_query = [
     'src/backend-query/enable-net.sh',
     'src/backend-query/list-components.sh',
     'src/backend-query/list-rsync-backups.sh',
-    'src/backend-query/list-tzones.sh',
     'src/backend-query/query-langs.sh',
     'src/backend-query/send-logs.sh',
     'src/backend-query/setup-ssh-keys.sh',
