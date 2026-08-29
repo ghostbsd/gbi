@@ -12,6 +12,7 @@ if not os.path.exists(tmp):
 
 
 time = '%stimezone' % tmp
+utc_clock = '%sutc_clock' % tmp
 tzdictionary = timezone_dictionary()
 
 cssProvider = Gtk.CssProvider()
@@ -71,6 +72,10 @@ class TimeZone:
         time_file = open(time, 'w')
         time_file.writelines(timezone)
         time_file.close()
+        # no makes pc-sysinstall write /etc/wall_cmos_clock on the install
+        utc_file = open(utc_clock, 'w')
+        utc_file.write('yes' if self.utc_check.get_active() else 'no')
+        utc_file.close()
         return
 
     def __init__(self, button3):
@@ -122,6 +127,17 @@ class TimeZone:
         sw.add(self.citytreeView)
         sw.show()
         hbox.pack_start(sw, True, True, 5)
+
+        self.utc_check = Gtk.CheckButton.new_with_label(
+            'Hardware clock uses UTC (uncheck when dual-booting Windows)'
+        )
+        self.utc_check.set_active(True)
+        self.utc_check.set_tooltip_text(
+            'Windows keeps the hardware clock on local time. '
+            'Leave this checked on any other machine.'
+        )
+        self.utc_check.show()
+        box2.pack_start(self.utc_check, False, False, 5)
         return
 
     def get_model(self):

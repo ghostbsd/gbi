@@ -15,6 +15,7 @@ dslice = f'{tmp}/slice'
 left = f'{tmp}/left'
 partlabel = f'{tmp}/partlabel'
 timezone = f'{tmp}/timezone'
+utc_clock = f'{tmp}/utc_clock'
 KBFile = f'{tmp}/keyboard'
 boot_file = f'{tmp}/boot'
 disk_scheme = f'{tmp}/scheme'
@@ -58,6 +59,11 @@ class GhostBSDCfg:
             f.write('\n# Timezone\n')
             f.write(f'timeZone={t_output}\n')
             f.write('enableNTP=yes\n')
+        # Hardware clock, written whether or not a timezone was picked
+        utc = 'yes'
+        if os.path.exists(utc_clock):
+            utc = open(utc_clock, 'r').read().strip() or 'yes'
+        f.write(f'utcClock={utc}\n')
         if os.path.exists(zfs_config):
             zfs = True
             # Disk Setup
