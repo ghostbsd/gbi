@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# install.py give the job to pc-sysinstall to install GhostBSD.
+# install.py gives the job to pc-sysinstall to install GhostBSD.
 
 import gi
 gi.require_version('Gtk', '3.0')
@@ -62,7 +62,7 @@ def read_output(command, probar, main_window):
             break
         bartext = line.rstrip()
         GLib.idle_add(update_progess, probar, bartext)
-        # Those for next 4 line is for debugin only.
+        # Those for next 4 line is for debugging only.
         # filer = open("/tmp/.gbi/tmp", "a")
         # filer.writelines(bartext)
         # filer.close

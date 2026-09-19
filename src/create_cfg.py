@@ -133,7 +133,7 @@ class GhostBSDCfg:
             part = open(partlabel, 'r').read()
             zfs = True if 'ZFS' in part else False
             # If slice and auto file exist add first partition line.
-            # But Swap need to be 0 it will take the rest of the freespace.
+            # But Swap needs to be 0 it will take the rest of the free space.
             for line in part.splitlines():
                 if 'BOOT' in line or 'BIOS' in line or 'UEFI' in line:
                     pass

@@ -34,7 +34,7 @@ styleContext.add_provider_for_screen(
 
 class Welcome:
 
-    # On selection it overwrite the delfaut language file.
+    # On selection it overwrites the default language file.
     def Language_Selection(self, tree_selection):
         model, treeiter = tree_selection.get_selected()
         if treeiter is not None:
