@@ -16,7 +16,7 @@ zfs_datasets = "/," \
     "/var/tmp(setuid=off)"
 
 
-# Find if pasword contain only lower case and number
+# Find if password contain only lower case and number
 def lowerCase(strg, search=re.compile(r'[^a-z]').search):
     return not bool(search(strg))
 
@@ -26,22 +26,22 @@ def upperCase(strg, search=re.compile(r'[^A-Z]').search):
     return not bool(search(strg))
 
 
-# Find if pasword contain only lower case and number
+# Find if password contain only lower case and number
 def lowerandNunber(strg, search=re.compile(r'[^a-z0-9]').search):
     return not bool(search(strg))
 
 
-# Find if pasword contain only upper case and number
+# Find if password contain only upper case and number
 def upperandNunber(strg, search=re.compile(r'[^A-Z0-9]').search):
     return not bool(search(strg))
 
 
-# Find if pasword contain only lower and upper case and
+# Find if password contain only lower and upper case and
 def lowerUpperCase(strg, search=re.compile(r'[^a-zA-Z]').search):
     return not bool(search(strg))
 
 
-# Find if pasword contain only lower and upper case and
+# Find if password contain only lower and upper case and
 def lowerUpperNumber(strg, search=re.compile(r'[^a-zA-Z0-9]').search):
     return not bool(search(strg))
 
