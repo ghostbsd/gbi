@@ -62,7 +62,7 @@ def read_output(command, probar, main_window):
             break
         bartext = line.rstrip()
         GLib.idle_add(update_progess, probar, bartext)
-        # Those for next 4 line is for debugging only.
+        # The following four lines are for debugging only.
         # filer = open("/tmp/.gbi/tmp", "a")
         # filer.writelines(bartext)
         # filer.close
